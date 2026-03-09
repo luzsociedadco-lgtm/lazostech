@@ -1,156 +1,236 @@
 # LazosTech
 
-Open-source blockchain infrastructure for transparent governance and social impact initiatives.
+Open-source blockchain infrastructure for **transparent governance, verifiable execution, and impact-based incentives**.
 
-LazosTech is a decentralized platform designed to improve transparency, trust, and accountability in institutional governance and community-driven initiatives using blockchain technology.
+LazosTech enables organizations, universities, and social initiatives to manage governance processes, execute activities, and verify outcomes on-chain while rewarding verified impact.
 
----
-
-## Overview
-
-LazosTech enables organizations, universities, and institutions to record governance decisions and activities on-chain, ensuring that records are verifiable, tamper-proof, and publicly auditable.
-
-The platform uses modular smart contracts and decentralized infrastructure to create transparent governance processes that stakeholders can independently verify.
+The platform combines **institutional governance**, **environmental impact tracking**, and **token-based incentives** into a modular smart contract architecture.
 
 ---
 
-## Problem
+# Overview
 
-Many institutions and social programs lack reliable mechanisms for verifying decisions, governance processes, and resource allocation.
+Many institutions struggle with maintaining reliable records of governance decisions, activity execution, and resource allocation.
 
-Centralized databases can be altered, records may be lost, and stakeholders often lack access to trustworthy information. These limitations reduce transparency and weaken accountability within organizations and community initiatives.
+Traditional systems rely on centralized databases that can be altered or lose historical records, reducing trust and accountability.
 
----
-
-## Solution
-
-LazosTech introduces a decentralized governance engine built on blockchain infrastructure.
-
-Key governance actions such as proposals, voting processes, and final resolutions are recorded on-chain, creating an immutable audit trail.
-
-This ensures that decisions cannot be modified retroactively and that all stakeholders can verify governance outcomes independently.
+LazosTech introduces a decentralized infrastructure where governance decisions, activity execution, and verification of outcomes are recorded on-chain, creating a transparent and auditable system.
 
 ---
 
-## Social Impact
+# Core Concept
 
-LazosTech aims to strengthen transparency and accountability in:
+LazosTech implements a **Governance → Execution → Verification → Incentive** model.
 
-- universities
-- NGOs
-- social initiatives
-- institutional governance systems
+Assemblies can propose activities, assign responsible participants, verify completion, and reward impact.
 
-The platform supports organizations that require transparent and verifiable decision-making infrastructure.
+```
+Assembly
+   ↓
+Create Resolution
+   ↓
+Deliberation & Voting
+   ↓
+Assign Responsible
+   ↓
+Activity Execution
+   ↓
+Verification
+   ↓
+Reward Distribution
+```
 
----
-
-## Technical Architecture
-
-LazosTech is built using a modular smart contract architecture.
-
-Key technologies include:
-
-- Solidity smart contracts
-- Diamond Standard (EIP-2535)
-- Foundry development framework
-- Base blockchain network
-- Frontend governance dashboard
-
----
-
-## Repository Structure
-
-src/ – smart contracts and governance logic  
-script/ – deployment and automation scripts  
-broadcast/ – execution logs and on-chain records  
-ethglobal-frontend/ – governance dashboard interface  
-docs/ – documentation and integrations  
+This model ensures that governance decisions are not only voted on, but also **executed and verified**.
 
 ---
 
-## Getting Started
+# Governance Model
 
-### Prerequisites
+LazosTech supports a hierarchical governance system.
 
-- Node.js
-- Foundry
-- Git
+## Board Governance
 
-### Installation
+Responsible for:
+
+* structural governance decisions
+* economic parameters
+* reward rates
+* platform upgrades
+
+Board governance operates as the highest authority in the system.
+
+## University Governance
+
+Responsible for:
+
+* operational initiatives
+* campus activities
+* environmental programs
+* social initiatives
+
+University governance can propose and execute activities but cannot modify the core economic or structural parameters without board approval.
+
+---
+
+# Environmental Impact: Recycling Workflow
+
+LazosTech includes an environmental impact module focused on recycling activities.
+
+Participants can register recycling actions which are verified and rewarded through the platform.
+
+```
+User recycles material
+   ↓
+Recycling record is submitted
+   ↓
+Verification of recycling activity
+   ↓
+Reward issued in NUDOS tokens
+```
+
+This mechanism encourages sustainable behavior and provides transparent tracking of environmental contributions.
+
+---
+
+# Token Incentives
+
+The platform includes a token-based incentive system.
+
+## NUDOS Token
+
+NUDOS tokens reward verified participation in governance activities and environmental initiatives.
+
+Users can earn tokens through:
+
+* verified governance tasks
+* recycling contributions
+* approved social initiatives
+
+Tokens can be redeemed for services, benefits, or marketplace transactions within the platform ecosystem.
+
+---
+
+# Architecture
+
+LazosTech uses a modular smart contract architecture based on the **Diamond Standard (EIP-2535)**.
+
+This architecture allows the system to evolve through modular upgrades without redeploying the entire contract system.
+
+Core components include:
+
+* Diamond Infrastructure
+* Governance Modules
+* Impact Tracking Modules
+* Incentive and Economy Modules
+* Marketplace Modules
+
+More details are available in `ARCHITECTURE.md`.
+
+---
+
+# Repository Structure
+
+```
+src/                Smart contracts (Diamond facets)
+script/             Deployment scripts
+broadcast/          Deployment transaction logs
+test/               Foundry test suite
+docs/               Documentation and architecture
+frontend/           Governance dashboard
+tools/              Development utilities
+```
+
+---
+
+# Getting Started
+
+## Requirements
+
+* Node.js
+* Foundry
+* Git
+
+## Installation
 
 Clone the repository:
 
+```
 git clone https://github.com/luzsociedadco-lgtm/lazostech.git
+```
 
-Navigate into the project:
+Enter the project folder:
 
+```
 cd lazostech
+```
 
 Install dependencies:
 
+```
 npm install
+```
 
 Compile smart contracts:
 
+```
 forge build
+```
 
 Run tests:
 
+```
 forge test
+```
 
 ---
 
-## Demo
+# Development Status
 
-A prototype governance execution has been deployed on Base Sepolia testnet.
+Current stage: **MVP prototype**
 
-The system demonstrates a full governance lifecycle including:
+Completed components:
 
-- proposal creation
-- voting
-- resolution execution
-- on-chain verification
-
-Deployment scripts and transaction logs are available in the `script/` and `broadcast/` folders.
-
----
-
-## Development Status
-
-Current stage: MVP prototype
-
-Completed:
-
-- governance smart contracts
-- on-chain governance execution
-- deployment on Base Sepolia
-- prototype frontend dashboard
+* Diamond architecture
+* governance modules
+* recycling tracking
+* reward token integration
+* deployment on Base Sepolia
 
 Next steps:
 
-- smart contract security review
-- pilot implementation
-- integration with partner institutions
+* security review
+* institutional pilots
+* extended verification workflows
 
 ---
 
-## Future Vision
+# Future Vision
 
-LazosTech aims to evolve into a broader infrastructure for transparent governance across social initiatives, universities, and institutional organizations.
+LazosTech aims to provide infrastructure for:
 
-Future development will focus on improving usability, expanding governance modules, and enabling organizations to easily deploy transparent governance systems.
+* transparent university governance
+* environmental incentive programs
+* NGO accountability systems
+* community-driven initiatives
 
----
-
-## Contributing
-
-We welcome contributions from developers, researchers, and organizations interested in decentralized governance and transparency infrastructure.
-
-Please see the `CONTRIBUTING.md` file for contribution guidelines.
+The long-term goal is to create a modular governance and impact framework that organizations can deploy and adapt to their needs.
 
 ---
 
-## License
+# Contributing
+
+Contributions are welcome from developers, researchers, and organizations interested in decentralized governance and environmental impact systems.
+
+Please review `CONTRIBUTING.md` for guidelines.
+
+---
+
+# Security
+
+Security considerations and vulnerability reporting procedures are documented in `SECURITY.md`.
+
+---
+
+# License
 
 MIT License
