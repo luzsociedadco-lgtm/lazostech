@@ -1,10 +1,10 @@
 # LazosTech
 
-Open-source blockchain infrastructure for **transparent governance, verifiable execution, and impact-based incentives**.
+Open-source blockchain infrastructure for **transparent governance, verifiable execution, and impact-based incentives.**
 
-LazosTech enables organizations, universities, and social initiatives to manage governance processes, execute activities, and verify outcomes on-chain while rewarding verified impact.
+LazosTech enables organizations, universities, and social initiatives to manage governance processes, execute activities, and verify real-world impact on-chain.
 
-The platform combines **institutional governance**, **environmental impact tracking**, and **token-based incentives** into a modular smart contract architecture.
+The platform combines **institutional governance, environmental impact tracking, and token-based incentives** into a modular smart contract architecture.
 
 ---
 
@@ -12,24 +12,37 @@ The platform combines **institutional governance**, **environmental impact track
 
 Many institutions struggle with maintaining reliable records of governance decisions, activity execution, and resource allocation.
 
-Traditional systems rely on centralized databases that can be altered or lose historical records, reducing trust and accountability.
+Traditional systems rely on centralized databases that can be modified or lose historical records, reducing transparency and trust.
 
-LazosTech introduces a decentralized infrastructure where governance decisions, activity execution, and verification of outcomes are recorded on-chain, creating a transparent and auditable system.
+LazosTech introduces decentralized infrastructure where **governance decisions, execution of activities, and verification of outcomes are recorded on-chain**, creating a transparent and auditable system.
 
 ---
 
-# Core Concept
+# Key Features
+
+• On-chain governance workflows
+• Transparent proposal and voting system
+• Activity execution tracking
+• Impact verification layer
+• Recycling contribution tracking
+• Tokenized incentive model
+• Modular smart contract architecture (Diamond Standard)
+• Upgradeable governance modules
+
+---
+
+# Core Model
 
 LazosTech implements a **Governance → Execution → Verification → Incentive** model.
-
-Assemblies can propose activities, assign responsible participants, verify completion, and reward impact.
 
 ```
 Assembly
    ↓
 Create Resolution
    ↓
-Deliberation & Voting
+Deliberation
+   ↓
+Voting
    ↓
 Assign Responsible
    ↓
@@ -40,91 +53,104 @@ Verification
 Reward Distribution
 ```
 
-This model ensures that governance decisions are not only voted on, but also **executed and verified**.
+This model ensures that governance decisions are **not only voted on but also executed and verified**.
 
 ---
 
-# Governance Model
+# Governance Structure
 
-LazosTech supports a hierarchical governance system.
+LazosTech supports a **multi-level governance model**.
 
 ## Board Governance
 
 Responsible for:
 
-* structural governance decisions
-* economic parameters
-* reward rates
-* platform upgrades
+• protocol-level governance
+• economic parameters
+• reward distribution rates
+• system upgrades
+• governance rules
 
-Board governance operates as the highest authority in the system.
+Board governance acts as the **highest authority of the platform**.
+
+---
 
 ## University Governance
 
-Responsible for:
+Responsible for operational initiatives such as:
 
-* operational initiatives
-* campus activities
-* environmental programs
-* social initiatives
+• campus programs
+• environmental initiatives
+• recycling campaigns
+• student participation programs
+• social impact activities
 
-University governance can propose and execute activities but cannot modify the core economic or structural parameters without board approval.
+Universities can **execute activities but cannot change core economic parameters** without board approval.
+
+More details in `GOVERNANCE.md`.
 
 ---
 
 # Environmental Impact: Recycling Workflow
 
-LazosTech includes an environmental impact module focused on recycling activities.
+LazosTech includes an environmental module focused on **recycling verification and incentives**.
 
-Participants can register recycling actions which are verified and rewarded through the platform.
+Participants can submit recycling activities which are verified and rewarded.
 
 ```
 User recycles material
    ↓
-Recycling record is submitted
+Recycling record submitted
    ↓
-Verification of recycling activity
+Verification process
    ↓
-Reward issued in NUDOS tokens
+Impact validation
+   ↓
+NUDOS token reward
 ```
 
-This mechanism encourages sustainable behavior and provides transparent tracking of environmental contributions.
+This creates a **transparent system for tracking environmental contributions**.
 
 ---
 
 # Token Incentives
 
-The platform includes a token-based incentive system.
+The platform uses the **NUDOS Token** as its incentive mechanism.
 
-## NUDOS Token
+Participants can earn tokens for:
 
-NUDOS tokens reward verified participation in governance activities and environmental initiatives.
+• governance participation
+• verified recycling activities
+• approved social initiatives
+• execution of governance tasks
 
-Users can earn tokens through:
+Tokens can be used for:
 
-* verified governance tasks
-* recycling contributions
-* approved social initiatives
+• ecosystem services
+• marketplace transactions
+• governance participation
+• impact rewards
 
-Tokens can be redeemed for services, benefits, or marketplace transactions within the platform ecosystem.
+More details in `TOKENOMICS.md`.
 
 ---
 
 # Architecture
 
-LazosTech uses a modular smart contract architecture based on the **Diamond Standard (EIP-2535)**.
+LazosTech uses a **modular smart contract architecture based on the Diamond Standard (EIP-2535)**.
 
-This architecture allows the system to evolve through modular upgrades without redeploying the entire contract system.
+This allows the system to evolve through modular upgrades without redeploying the entire contract system.
 
-Core components include:
+Core layers include:
 
-* Diamond Infrastructure
-* Governance Modules
-* Impact Tracking Modules
-* Incentive and Economy Modules
-* Marketplace Modules
+• Diamond Infrastructure
+• Governance Modules
+• Execution Modules
+• Impact Verification Modules
+• Incentive System
+• Marketplace Modules
 
-More details are available in `ARCHITECTURE.md`.
+More details in `ARCHITECTURE.md`.
 
 ---
 
@@ -136,8 +162,8 @@ script/             Deployment scripts
 broadcast/          Deployment transaction logs
 test/               Foundry test suite
 docs/               Documentation and architecture
-frontend/           Governance dashboard
 tools/              Development utilities
+frontend/           Governance dashboard
 ```
 
 ---
@@ -146,37 +172,39 @@ tools/              Development utilities
 
 ## Requirements
 
-* Node.js
-* Foundry
-* Git
+• Node.js
+• Foundry
+• Git
+
+---
 
 ## Installation
 
-Clone the repository:
+Clone the repository
 
 ```
 git clone https://github.com/luzsociedadco-lgtm/lazostech.git
 ```
 
-Enter the project folder:
+Enter the project folder
 
 ```
 cd lazostech
 ```
 
-Install dependencies:
+Install dependencies
 
 ```
 npm install
 ```
 
-Compile smart contracts:
+Compile contracts
 
 ```
 forge build
 ```
 
-Run tests:
+Run tests
 
 ```
 forge test
@@ -186,34 +214,58 @@ forge test
 
 # Development Status
 
-Current stage: **MVP prototype**
+Current stage:
 
-Completed components:
+**MVP Prototype**
 
-* Diamond architecture
-* governance modules
-* recycling tracking
-* reward token integration
-* deployment on Base Sepolia
+Completed components
 
-Next steps:
+• Diamond architecture
+• governance modules
+• recycling workflow tracking
+• reward token integration
+• deployment on Base Sepolia
 
-* security review
-* institutional pilots
-* extended verification workflows
+Next steps
+
+• security review
+• institutional pilots
+• verification layer improvements
+• impact analytics
 
 ---
 
-# Future Vision
+# Use Cases
 
-LazosTech aims to provide infrastructure for:
+## Universities
 
-* transparent university governance
-* environmental incentive programs
-* NGO accountability systems
-* community-driven initiatives
+Track governance decisions and environmental programs.
 
-The long-term goal is to create a modular governance and impact framework that organizations can deploy and adapt to their needs.
+## Municipal Recycling Programs
+
+Reward verified recycling participation.
+
+## NGOs
+
+Improve transparency in social impact initiatives.
+
+## Community Organizations
+
+Run assemblies and execute decisions on-chain.
+
+---
+
+# Documentation
+
+Additional documentation:
+
+• `ARCHITECTURE.md`
+• `GOVERNANCE.md`
+• `TOKENOMICS.md`
+• `WORKFLOWS.md`
+• `ROADMAP.md`
+• `SECURITY.md`
+• `WHITEPAPER.md`
 
 ---
 
@@ -221,13 +273,13 @@ The long-term goal is to create a modular governance and impact framework that o
 
 Contributions are welcome from developers, researchers, and organizations interested in decentralized governance and environmental impact systems.
 
-Please review `CONTRIBUTING.md` for guidelines.
+Please review `CONTRIBUTING.md`.
 
 ---
 
 # Security
 
-Security considerations and vulnerability reporting procedures are documented in `SECURITY.md`.
+Security procedures and vulnerability reporting are documented in `SECURITY.md`.
 
 ---
 
