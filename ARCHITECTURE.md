@@ -1,24 +1,110 @@
-# LazosTech Architecture
+# System Architecture
 
-LazosTech is built using a modular smart contract architecture designed for scalable and transparent governance systems.
+LazosTech is built using a modular smart contract architecture based on the **Diamond Standard (EIP-2535)**.
 
-## Core Components
+This design allows the system to evolve through modular upgrades while maintaining a single contract address.
 
-Smart Contracts  
-Governance logic implemented in Solidity.
+---
 
-Diamond Standard (EIP-2535)  
-Allows modular upgrades and separation of contract functionality.
+# Diamond Architecture
 
-Frontend Interface  
-Dashboard that enables users to visualize proposals, votes, and governance outcomes.
+The Diamond acts as a router that delegates function calls to different modules known as facets.
 
-Blockchain Network  
-Currently deployed on Base Sepolia testnet.
+```
+User
+  ↓
+Diamond Router
+  ↓
+Facet Execution
+```
 
-## Governance Flow
+This architecture enables modular development and upgrades without redeploying the entire system.
 
-1. Proposal creation
-2. Voting process
+---
+
+# Core Infrastructure
+
+Core infrastructure facets include:
+
+* DiamondCutFacet
+* DiamondLoupeFacet
+* OwnershipFacet
+
+These facets manage upgrades, introspection, and ownership control.
+
+---
+
+# Governance Modules
+
+Governance logic is separated into dedicated facets.
+
+Primary modules include:
+
+* CorporateGovernanceFacet
+* UniversityGovernanceFacet
+* Governance view facets
+
+These modules manage assemblies, resolutions, voting processes, and verification workflows.
+
+---
+
+# Impact Tracking Modules
+
+Impact tracking modules record environmental and social contributions.
+
+Examples include:
+
+* recycling activity tracking
+* environmental participation records
+
+These records create transparent histories of institutional impact.
+
+---
+
+# Economic Modules
+
+The economic layer manages rewards and token-based incentives.
+
+Key features include:
+
+* NUDOS reward distribution
+* ticket-based benefits
+* internal marketplace interactions
+
+Economic parameters are controlled through governance mechanisms.
+
+---
+
+# Frontend Interface
+
+The platform includes a governance dashboard where participants can:
+
+* view proposals
+* vote on resolutions
+* track activities
+* verify outcomes
+* manage rewards
+
+---
+
+# Upgradeability
+
+The Diamond architecture allows the platform to evolve by adding or updating facets without changing the main contract address.
+
+This ensures long-term flexibility and maintainability.
+
+---
+
+# Security Considerations
+
+Security mechanisms include:
+
+* role-based access control
+* governance restrictions
+* modular contract isolation
+* upgrade transparency
+
+Security practices are documented in `SECURITY.md`.
+
 3. On-chain resolution
 4. Public verification
