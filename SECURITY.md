@@ -1,47 +1,42 @@
 # Security Policy
 
-## Supported Versions
+Security is a priority for the LazosTech project.
 
-LazosTech is currently under active development. Security reviews and improvements are ongoing as the platform evolves.
-
-The latest version of the repository should always be considered the most secure and up-to-date implementation.
+We welcome responsible disclosure of vulnerabilities.
 
 ---
 
-## Reporting a Vulnerability
+# Reporting Vulnerabilities
 
-If you discover a security vulnerability in LazosTech, please report it responsibly.
+If you discover a security vulnerability, please report it privately.
 
-Do not disclose security vulnerabilities publicly until they have been reviewed and addressed.
+Contact:
 
-Please send vulnerability reports to:
+[security@lazostech.org](mailto:security@lazostech.org)
 
-security@lazostech.org
+Please include:
 
-Include the following information when possible:
-
-- description of the vulnerability
-- steps to reproduce the issue
-- potential impact
-- suggested mitigation if available
+* description of the issue
+* potential impact
+* steps to reproduce
+* suggested mitigation (if available)
 
 ---
 
-## Security Approach
+# Responsible Disclosure
 
-LazosTech prioritizes secure smart contract development and responsible disclosure.
-
-Security practices include:
-
-- modular smart contract architecture
-- testing with Foundry
-- code reviews
-- future third-party security audits
+We request that researchers do not publicly disclose vulnerabilities until they have been reviewed and addressed.
 
 ---
 
-## Responsible Disclosure
+# Security Practices
 
-We appreciate responsible disclosure of security issues.
+The project follows several security practices:
 
-Researchers who responsibly report vulnerabilities may be acknowledged for their contribution to improving the security of the project.
+* modular smart contract architecture
+* role-based access control
+* transparent governance execution
+* upgrade review procedures
+
+Future development will include external smart contract security audits.
+acknowledged for their contribution to improving the security of the project.
