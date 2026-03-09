@@ -1,22 +1,53 @@
-# LazosTech Roadmap
+# Roadmap
 
-## 2026
+LazosTech development follows a phased roadmap focused on building transparent governance infrastructure.
 
-Q2
-- Improve smart contract architecture
-- Expand documentation
-- Strengthen governance modules
+---
 
-Q3
-- Security testing and contract review
-- Pilot deployment with partner organizations
+# Phase 1 — Prototype
 
-Q4
-- Improve frontend governance dashboard
-- Community testing and feedback
+Completed components:
 
-## 2027
+* Diamond architecture
+* governance modules
+* recycling tracking
+* reward token integration
+* testnet deployment
 
-- Expansion to additional governance use cases
-- Integration with educational and social institutions
-- Development of advanced governance tools
+---
+
+# Phase 2 — Security and Testing
+
+Goals:
+
+* expand automated testing
+* perform security review
+* validate governance workflows
+* optimize contract architecture
+
+---
+
+# Phase 3 — Institutional Pilots
+
+Goals:
+
+* deploy pilot programs with universities
+* test recycling incentive mechanisms
+* validate governance participation models
+
+---
+
+# Phase 4 — Ecosystem Development
+
+Goals:
+
+* expand governance modules
+* integrate external identity systems
+* develop analytics tools
+* improve governance dashboards
+
+---
+
+# Long-Term Vision
+
+LazosTech aims to become a modular infrastructure for transparent governance and environmental impact systems across institutions and communities.
