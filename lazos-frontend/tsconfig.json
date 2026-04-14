@@ -1,7 +1,11 @@
 {
   "compilerOptions": {
-    "target": "ES2017",
-    "lib": ["dom", "dom.iterable", "esnext"],
+    "target": "ES2020",
+    "lib": [
+      "dom",
+      "dom.iterable",
+      "es2020"
+    ],
     "allowJs": true,
     "skipLibCheck": true,
     "strict": false,
@@ -9,24 +13,41 @@
     "incremental": true,
     "module": "esnext",
     "esModuleInterop": true,
-    "moduleResolution": "node",
+    "moduleResolution": "bundler",
     "resolveJsonModule": true,
     "isolatedModules": true,
     "jsx": "preserve",
-    "plugins": [{ "name": "next" }],
+    "plugins": [
+      {
+        "name": "next"
+      }
+    ],
     "strictNullChecks": true,
-
-    // 👇 Añade estas dos líneas
     "baseUrl": ".",
     "paths": {
-      "@/*": ["./*"]
+      "@/*": [
+        "./*"
+      ]
     }
   },
   "include": [
-    "**/*.ts",
-    "**/*.tsx",
+    "app/**/*.ts",
+    "app/**/*.tsx",
     "next-env.d.ts",
     ".next/types/**/*.ts"
   ],
-  "exclude": ["node_modules"]
+  "exclude": [
+    "node_modules",
+    ".next",
+    "hooks",
+    "packages",
+    "src",
+    "layout.tsx",
+    "app/components/NudosBalance.tsx",
+    "app/components/Header.tsx",
+    "app/components/ProfileSection.tsx",
+    "app/components/StatsSection.tsx",
+    "app/components/WalletDashboard.tsx",
+    "app/components/ui"
+  ]
 }

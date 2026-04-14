@@ -6,30 +6,48 @@ library UniversityGovernanceStorage {
     bytes32 constant STORAGE_POSITION =
         keccak256("lazostech.storage.university.governance");
 
-    // 👤 Quien ejecutará actividades aprobadas (ej: logística reciclaje)
+    enum ResolutionStatus {
+        Created,
+	Deliberation,
+	Voting,
+        Approved,
+        Rejected,
+        Closed,
+        Executed
+    }
+
     struct Executor {
         bool assigned;
         uint256 completedActivities;
         uint256 redeemableRewards;
     }
 
-    struct Resolution {
-        string description;
-        uint256 yesVotes;
-        uint256 noVotes;
-        bool closed;
+struct Resolution {
 
-        mapping(address => bool) voted;
-        address executor;     // quién ejecuta la actividad
-        bool executed;        // si ya se completó
-    }
+    string description;
+
+    uint256 deliberationDeadline;
+    uint256 votingDeadline;
+
+    uint256 yesVotes;
+    uint256 noVotes;
+
+    ResolutionStatus status;
+
+    mapping(address => bool) voted;
+
+    address executor;
+    bool executed;
+}
 
     struct Layout {
         bool initialized;
         bool sessionActive;
 
-        // 👩‍🎓 Asamblea universitaria
         mapping(address => bool) members;
+        uint256 memberCount;
+
+        uint256 quorumPercentage;
 
         uint256 resolutionCount;
         mapping(uint256 => Resolution) resolutions;

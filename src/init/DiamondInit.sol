@@ -26,11 +26,18 @@ function init() external {
     // 2.5% fee marketplace
 
 // =============================================================
-// ♻️ RECYCLING REWARD RATES (PILOTO)
+//  RECYCLING REWARD RATES
 // =============================================================
 
+// PILOTO: solo aluminio activo
 // 4 latas = 1 NUDOS → 0.25 NUDOS por lata
-s.recycleRates[keccak256("AL")] = 0.25 ether;
+
+s.recycleRates[AppStorage.Material.AL] = 0.25 ether;
+
+// materiales listos pero desactivados
+s.recycleRates[AppStorage.Material.PL] = 0;
+s.recycleRates[AppStorage.Material.CB] = 0;
+s.recycleRates[AppStorage.Material.GL] = 0;
 
 }
 

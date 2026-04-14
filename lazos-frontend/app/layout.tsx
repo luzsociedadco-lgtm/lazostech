@@ -1,24 +1,26 @@
 import "./globals.css";
-// RUTA CORREGIDA: Usamos './' porque 'components' está dentro de 'app'
-import FooterNav from "./components/FooterNav"; 
+import FooterNav from "./components/FooterNav";
+import { WagmiWrapper } from "./providers/WagmiWrapper";
 
 export const metadata = {
-  title: "Lazos App",
-  description: "Dapp de reciclaje con tokens",
+  title: "NUDOS",
+  description: "Frontend de la dapp NUDOS sobre Base Sepolia",
 };
 
-export default function RootLayout({ children }: { children: React.ReactNode }) {
+export default function RootLayout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
   return (
     <html lang="es">
-      {/* Añadimos 'max-w-md' al body para simular el ancho de un dispositivo móvil y centrar el contenido, 
-          lo cual es crucial para que el 'FooterNav' fijo se vea bien centrado. */}
-      <body className="min-h-screen bg-neutral-100 mx-auto max-w-md pb-20 relative">
-
-        {/* CONTENIDO DE LA PÁGINA */}
-        {children}
-
-        {/* FOOTER GLOBAL */}
-        <FooterNav />
+      <body>
+        <WagmiWrapper>
+          <div className="app-frame">
+            {children}
+            <FooterNav />
+          </div>
+        </WagmiWrapper>
       </body>
     </html>
   );

@@ -1,11 +1,18 @@
-'use client'
+"use client";
 
-import { ConnectButton } from '@rainbow-me/rainbowkit'
+import { ConnectButton } from "@rainbow-me/rainbowkit";
 
 export function WalletConnect() {
   return (
-    <div className="flex justify-end p-4">
-      <ConnectButton />
+    <div className="wallet-connect">
+      <ConnectButton
+        accountStatus={{
+          smallScreen: "avatar",
+          largeScreen: "full",
+        }}
+        chainStatus="icon"
+        showBalance={false}
+      />
     </div>
-  )
+  );
 }

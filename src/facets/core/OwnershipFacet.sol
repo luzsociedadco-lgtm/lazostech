@@ -1,15 +1,37 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.30;
 
-import {LibDiamond} from "src/libraries/LibDiamond.sol";
+import {AppStorage} from "src/libraries/AppStorage.sol";
 
 contract OwnershipFacet {
+
+    event OwnershipTransferred(address indexed previousOwner, address indexed newOwner);
+
+    /*//////////////////////////////////////////////////////////////
+                                VIEW
+    //////////////////////////////////////////////////////////////*/
+
     function owner() external view returns (address) {
-        return LibDiamond.contractOwner();
+        return AppStorage.layout().owner;
     }
 
-    function transferOwnership(address newOwner) external {
-        LibDiamond.enforceIsContractOwner();
-        LibDiamond.setContractOwner(newOwner);
+    /*//////////////////////////////////////////////////////////////
+                                CORE
+    //////////////////////////////////////////////////////////////*/
+
+    modifier onlyOwner() {
+        require(msg.sender == AppStorage.layout().owner, "Not owner");
+        _;
+    }
+
+    function transferOwnership(address newOwner) external onlyOwner {
+        require(newOwner != address(0), "Zero owner");
+
+        AppStorage.Layout storage s = AppStorage.layout();
+
+        address previousOwner = s.owner;
+        s.owner = newOwner;
+
+        emit OwnershipTransferred(previousOwner, newOwner);
     }
 }

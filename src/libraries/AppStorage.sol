@@ -11,11 +11,12 @@ library AppStorage {
     // ENUMS
     // =============================================================
     enum Role {
-        None,
-        Student,
-        Professor,
-        CampusStaff,
-        UniversityStaff
+	None,
+	Student,
+	Professor,
+	AdministrativeStaff,
+	CampusStaff,
+	UniversityStaff
     }
 
     enum ItemStatus {
@@ -36,23 +37,59 @@ library AppStorage {
     // STRUCTS AUXILIARES
     // =============================================================
 
+    // ---- University ----
+    struct University {
+	uint256 id;
+	string name;
+	string metadataURI;
+
+	address[] staffList;
+	mapping(address => bool) isStaff;
+
+	uint256[] campusIds;
+	}
+
     // ---- Campus ----
     struct Campus {
-        uint256 id;
-        string name;
-        string metadataURI;
-        address[] staffList;
-        mapping(address => bool) isStaff;
-    }
+	uint256 id;
+
+	uint256 universityId;
+
+	string name;
+	string metadataURI;
+
+	address[] staffList;
+	mapping(address => bool) isStaff;
+
+	uint256[] programIds;
+	}
+
+    // ---- Program ----
+    struct Program {
+	uint256 id;
+
+	uint256 campusId;
+
+	string name;
+	string metadataURI;
+
+	address coordinator;
+	}
 
     // ---- Profiles ----
     struct Profile {
-        address owner;
-        string metadataURI;
-        uint256 universityId;
-        Role role;
-        bool exists;
-    }
+	address owner;
+
+	uint256 universityId;
+	uint256 campusId;
+	uint256 programId;
+
+	string metadataURI;
+
+	Role role;
+
+	bool exists;
+	}
 
     // ---- Marketplace ----
     struct Item {
@@ -107,6 +144,8 @@ library AppStorage {
         uint256 cardboard;
         uint256 glass;
         uint256 timestamp;
+	uint256 rewardBaseUnit;
+	uint256 rewardDecayFactor;
     }
 
     struct CampusMaterialRecord {
@@ -114,16 +153,76 @@ library AppStorage {
         MaterialRecord record;
     }
 
+    // ---- Recycling Machines ----
+    struct Machine {
+	uint256 id;
+	uint256 campusId;
+	string metadataURI;
+	address operator;
+	bool active;
+}
+	
+// =============================================================
+// 🌱 IMPACT CREDENTIALS
+// =============================================================
+
+struct ImpactCredential {
+    address user;
+    uint256 year;
+    uint256 aluminium;
+    uint256 plastic;
+    uint256 cardboard;
+    uint256 glass;
+    uint256 co2Saved;
+}
+
+// =============================================================
+// 🌍 IMPACT AGGREGATION
+// =============================================================
+
+struct UserImpactTotals {
+    uint256 aluminium;
+    uint256 plastic;
+    uint256 cardboard;
+    uint256 glass;
+    uint256 totalActions;
+}
+
+// =============================================================
+// 🔐 ORACLE REPUTATION
+// =============================================================
+
+struct OracleStats {
+    uint256 submissions;
+    uint256 rejected;
+    uint256 lastSubmission;
+}
+
     // =============================================================
     // LAYOUT PRINCIPAL (ÚNICO)
     // =============================================================
     struct Layout {
         // ---- Ownership ----
         address owner;
+	address governanceExecutor;
 
-        // ---- Campuses ----
-        mapping(uint256 => Campus) campuses;
-        uint256[] campusIds;
+	// ---- Universities ----
+	mapping(uint256 => University) universities;
+	uint256[] universityIds;
+
+	// ---- University Impact ----
+	mapping(uint256 => UserImpactTotals) universityImpactTotals;
+
+	// ---- Campuses ----
+	mapping(uint256 => Campus) campuses;
+	uint256[] campusIds;
+
+	// ---- Programs ----
+	mapping(uint256 => Program) programs;
+	uint256[] programIds;
+
+	// ---- Program Impact ----
+	mapping(uint256 => UserImpactTotals) programImpactTotals;
 
         // ---- Profiles ----
         mapping(address => Profile) profiles;
@@ -139,7 +238,8 @@ library AppStorage {
 
         // ---- Rewards ----
         address token;
-        mapping(bytes32 => uint256) recycleRates;
+        mapping(Material => uint256) recycleRates;
+	uint256 rewardBaseUnit;
 
         // ---- NUDOS Economy ----
         mapping(address => uint256) nudosBalance; // tokens disponibles
@@ -150,6 +250,7 @@ library AppStorage {
         uint256 nextItemId;
         uint256 nextTradeId;
         uint256 marketplaceFeeBps;
+	mapping(address => uint256) lastPurchaseBlock;
         mapping(uint256 => Item) items;
         mapping(uint256 => Trade) trades;
         mapping(uint256 => mapping(address => uint8)) ratings;
@@ -165,7 +266,45 @@ library AppStorage {
 
         // ---- Recycling History ----
         mapping(address => CampusMaterialRecord[]) recyclingHistory;
-    }
+
+	// ---- Recycling Oracle ----
+	mapping(address => bool) recyclingOracles;
+	mapping(bytes32 => bool) processedRecycles;
+	mapping(address => uint256) oracleMachine;
+	mapping(uint256 => uint256) lastMachineRecycle;
+	mapping(address => uint256) oracleReputation;
+	mapping(address => bool) oracleBlocked;
+	mapping(address => uint256) oracleDailyImpact;
+	mapping(address => uint256) oracleLastReset;
+
+	// ---- Recycling Machines ----
+	uint256 nextMachineId;
+	mapping(uint256 => Machine) machines;
+	uint256[] machineIds;
+
+	// ---- Impact Credentials ----
+	uint256 nextImpactCredentialId;
+	mapping(uint256 => ImpactCredential) impactCredentials;
+	mapping(address => uint256[]) userImpactCredentials;
+	mapping(address => mapping(uint256 => bool)) userYearCredentialMinted;
+
+	// ---- Impact Aggregation ----
+	mapping(address => UserImpactTotals) userImpactTotals;
+	mapping(uint256 => UserImpactTotals) campusImpactTotals;
+	mapping(address => uint256) userBadgeLevel;
+	UserImpactTotals globalImpact;
+
+	// ---- Oracle Reputation ----
+	mapping(address => OracleStats) oracleStats;
+
+	// ---- Recycler Index ----
+	address[] recyclerIndex;
+	mapping(address => bool) recyclerExists;
+
+	// ---- Anti Fraud ----
+	mapping(address => uint256) lastUserRecycle;
+
+}
 
     // =============================================================
     // ACCESSOR
@@ -176,4 +315,5 @@ library AppStorage {
             s.slot := slot
         }
     }
+
 }

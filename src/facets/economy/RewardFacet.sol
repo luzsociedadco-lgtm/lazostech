@@ -19,7 +19,7 @@ contract RewardFacet {
     /*//////////////////////////////////////////////////////////////
                                 EVENTS
     //////////////////////////////////////////////////////////////*/
-    event RewardGranted(address indexed user, uint256 amount);
+    event RewardGranted(address indexed user, uint256 amount, uint256 newBalance);
     event TokenUpdated(address indexed token);
     event RecycleRateUpdated(bytes32 indexed material, uint256 rate);
 
@@ -32,25 +32,41 @@ contract RewardFacet {
         emit TokenUpdated(token);
     }
 
-    function setRecycleRate(bytes32 material, uint256 rate) external onlyOwner {
-        require(rate > 0, "RewardFacet: ZERO_RATE");
-        AppStorage.layout().recycleRates[material] = rate;
-        emit RecycleRateUpdated(material, rate);
-    }
+function setRecycleRate(AppStorage.Material material, uint256 rate)
+    external
+    onlyOwner
+{
+    require(rate > 0, "RewardFacet: ZERO_RATE");
+
+    AppStorage.layout().recycleRates[material] = rate;
+
+    emit RecycleRateUpdated(bytes32(uint256(material)), rate);
+}
 
     /*//////////////////////////////////////////////////////////////
                                 REWARDS
     //////////////////////////////////////////////////////////////*/
-    function grantReward(address user, uint256 amount) external onlyOwner {
-        require(user != address(0), "RewardFacet: ZERO_USER");
-        require(amount > 0, "RewardFacet: ZERO_AMOUNT");
+function grantReward(address user, uint256 amount) external {
+    AppStorage.Layout storage s = AppStorage.layout();
 
-        AppStorage.Layout storage s = AppStorage.layout();
-        s.nudosBalance[user] += amount;
-        s.nudosAccumulated[user] += amount;
+    require(
+        msg.sender == address(this) || s.recyclingOracles[msg.sender],
+        "RewardFacet: NOT_AUTHORIZED"
+    );
 
-        emit RewardGranted(user, amount);
-    }
+    require(user != address(0), "RewardFacet: ZERO_USER");
+    require(amount > 0, "RewardFacet: ZERO_AMOUNT");
+
+    uint256 maxReward = 100 ether;
+    require(amount <= maxReward, "RewardFacet: MAX_REWARD_EXCEEDED");
+
+    s.nudosAccumulated[user] += amount;
+    s.nudosBalance[user] += amount;
+
+    uint256 newBalance = s.nudosBalance[user];
+
+    emit RewardGranted(user, amount, newBalance);
+}
 
     /*//////////////////////////////////////////////////////////////
                                 VIEWS
@@ -59,13 +75,17 @@ contract RewardFacet {
         return AppStorage.layout().token;
     }
 
-    function getRecycleRate(bytes32 material) external view returns (uint256) {
-        return AppStorage.layout().recycleRates[material];
-    }
+function getRecycleRate(AppStorage.Material material)
+    external
+    view
+    returns (uint256)
+{
+    return AppStorage.layout().recycleRates[material];
+}
 
-    function getNudos(address user) external view returns (uint256) {
-        return AppStorage.layout().nudosBalance[user];
-    }
+function getNudos(address user) external view returns (uint256) {
+    return AppStorage.layout().nudosBalance[user];
+}
 
     function getNudosAccumulated(address user) external view returns (uint256) {
         return AppStorage.layout().nudosAccumulated[user];
