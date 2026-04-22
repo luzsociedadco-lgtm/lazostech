@@ -20,6 +20,7 @@ import {
   X,
 } from "lucide-react";
 import { useState } from "react";
+import { FeatureGate } from "@/app/components/FeatureGate";
 
 const categories = [
   { label: "Alimentos", icon: CookingPot },
@@ -89,6 +90,7 @@ export default function MarketplacePage() {
     <>
       <main className="market-screen">
         <section className="market-shell">
+          <FeatureGate module="marketplace">
           <header className="market-topbar">
             <h1>Marketplace</h1>
             <button type="button" onClick={() => setDrawerOpen(true)} aria-label="Abrir inventario">
@@ -188,6 +190,7 @@ export default function MarketplacePage() {
               ))}
             </div>
           </section>
+          </FeatureGate>
         </section>
       </main>
 

@@ -4,7 +4,6 @@ pragma solidity ^0.8.30;
 import {AppStorage} from "src/libraries/AppStorage.sol";
 
 contract OwnershipFacet {
-
     event OwnershipTransferred(address indexed previousOwner, address indexed newOwner);
 
     /*//////////////////////////////////////////////////////////////

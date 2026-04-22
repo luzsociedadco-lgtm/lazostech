@@ -2,9 +2,10 @@
 pragma solidity ^0.8.30;
 
 import {AppStorage} from "src/libraries/AppStorage.sol";
+import {LibEntityRules} from "src/libraries/LibEntityRules.sol";
+import {LibNudosAccess} from "src/libraries/LibNudosAccess.sol";
 
 contract UniversityFacet {
-
     /*//////////////////////////////////////////////////////////////
                                 EVENTS
     //////////////////////////////////////////////////////////////*/
@@ -12,7 +13,9 @@ contract UniversityFacet {
     event ProfileUpdated(address indexed owner);
     event UniversityStaffAdded(address indexed staff);
     event UniversityStaffRemoved(address indexed staff);
+    event SystemAdminUpdated(address indexed admin, bool enabled);
     event UniversityCreated(uint256 indexed universityId, string name);
+    event UniversityUpdated(uint256 indexed universityId, string name);
 
     /*//////////////////////////////////////////////////////////////
                                MODIFIERS
@@ -22,40 +25,28 @@ contract UniversityFacet {
         _;
     }
 
-function _checkUniversityStaff() internal view {
-    AppStorage.Layout storage s = AppStorage.layout();
-
-    require(
-        msg.sender == s.owner || s.isUniversityStaff[msg.sender],
-        "not authorized"
-    );
-}
-
-function _onlyOwnerOrStaff(AppStorage.Layout storage s) internal view {
-    require(
-        msg.sender == s.owner || s.isUniversityStaff[msg.sender],
-        "Not authorized"
-    );
-}
+    function _checkUniversityStaff() internal view {
+        AppStorage.Layout storage s = AppStorage.layout();
+        require(LibNudosAccess.isOwnerOrSystemAdmin(msg.sender) || s.isUniversityStaff[msg.sender], "Not authorized");
+    }
 
     /*//////////////////////////////////////////////////////////////
                        UNIVERSITY STAFF MANAGEMENT
     //////////////////////////////////////////////////////////////*/
 
-function addUniversityStaff(address staff) external {
-    AppStorage.Layout storage s = AppStorage.layout();
+    function addUniversityStaff(address staff) external {
+        AppStorage.Layout storage s = AppStorage.layout();
+        LibNudosAccess.enforceOwnerOrSystemAdmin();
 
-    _onlyOwnerOrStaff(s);
+        require(staff != address(0), "Invalid");
 
-    require(staff != address(0), "Invalid");
-
-    if (!s.isUniversityStaff[staff]) {
-        s.isUniversityStaff[staff] = true;
-        emit UniversityStaffAdded(staff);
+        if (!s.isUniversityStaff[staff]) {
+            s.isUniversityStaff[staff] = true;
+            emit UniversityStaffAdded(staff);
+        }
     }
-}
 
-function removeUniversityStaff(address staff) external onlyUniversityStaff {
+    function removeUniversityStaff(address staff) external onlyUniversityStaff {
         AppStorage.Layout storage s = AppStorage.layout();
         if (s.isUniversityStaff[staff]) {
             s.isUniversityStaff[staff] = false;
@@ -63,54 +54,78 @@ function removeUniversityStaff(address staff) external onlyUniversityStaff {
         }
     }
 
-function isUniversityStaff(address who) external view returns (bool) {
+    function isUniversityStaff(address who) external view returns (bool) {
         AppStorage.Layout storage s = AppStorage.layout();
         return s.isUniversityStaff[who];
     }
 
-function createUniversity(
-    uint256 universityId,
-    string calldata name,
-    string calldata metadataURI
-	) external {
+    function setSystemAdmin(address admin, bool enabled) external {
+        AppStorage.Layout storage s = AppStorage.layout();
+        LibNudosAccess.enforceOwner();
 
-    AppStorage.Layout storage s = AppStorage.layout();
-    require(msg.sender == s.owner, "Not owner");
+        require(admin != address(0), "Invalid admin");
+        s.isSystemAdmin[admin] = enabled;
 
-    AppStorage.University storage u = s.universities[universityId];
-    require(bytes(u.name).length == 0, "University exists");
+        emit SystemAdminUpdated(admin, enabled);
+    }
 
-    u.id = universityId;
-    u.name = name;
-    u.metadataURI = metadataURI;
+    function isSystemAdmin(address who) external view returns (bool) {
+        return AppStorage.layout().isSystemAdmin[who];
+    }
 
-    s.universityIds.push(universityId);
+    function createUniversity(uint256 universityId, string calldata name, string calldata metadataURI) external {
+        AppStorage.Layout storage s = AppStorage.layout();
+        LibNudosAccess.enforceOwner();
 
-    emit UniversityCreated(universityId, name);
-}
+        // Pilot whitelist: keep only the generic bucket and Universidad del Valle.
+        require(LibEntityRules.isSupportedUniversityId(universityId), "Unsupported university");
+        require(bytes(name).length > 0, "Name required");
 
-function getUniversity(uint256 universityId)
-    external
-    view
-    returns (
-        uint256 id,
-        string memory name,
-        string memory metadataURI,
-        uint256[] memory campusIds
-    )
-{
-    AppStorage.University storage u = AppStorage.layout().universities[universityId];
+        AppStorage.University storage u = s.universities[universityId];
+        require(bytes(u.name).length == 0, "University exists");
 
-    return (u.id, u.name, u.metadataURI, u.campusIds);
-}
+        u.id = universityId;
+        u.name = name;
+        u.metadataURI = metadataURI;
 
-function bootstrapUniversityStaff(address staff) external {
-    AppStorage.Layout storage s = AppStorage.layout();
+        s.universityIds.push(universityId);
 
-    require(msg.sender == s.owner, "Not owner");
-    require(staff != address(0), "Invalid");
+        emit UniversityCreated(universityId, name);
+    }
 
-    s.isUniversityStaff[staff] = true;
-}
+    function updateUniversity(uint256 universityId, string calldata name, string calldata metadataURI) external {
+        AppStorage.Layout storage s = AppStorage.layout();
+        LibNudosAccess.enforceOwner();
 
+        require(LibEntityRules.universityExists(s, universityId), "University not found");
+        require(bytes(name).length > 0, "Name required");
+
+        AppStorage.University storage u = s.universities[universityId];
+        u.name = name;
+        u.metadataURI = metadataURI;
+
+        emit UniversityUpdated(universityId, name);
+    }
+
+    function getUniversity(uint256 universityId)
+        external
+        view
+        returns (uint256 id, string memory name, string memory metadataURI, uint256[] memory campusIds)
+    {
+        AppStorage.University storage u = AppStorage.layout().universities[universityId];
+
+        return (u.id, u.name, u.metadataURI, u.campusIds);
+    }
+
+    function listUniversityIds() external view returns (uint256[] memory) {
+        return AppStorage.layout().universityIds;
+    }
+
+    function bootstrapUniversityStaff(address staff) external {
+        AppStorage.Layout storage s = AppStorage.layout();
+        LibNudosAccess.enforceOwner();
+        require(staff != address(0), "Invalid");
+
+        s.isUniversityStaff[staff] = true;
+    }
 }

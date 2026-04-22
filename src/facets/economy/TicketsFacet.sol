@@ -20,83 +20,73 @@ contract TicketsFacet is ITicketsModule {
         AppStorage.Layout storage s = AppStorage.layout();
         uint256 requiredNudos = ticketsAmount * s.nudosPerTicket;
         require(s.nudosBalance[msg.sender] >= requiredNudos, "Insufficient NUDOS");
-	require(ticketsAmount > 0, "Invalid amount");
+        require(ticketsAmount > 0, "Invalid amount");
 
         // Descontar NUDOS
         s.nudosBalance[msg.sender] -= requiredNudos;
-	s.nudosBalance[address(this)] += requiredNudos;
+        s.nudosBalance[address(this)] += requiredNudos;
 
         // Agregar tickets
         s.ticketBalance[msg.sender] += ticketsAmount;
 
-	emit TicketBalanceChanged(msg.sender, s.ticketBalance[msg.sender]);
+        emit TicketBalanceChanged(msg.sender, s.ticketBalance[msg.sender]);
         emit TicketsRedeemed(msg.sender, ticketsAmount, requiredNudos);
     }
 
     // ----------------------------
     // MINT TICKET (cumple con ITicketsModule)
     // ----------------------------
-function mintTicket(address to, uint256 ticketType, uint256 amount)
-    external
-    override
-{
-    AppStorage.Layout storage s = AppStorage.layout();
+    function mintTicket(address to, uint256 ticketType, uint256 amount) external override {
+        AppStorage.Layout storage s = AppStorage.layout();
 
-    require(s.isUniversityStaff[msg.sender], "Only university staff");
-    require(to != address(0), "Invalid recipient");
-    require(amount > 0, "Invalid amount");
+        require(s.isUniversityStaff[msg.sender], "Only university staff");
+        require(to != address(0), "Invalid recipient");
+        require(amount > 0, "Invalid amount");
 
-    s.ticketBalance[to] += amount;
+        s.ticketBalance[to] += amount;
 
-    emit TicketsMinted(to, amount, ticketType, msg.sender);
-    emit TicketBalanceChanged(to, s.ticketBalance[to]);
-}
+        emit TicketsMinted(to, amount, ticketType, msg.sender);
+        emit TicketBalanceChanged(to, s.ticketBalance[to]);
+    }
 
     // ----------------------------
     // TRANSFER TICKET (cumple con ITicketsModule)
     // ----------------------------
-function transferTicket(address from, address to, uint256 amount)
-    external
-    override
-{
-    AppStorage.Layout storage s = AppStorage.layout();
+    function transferTicket(address from, address to, uint256 amount) external override {
+        AppStorage.Layout storage s = AppStorage.layout();
 
-    require(msg.sender == from, "Not owner");
-    require(to != address(0), "Invalid recipient");
-    require(amount > 0, "Invalid amount");
-    require(s.ticketBalance[from] >= amount, "Insufficient tickets");
+        require(msg.sender == from, "Not owner");
+        require(to != address(0), "Invalid recipient");
+        require(amount > 0, "Invalid amount");
+        require(s.ticketBalance[from] >= amount, "Insufficient tickets");
 
-    s.ticketBalance[from] -= amount;
-    s.ticketBalance[to] += amount;
+        s.ticketBalance[from] -= amount;
+        s.ticketBalance[to] += amount;
 
-    emit TicketsTransferred(from, to, amount);
-    emit TicketBalanceChanged(from, s.ticketBalance[from]);
-    emit TicketBalanceChanged(to, s.ticketBalance[to]);
-}
-
+        emit TicketsTransferred(from, to, amount);
+        emit TicketBalanceChanged(from, s.ticketBalance[from]);
+        emit TicketBalanceChanged(to, s.ticketBalance[to]);
+    }
 
     // ----------------------------
     // USE TICKET (cumple con ITicketsModule)
     // ----------------------------
 
-function useTicket(address user, uint256 ticketType, uint256 amount)
-    external
-    override
-{
-	ticketType;
+    function useTicket(address user, uint256 ticketType, uint256 amount) external override {
+        ticketType;
 
-    AppStorage.Layout storage s = AppStorage.layout();
+        AppStorage.Layout storage s = AppStorage.layout();
 
-    require(s.isUniversityStaff[msg.sender], "Only authorized operator");
-    require(user != address(0), "Invalid user");
-    require(amount > 0, "Invalid amount");
-    require(s.ticketBalance[user] >= amount, "Insufficient tickets");
+        require(s.isUniversityStaff[msg.sender], "Only authorized operator");
+        require(user != address(0), "Invalid user");
+        require(amount > 0, "Invalid amount");
+        require(s.ticketBalance[user] >= amount, "Insufficient tickets");
 
-    s.ticketBalance[user] -= amount;
+        s.ticketBalance[user] -= amount;
 
-    emit TicketsUsed(user, amount);
-    emit TicketBalanceChanged(user, s.ticketBalance[user]);
-}
+        emit TicketsUsed(user, amount);
+        emit TicketBalanceChanged(user, s.ticketBalance[user]);
+    }
 
     // ----------------------------
     // VIEW FUNCTION
@@ -105,19 +95,18 @@ function useTicket(address user, uint256 ticketType, uint256 amount)
         return AppStorage.layout().ticketBalance[user];
     }
 
-function grantTicketsFromFiat(address user, uint256 amount) external {
-    AppStorage.Layout storage s = AppStorage.layout();
+    function grantTicketsFromFiat(address user, uint256 amount) external {
+        AppStorage.Layout storage s = AppStorage.layout();
 
-    require(s.isUniversityStaff[msg.sender], "Only university staff");
-    require(user != address(0), "Invalid user");
-    require(amount > 0, "Invalid amount");
-    require(amount <= 100, "Excessive ticket grant");
+        require(s.isUniversityStaff[msg.sender], "Only university staff");
+        require(user != address(0), "Invalid user");
+        require(amount > 0, "Invalid amount");
+        require(amount <= 100, "Excessive ticket grant");
 
-    s.ticketBalance[user] += amount;
+        s.ticketBalance[user] += amount;
 
-    emit TicketsPurchasedFiat(user, amount, msg.sender);
-    emit FiatTicketGrantTracked(msg.sender, user, amount);
-    emit TicketBalanceChanged(user, s.ticketBalance[user]);
-}
-
+        emit TicketsPurchasedFiat(user, amount, msg.sender);
+        emit FiatTicketGrantTracked(msg.sender, user, amount);
+        emit TicketBalanceChanged(user, s.ticketBalance[user]);
+    }
 }

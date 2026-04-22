@@ -12,6 +12,7 @@ import {
   X,
 } from "lucide-react";
 import { useMemo, useState } from "react";
+import { FeatureGate } from "@/app/components/FeatureGate";
 
 const days = [
   { day: "Lunes", image: "/images/slide-1.jpg" },
@@ -47,6 +48,7 @@ export default function TicketsPage() {
     <>
       <main className="tickets-screen">
         <section className="tickets-shell">
+          <FeatureGate module="tickets">
           <header className="tickets-topbar">
             <h1>Compra de Tickets</h1>
             <button type="button" onClick={() => setTurnsOpen(true)} aria-label="Abrir menu y turnos">
@@ -144,6 +146,7 @@ export default function TicketsPage() {
               <button type="button">Proceder al pago</button>
             </form>
           </section>
+          </FeatureGate>
         </section>
       </main>
 

@@ -4,12 +4,7 @@ pragma solidity ^0.8.30;
 import {AppStorage} from "src/libraries/AppStorage.sol";
 
 contract ImpactLeaderboardFacet {
-
-    function getTopRecyclers(uint256 limit)
-        external
-        view
-        returns (address[] memory users, uint256[] memory totals)
-    {
+    function getTopRecyclers(uint256 limit) external view returns (address[] memory users, uint256[] memory totals) {
         AppStorage.Layout storage s = AppStorage.layout();
         uint256 length = s.recyclerIndex.length;
 
@@ -26,14 +21,11 @@ contract ImpactLeaderboardFacet {
 
         for (uint256 i = 0; i < length; i++) {
             address user = s.recyclerIndex[i];
-            
+
             // Cargamos en memoria para ahorrar gas de lectura
             AppStorage.UserImpactTotals memory impact = s.userImpactTotals[user];
 
-            uint256 total = impact.aluminium +
-                impact.plastic +
-                impact.cardboard +
-                impact.glass;
+            uint256 total = impact.aluminium + impact.plastic + impact.cardboard + impact.glass;
 
             // Insertion sort parcial
             for (uint256 j = 0; j < resultSize; j++) {

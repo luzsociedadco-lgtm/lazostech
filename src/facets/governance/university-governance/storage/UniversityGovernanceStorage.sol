@@ -2,14 +2,12 @@
 pragma solidity ^0.8.30;
 
 library UniversityGovernanceStorage {
-
-    bytes32 constant STORAGE_POSITION =
-        keccak256("lazostech.storage.university.governance");
+    bytes32 constant STORAGE_POSITION = keccak256("lazostech.storage.university.governance");
 
     enum ResolutionStatus {
         Created,
-	Deliberation,
-	Voting,
+        Deliberation,
+        Voting,
         Approved,
         Rejected,
         Closed,
@@ -22,23 +20,34 @@ library UniversityGovernanceStorage {
         uint256 redeemableRewards;
     }
 
-struct Resolution {
+    struct ExecutionTask {
+        uint256 id;
+        uint256 resolutionId;
+        address executor;
+        uint256 rewardAmount;
+        uint256 createdAt;
+        bool completed;
+    }
 
-    string description;
+    struct Resolution {
 
-    uint256 deliberationDeadline;
-    uint256 votingDeadline;
 
-    uint256 yesVotes;
-    uint256 noVotes;
+        string description;
 
-    ResolutionStatus status;
+        uint256 deliberationDeadline;
+        uint256 votingDeadline;
 
-    mapping(address => bool) voted;
+        uint256 yesVotes;
+        uint256 noVotes;
 
-    address executor;
-    bool executed;
-}
+        ResolutionStatus status;
+
+        mapping(address => bool) voted;
+
+        address executor;
+        bool executed;
+        bool executionTaskCreated;
+    }
 
     struct Layout {
         bool initialized;
@@ -53,6 +62,11 @@ struct Resolution {
         mapping(uint256 => Resolution) resolutions;
 
         mapping(address => Executor) executors;
+        mapping(address => bool) activeMembers;
+        uint256 activeMemberCount;
+        uint256 sessionStartResolutionId;
+        uint256 executionTaskCount;
+        mapping(uint256 => ExecutionTask) executionTasks;
     }
 
     function layout() internal pure returns (Layout storage l) {

@@ -4,12 +4,7 @@ pragma solidity ^0.8.30;
 import {UniversityGovernanceStorage} from "./storage/UniversityGovernanceStorage.sol";
 
 contract UniversityGovernanceViewFacet {
-
-    function us()
-        internal
-        pure
-        returns (UniversityGovernanceStorage.Layout storage)
-    {
+    function us() internal pure returns (UniversityGovernanceStorage.Layout storage) {
         return UniversityGovernanceStorage.layout();
     }
 
@@ -25,49 +20,60 @@ contract UniversityGovernanceViewFacet {
             bool executed
         )
     {
-        UniversityGovernanceStorage.Resolution storage r =
-            us().resolutions[id];
+        UniversityGovernanceStorage.Resolution storage r = us().resolutions[id];
 
-        return (
-            r.description,
-            r.yesVotes,
-            r.noVotes,
-            r.status,
-            r.executor,
-            r.executed
-        );
+        return (r.description, r.yesVotes, r.noVotes, r.status, r.executor, r.executed);
     }
 
-    function isMember(address user)
-        external
-        view
-        returns (bool)
-    {
+    function isMember(address user) external view returns (bool) {
         return us().members[user];
     }
 
-    function getResolutionCount()
-        external
-        view
-        returns (uint256)
-    {
+    function isActiveMember(address user) external view returns (bool) {
+        return us().activeMembers[user];
+    }
+
+    function getResolutionCount() external view returns (uint256) {
         return us().resolutionCount;
     }
 
     function getExecutorInfo(address user)
         external
         view
+        returns (uint256 completedActivities, uint256 redeemableRewards)
+    {
+        UniversityGovernanceStorage.Executor storage ex = us().executors[user];
+
+        return (ex.completedActivities, ex.redeemableRewards);
+    }
+
+    function getSessionState()
+        external
+        view
         returns (
-            uint256 completedActivities,
-            uint256 redeemableRewards
+            bool sessionActive,
+            uint256 activeMemberCount,
+            uint256 sessionStartResolutionId,
+            uint256 executionTaskCount
         )
     {
-        UniversityGovernanceStorage.Executor storage ex =
-            us().executors[user];
+        UniversityGovernanceStorage.Layout storage s = us();
+        return (s.sessionActive, s.activeMemberCount, s.sessionStartResolutionId, s.executionTaskCount);
+    }
 
-        return (
-            ex.completedActivities,
-            ex.redeemableRewards
-        );
+    function getExecutionTask(uint256 taskId)
+        external
+        view
+        returns (
+            uint256 id,
+            uint256 resolutionId,
+            address executor,
+            uint256 rewardAmount,
+            uint256 createdAt,
+            bool completed
+        )
+    {
+        UniversityGovernanceStorage.ExecutionTask storage task = us().executionTasks[taskId];
+        return (task.id, task.resolutionId, task.executor, task.rewardAmount, task.createdAt, task.completed);
     }
 }

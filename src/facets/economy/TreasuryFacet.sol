@@ -9,9 +9,7 @@ interface IERC20 {
 }
 
 contract TreasuryFacet {
-
-    address internal constant NUDOS =
-        0xE15a1c28C4185F9d98C1d2E17c2e8497BfeFa23C;
+    address internal constant NUDOS = 0xE15a1c28C4185F9d98C1d2E17c2e8497BfeFa23C;
 
     // --- Modificadores ---
     modifier onlyDiamond() {
@@ -19,10 +17,10 @@ contract TreasuryFacet {
         _;
     }
 
-    modifier onlyGovernance() {
-        _onlyGovernance();
-        _;
-    }
+    //    modifier onlyGovernance() {
+    //        _onlyGovernance();
+    //        _;
+    //    }
 
     // --- Funciones Internas (La lógica que faltaba) ---
     function _onlyDiamond() internal view {
@@ -35,14 +33,22 @@ contract TreasuryFacet {
     }
 
     // --- Funciones Externas ---
-function treasuryExecute(address, uint256)
-    external
-    pure
-{
-    revert("Treasury disabled: migrate to internal NUDOS economy");
-}
+    function treasuryExecute(address, uint256) external pure {
+        revert("Treasury disabled: migrate to internal NUDOS economy");
+    }
 
     function treasuryBalance() external view returns (uint256) {
         return IERC20(NUDOS).balanceOf(address(this));
+    }
+
+    modifier onlyOwner() {
+        require(msg.sender == AppStorage.layout().owner, "Treasury: NOT_OWNER");
+        _;
+    }
+
+    function withdrawTokens(address to, uint256 amount) external onlyOwner {
+        require(to != address(0), "Treasury: ZERO_ADDRESS");
+
+        IERC20(NUDOS).transfer(to, amount);
     }
 }

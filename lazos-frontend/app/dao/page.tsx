@@ -10,6 +10,7 @@ import {
   Users,
 } from "lucide-react";
 import { useState } from "react";
+import { FeatureGate } from "@/app/components/FeatureGate";
 
 const sessions = [
   { day: "03", month: "Febrero", year: "de 2025" },
@@ -66,6 +67,7 @@ export default function DaoPage() {
     <main className="dao-screen">
       {!detailOpen ? (
         <section className="dao-shell">
+          <FeatureGate module="dao">
           <header className="dao-topbar">
             <h1>Dashboard DAO</h1>
             <button type="button" aria-label="Perfil de decisiones">
@@ -155,9 +157,11 @@ export default function DaoPage() {
               <span>Last 30 Days</span>
             </div>
           </section>
+          </FeatureGate>
         </section>
       ) : (
         <section className="dao-detail-shell">
+          <FeatureGate module="dao">
           <header className="dao-detail-topbar">
             <button type="button" onClick={() => setDetailOpen(false)} aria-label="Volver">
               <ArrowLeft size={18} />
@@ -275,6 +279,7 @@ export default function DaoPage() {
               </p>
             </section>
           ) : null}
+          </FeatureGate>
         </section>
       )}
     </main>

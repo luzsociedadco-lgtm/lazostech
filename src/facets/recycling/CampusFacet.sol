@@ -2,6 +2,8 @@
 pragma solidity ^0.8.30;
 
 import {AppStorage} from "src/libraries/AppStorage.sol";
+import {LibEntityRules} from "src/libraries/LibEntityRules.sol";
+import {LibNudosAccess} from "src/libraries/LibNudosAccess.sol";
 
 contract CampusFacet {
     /*//////////////////////////////////////////////////////////////
@@ -17,8 +19,8 @@ contract CampusFacet {
                                MODIFIERS
     //////////////////////////////////////////////////////////////*/
 
-    modifier onlyUniversityStaff() {
-        _checkUniversityStaff();
+    modifier onlySystemOperator() {
+        _checkSystemOperator();
         _;
     }
 
@@ -26,40 +28,38 @@ contract CampusFacet {
                            CAMPUS MANAGEMENT
     //////////////////////////////////////////////////////////////*/
 
-    function _checkUniversityStaff() internal view {
-        AppStorage.Layout storage s = AppStorage.layout();
-        require(s.isUniversityStaff[msg.sender], "CampusFacet: not university staff");
+    function _checkSystemOperator() internal view {
+        require(LibNudosAccess.isOwnerOrSystemAdmin(msg.sender), "CampusFacet: not authorized");
     }
 
-function createCampus(
-    uint256 campusId,
-    uint256 universityId,
-    string calldata name,
-    string calldata metadataURI
-) external onlyUniversityStaff {
+    function createCampus(uint256 campusId, uint256 universityId, string calldata name, string calldata metadataURI)
+        external
+        onlySystemOperator
+    {
+        AppStorage.Layout storage s = AppStorage.layout();
+        AppStorage.Campus storage c = s.campuses[campusId];
 
-    AppStorage.Layout storage s = AppStorage.layout();
-    AppStorage.Campus storage c = s.campuses[campusId];
+        // Pilot catalog: campus creation is limited to the canonical IDs we want
+        // to keep visible in the product.
+        require(LibEntityRules.isSupportedCampusId(campusId), "Unsupported campus");
+        require(LibEntityRules.universityExists(s, universityId), "University not found");
+        require(c.id == 0, "Campus exists");
 
-    require(s.universities[universityId].id != 0, "University not found");
+        c.id = campusId;
+        c.universityId = universityId;
+        c.name = name;
+        c.metadataURI = metadataURI;
 
-    require(c.id == 0, "Campus exists");
+        // 🔗 LINK BIDIRECCIONAL
+        s.universities[universityId].campusIds.push(campusId);
+        s.campusIds.push(campusId);
 
-    c.id = campusId;
-    c.universityId = universityId;
-    c.name = name;
-    c.metadataURI = metadataURI;
-
-    // 🔗 LINK BIDIRECCIONAL
-    s.universities[universityId].campusIds.push(campusId);
-    s.campusIds.push(campusId);
-
-    emit CampusCreated(campusId, name);
-}
+        emit CampusCreated(campusId, name);
+    }
 
     function updateCampus(uint256 campusId, string calldata newName, string calldata newMetadataURI)
         external
-        onlyUniversityStaff
+        onlySystemOperator
     {
         AppStorage.Layout storage s = AppStorage.layout();
         AppStorage.Campus storage c = s.campuses[campusId];
@@ -72,12 +72,12 @@ function createCampus(
         emit CampusUpdated(campusId, newName);
     }
 
-    function addCampusStaff(uint256 campusId, address staff) external onlyUniversityStaff {
+    function addCampusStaff(uint256 campusId, address staff) external onlySystemOperator {
         AppStorage.Layout storage s = AppStorage.layout();
         AppStorage.Campus storage c = s.campuses[campusId];
 
-	require(c.id != 0, "Campus not found");
-	require(staff != address(0), "Invalid staff");
+        require(c.id != 0, "Campus not found");
+        require(staff != address(0), "Invalid staff");
 
         if (!c.isStaff[staff]) {
             c.isStaff[staff] = true;
@@ -86,11 +86,11 @@ function createCampus(
         }
     }
 
-    function removeCampusStaff(uint256 campusId, address staff) external onlyUniversityStaff {
+    function removeCampusStaff(uint256 campusId, address staff) external onlySystemOperator {
         AppStorage.Layout storage s = AppStorage.layout();
         AppStorage.Campus storage c = s.campuses[campusId];
 
-	require(c.id != 0, "Campus not found");
+        require(c.id != 0, "Campus not found");
 
         if (c.isStaff[staff]) {
             c.isStaff[staff] = false;
@@ -103,32 +103,24 @@ function createCampus(
         return s.campuses[campusId].isStaff[who];
     }
 
+    function getCampus(uint256 campusId)
+        external
+        view
+        returns (
+            uint256 id,
+            uint256 universityId,
+            string memory name,
+            string memory metadataURI,
+            address[] memory staffList
+        )
+    {
+        AppStorage.Layout storage s = AppStorage.layout();
+        AppStorage.Campus storage c = s.campuses[campusId];
 
-function getCampus(uint256 campusId)
-    external
-    view
-    returns (
-        uint256 id,
-        uint256 universityId,
-        string memory name,
-        string memory metadataURI,
-        address[] memory staffList
-    )
-{
-    AppStorage.Layout storage s = AppStorage.layout();
-    AppStorage.Campus storage c = s.campuses[campusId];
+        return (c.id, c.universityId, c.name, c.metadataURI, c.staffList);
+    }
 
-    return (
-        c.id,
-        c.universityId,
-        c.name,
-        c.metadataURI,
-        c.staffList
-    );
-}
-
-
-function listCampusIds() external view returns (uint256[] memory) {
+    function listCampusIds() external view returns (uint256[] memory) {
         AppStorage.Layout storage s = AppStorage.layout();
         return s.campusIds;
     }

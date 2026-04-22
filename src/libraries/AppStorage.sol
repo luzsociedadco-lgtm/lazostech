@@ -11,12 +11,12 @@ library AppStorage {
     // ENUMS
     // =============================================================
     enum Role {
-	None,
-	Student,
-	Professor,
-	AdministrativeStaff,
-	CampusStaff,
-	UniversityStaff
+        None,
+        Student,
+        Professor,
+        AdministrativeStaff,
+        CampusStaff,
+        UniversityStaff
     }
 
     enum ItemStatus {
@@ -39,57 +39,57 @@ library AppStorage {
 
     // ---- University ----
     struct University {
-	uint256 id;
-	string name;
-	string metadataURI;
+        uint256 id;
+        string name;
+        string metadataURI;
 
-	address[] staffList;
-	mapping(address => bool) isStaff;
+        address[] staffList;
+        mapping(address => bool) isStaff;
 
-	uint256[] campusIds;
-	}
+        uint256[] campusIds;
+    }
 
     // ---- Campus ----
     struct Campus {
-	uint256 id;
+        uint256 id;
 
-	uint256 universityId;
+        uint256 universityId;
 
-	string name;
-	string metadataURI;
+        string name;
+        string metadataURI;
 
-	address[] staffList;
-	mapping(address => bool) isStaff;
+        address[] staffList;
+        mapping(address => bool) isStaff;
 
-	uint256[] programIds;
-	}
+        uint256[] programIds;
+    }
 
     // ---- Program ----
     struct Program {
-	uint256 id;
+        uint256 id;
 
-	uint256 campusId;
+        uint256 campusId;
 
-	string name;
-	string metadataURI;
+        string name;
+        string metadataURI;
 
-	address coordinator;
-	}
+        address coordinator;
+    }
 
     // ---- Profiles ----
     struct Profile {
-	address owner;
+        address owner;
 
-	uint256 universityId;
-	uint256 campusId;
-	uint256 programId;
+        uint256 universityId;
+        uint256 campusId;
+        uint256 programId;
 
-	string metadataURI;
+        string metadataURI;
 
-	Role role;
+        Role role;
 
-	bool exists;
-	}
+        bool exists;
+    }
 
     // ---- Marketplace ----
     struct Item {
@@ -144,8 +144,8 @@ library AppStorage {
         uint256 cardboard;
         uint256 glass;
         uint256 timestamp;
-	uint256 rewardBaseUnit;
-	uint256 rewardDecayFactor;
+        uint256 rewardBaseUnit;
+        uint256 rewardDecayFactor;
     }
 
     struct CampusMaterialRecord {
@@ -155,48 +155,62 @@ library AppStorage {
 
     // ---- Recycling Machines ----
     struct Machine {
-	uint256 id;
-	uint256 campusId;
-	string metadataURI;
-	address operator;
-	bool active;
-}
-	
-// =============================================================
-// 🌱 IMPACT CREDENTIALS
-// =============================================================
+        uint256 id;
+        uint256 campusId;
+        string metadataURI;
+        address operator;
+        bool active;
+    }
 
-struct ImpactCredential {
-    address user;
-    uint256 year;
-    uint256 aluminium;
-    uint256 plastic;
-    uint256 cardboard;
-    uint256 glass;
-    uint256 co2Saved;
-}
+    // =============================================================
+    // 🌱 IMPACT CREDENTIALS
+    // =============================================================
 
-// =============================================================
-// 🌍 IMPACT AGGREGATION
-// =============================================================
+    struct ImpactCredential {
+        address user;
+        uint256 year;
+        uint256 aluminium;
+        uint256 plastic;
+        uint256 cardboard;
+        uint256 glass;
+        uint256 co2Saved;
+    }
 
-struct UserImpactTotals {
-    uint256 aluminium;
-    uint256 plastic;
-    uint256 cardboard;
-    uint256 glass;
-    uint256 totalActions;
-}
+    struct RecycleCredential {
+        address user;
+        uint256 machineId;
+        uint256 campusId;
+        uint256 universityId;
+        uint256 timestamp;
+        uint256 aluminium;
+        uint256 plastic;
+        uint256 cardboard;
+        uint256 glass;
+        uint256 co2Saved;
+        uint256 rewardAmount;
+    }
 
-// =============================================================
-// 🔐 ORACLE REPUTATION
-// =============================================================
+    // =============================================================
+    // 🌍 IMPACT AGGREGATION
+    // =============================================================
 
-struct OracleStats {
-    uint256 submissions;
-    uint256 rejected;
-    uint256 lastSubmission;
-}
+    struct UserImpactTotals {
+        uint256 aluminium;
+        uint256 plastic;
+        uint256 cardboard;
+        uint256 glass;
+        uint256 totalActions;
+    }
+
+    // =============================================================
+    // 🔐 ORACLE REPUTATION
+    // =============================================================
+
+    struct OracleStats {
+        uint256 submissions;
+        uint256 rejected;
+        uint256 lastSubmission;
+    }
 
     // =============================================================
     // LAYOUT PRINCIPAL (ÚNICO)
@@ -204,25 +218,25 @@ struct OracleStats {
     struct Layout {
         // ---- Ownership ----
         address owner;
-	address governanceExecutor;
+        address governanceExecutor;
 
-	// ---- Universities ----
-	mapping(uint256 => University) universities;
-	uint256[] universityIds;
+        // ---- Universities ----
+        mapping(uint256 => University) universities;
+        uint256[] universityIds;
 
-	// ---- University Impact ----
-	mapping(uint256 => UserImpactTotals) universityImpactTotals;
+        // ---- University Impact ----
+        mapping(uint256 => UserImpactTotals) universityImpactTotals;
 
-	// ---- Campuses ----
-	mapping(uint256 => Campus) campuses;
-	uint256[] campusIds;
+        // ---- Campuses ----
+        mapping(uint256 => Campus) campuses;
+        uint256[] campusIds;
 
-	// ---- Programs ----
-	mapping(uint256 => Program) programs;
-	uint256[] programIds;
+        // ---- Programs ----
+        mapping(uint256 => Program) programs;
+        uint256[] programIds;
 
-	// ---- Program Impact ----
-	mapping(uint256 => UserImpactTotals) programImpactTotals;
+        // ---- Program Impact ----
+        mapping(uint256 => UserImpactTotals) programImpactTotals;
 
         // ---- Profiles ----
         mapping(address => Profile) profiles;
@@ -230,6 +244,7 @@ struct OracleStats {
 
         // ---- University Staff ----
         mapping(address => bool) isUniversityStaff;
+        mapping(address => bool) isSystemAdmin;
 
         // ---- Tickets ----
         mapping(address => uint256) ticketBalance;
@@ -239,7 +254,7 @@ struct OracleStats {
         // ---- Rewards ----
         address token;
         mapping(Material => uint256) recycleRates;
-	uint256 rewardBaseUnit;
+        uint256 rewardBaseUnit;
 
         // ---- NUDOS Economy ----
         mapping(address => uint256) nudosBalance; // tokens disponibles
@@ -250,7 +265,7 @@ struct OracleStats {
         uint256 nextItemId;
         uint256 nextTradeId;
         uint256 marketplaceFeeBps;
-	mapping(address => uint256) lastPurchaseBlock;
+        mapping(address => uint256) lastPurchaseBlock;
         mapping(uint256 => Item) items;
         mapping(uint256 => Trade) trades;
         mapping(uint256 => mapping(address => uint8)) ratings;
@@ -267,44 +282,48 @@ struct OracleStats {
         // ---- Recycling History ----
         mapping(address => CampusMaterialRecord[]) recyclingHistory;
 
-	// ---- Recycling Oracle ----
-	mapping(address => bool) recyclingOracles;
-	mapping(bytes32 => bool) processedRecycles;
-	mapping(address => uint256) oracleMachine;
-	mapping(uint256 => uint256) lastMachineRecycle;
-	mapping(address => uint256) oracleReputation;
-	mapping(address => bool) oracleBlocked;
-	mapping(address => uint256) oracleDailyImpact;
-	mapping(address => uint256) oracleLastReset;
+        // ---- Recycling Oracle ----
+        mapping(address => bool) recyclingOracles;
+        mapping(bytes32 => bool) processedRecycles;
+        mapping(address => uint256) oracleMachine;
+        mapping(uint256 => uint256) lastMachineRecycle;
+        mapping(address => uint256) oracleReputation;
+        mapping(address => bool) oracleBlocked;
+        mapping(address => uint256) oracleDailyImpact;
+        mapping(address => uint256) oracleLastReset;
 
-	// ---- Recycling Machines ----
-	uint256 nextMachineId;
-	mapping(uint256 => Machine) machines;
-	uint256[] machineIds;
+        // ---- Recycling Machines ----
+        uint256 nextMachineId;
+        mapping(uint256 => Machine) machines;
+        uint256[] machineIds;
 
-	// ---- Impact Credentials ----
-	uint256 nextImpactCredentialId;
-	mapping(uint256 => ImpactCredential) impactCredentials;
-	mapping(address => uint256[]) userImpactCredentials;
-	mapping(address => mapping(uint256 => bool)) userYearCredentialMinted;
+        // ---- Impact Credentials ----
+        uint256 nextImpactCredentialId;
+        mapping(uint256 => ImpactCredential) impactCredentials;
+        mapping(address => uint256[]) userImpactCredentials;
+        mapping(address => mapping(uint256 => bool)) userYearCredentialMinted;
 
-	// ---- Impact Aggregation ----
-	mapping(address => UserImpactTotals) userImpactTotals;
-	mapping(uint256 => UserImpactTotals) campusImpactTotals;
-	mapping(address => uint256) userBadgeLevel;
-	UserImpactTotals globalImpact;
+        // ---- Impact Aggregation ----
+        mapping(address => UserImpactTotals) userImpactTotals;
+        mapping(uint256 => UserImpactTotals) campusImpactTotals;
+        mapping(address => uint256) userBadgeLevel;
+        UserImpactTotals globalImpact;
 
-	// ---- Oracle Reputation ----
-	mapping(address => OracleStats) oracleStats;
+        // ---- Oracle Reputation ----
+        mapping(address => OracleStats) oracleStats;
 
-	// ---- Recycler Index ----
-	address[] recyclerIndex;
-	mapping(address => bool) recyclerExists;
+        // ---- Recycler Index ----
+        address[] recyclerIndex;
+        mapping(address => bool) recyclerExists;
 
-	// ---- Anti Fraud ----
-	mapping(address => uint256) lastUserRecycle;
+        // ---- Anti Fraud ----
+        mapping(address => uint256) lastUserRecycle;
 
-}
+        // ---- Recycle Credentials ----
+        uint256 nextRecycleCredentialId;
+        mapping(uint256 => RecycleCredential) recycleCredentials;
+        mapping(address => uint256[]) userRecycleCredentialIds;
+    }
 
     // =============================================================
     // ACCESSOR
@@ -315,5 +334,4 @@ struct OracleStats {
             s.slot := slot
         }
     }
-
 }

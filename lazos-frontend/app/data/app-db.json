@@ -1,0 +1,124 @@
+{
+  "users": [
+    {
+      "id": "usr_sqez2vvn",
+      "email": "alehandre10@hotmail.com",
+      "passwordHash": "edf22513d0b7850022659eb155c52448:838e961e7521a68798850cdd36d29dda46c8c02ff382be36f7d2c174c1aca5143e8baf3c7df2f98e4738b1893514e5092c4ac3e579804c70d319d3125f5eb87a",
+      "authProvider": "email",
+      "createdAt": "2026-04-22T04:03:42.666Z",
+      "updatedAt": "2026-04-22T04:03:42.666Z",
+      "profile": {
+        "firstName": "alehandre10",
+        "lastName": "",
+        "phone": "",
+        "nationalId": "",
+        "studentCode": "",
+        "universityId": 0,
+        "campusId": 1,
+        "programId": 0,
+        "studentType": "",
+        "benefitLabel": ""
+      },
+      "linkedWallet": null,
+      "universityValidated": false,
+      "syncState": {
+        "directoryMatched": false,
+        "profileComplete": false,
+        "walletLinked": false,
+        "onchainProfileRegistered": false,
+        "onchainAffiliationSynced": false
+      },
+      "balances": {
+        "internal": {
+          "nudos": 0,
+          "tickets": 0,
+          "source": "diamond_internal"
+        },
+        "wallet": {
+          "erc20Nudos": null,
+          "source": "erc20_wallet"
+        }
+      }
+    },
+    {
+      "id": "usr_mc8paurr",
+      "email": "reeeeee@hotmail.com",
+      "passwordHash": "2b60d366cf81709a87899910651f7a32:9784ff08517001209d24498feb28ea4d54d19b8c099e3d71b9004f202a131b15ef78493bd5c85951ff661b688a1b9d131c78e7137aebbe2231199f7766b373a3",
+      "authProvider": "email",
+      "createdAt": "2026-04-22T04:27:41.560Z",
+      "updatedAt": "2026-04-22T04:27:41.560Z",
+      "profile": {
+        "firstName": "reeeeee",
+        "lastName": "",
+        "phone": "",
+        "nationalId": "",
+        "studentCode": "",
+        "universityId": 0,
+        "campusId": 1,
+        "programId": 0,
+        "studentType": "",
+        "benefitLabel": ""
+      },
+      "linkedWallet": null,
+      "universityValidated": false,
+      "syncState": {
+        "directoryMatched": false,
+        "profileComplete": false,
+        "walletLinked": false,
+        "onchainProfileRegistered": false,
+        "onchainAffiliationSynced": false
+      },
+      "balances": {
+        "internal": {
+          "nudos": 0,
+          "tickets": 0,
+          "source": "diamond_internal"
+        },
+        "wallet": {
+          "erc20Nudos": null,
+          "source": "erc20_wallet"
+        }
+      }
+    },
+    {
+      "id": "usr_g9jde1u0",
+      "email": "reeee@hotmail.com",
+      "passwordHash": "0407b0a11c0e8566ede88d32adb3d28c:04418e1f94b20e679562b4ed31017519949027b9ab9e4ca7a55fad9d631544e20d8d21391fc5341adbafe639025bbb3ef6737f7f6a8806d9e3cbc464855857c6",
+      "authProvider": "email",
+      "createdAt": "2026-04-22T05:10:46.823Z",
+      "updatedAt": "2026-04-22T06:30:29.535Z",
+      "profile": {
+        "firstName": "reeee",
+        "lastName": "",
+        "phone": "",
+        "nationalId": "",
+        "studentCode": "",
+        "universityId": 0,
+        "campusId": 1,
+        "programId": 0,
+        "studentType": "",
+        "benefitLabel": ""
+      },
+      "linkedWallet": null,
+      "universityValidated": false,
+      "syncState": {
+        "directoryMatched": false,
+        "profileComplete": false,
+        "walletLinked": false,
+        "onchainProfileRegistered": false,
+        "onchainAffiliationSynced": false
+      },
+      "balances": {
+        "internal": {
+          "nudos": 0,
+          "tickets": 0,
+          "source": "diamond_internal"
+        },
+        "wallet": {
+          "erc20Nudos": null,
+          "source": "erc20_wallet"
+        }
+      }
+    }
+  ]
+}

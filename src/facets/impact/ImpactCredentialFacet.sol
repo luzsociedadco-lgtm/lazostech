@@ -4,7 +4,6 @@ pragma solidity ^0.8.30;
 import {AppStorage} from "src/libraries/AppStorage.sol";
 
 contract ImpactCredentialFacet {
-
     event ImpactCredentialMinted(
         uint256 indexed tokenId,
         address indexed user,
@@ -14,6 +13,10 @@ contract ImpactCredentialFacet {
         uint256 cardboard,
         uint256 glass,
         uint256 co2Saved
+    );
+
+    event RecycleCredentialIssued(
+        uint256 indexed tokenId, address indexed user, uint256 indexed machineId, uint256 rewardAmount, uint256 co2Saved
     );
 
     struct Credential {
@@ -26,86 +29,100 @@ contract ImpactCredentialFacet {
         uint256 co2Saved;
     }
 
-function mintImpactCredential(address user, uint256 year) external {
+    function issueRecycleCredential(
+        address user,
+        uint256 machineId,
+        uint256 campusId,
+        uint256 universityId,
+        uint256 aluminium,
+        uint256 plastic,
+        uint256 cardboard,
+        uint256 glass,
+        uint256 rewardAmount
+    ) external returns (uint256 tokenId) {
+        AppStorage.Layout storage s = AppStorage.layout();
 
-    AppStorage.Layout storage s = AppStorage.layout();
+        require(msg.sender == address(this) || msg.sender == s.owner, "Not authorized");
+        require(user != address(0), "Invalid user");
+        require(s.profiles[user].exists, "User not found");
+        require(s.machines[machineId].id != 0, "Machine not found");
 
-require(user != address(0), "Invalid user");
-require(year >= 2025, "Invalid year");
+        uint256 total = aluminium + plastic + cardboard + glass;
+        require(total > 0, "No impact");
 
-	require(s.profiles[user].exists, "User not found");
+        uint256 co2Saved = aluminium * 9 + plastic * 6 + cardboard * 3 + glass * 1;
 
-	    // 🚫 evitar doble mint por año
-    require(!s.userYearCredentialMinted[user][year], 
-	"Credential already minted for year"
-    );
+        tokenId = ++s.nextRecycleCredentialId;
 
-    AppStorage.UserImpactTotals storage totals =
-        s.userImpactTotals[user];
+        s.recycleCredentials[tokenId] = AppStorage.RecycleCredential({
+            user: user,
+            machineId: machineId,
+            campusId: campusId,
+            universityId: universityId,
+            timestamp: block.timestamp,
+            aluminium: aluminium,
+            plastic: plastic,
+            cardboard: cardboard,
+            glass: glass,
+            co2Saved: co2Saved,
+            rewardAmount: rewardAmount
+        });
 
-    uint256 aluminium = totals.aluminium;
-    uint256 plastic = totals.plastic;
-    uint256 cardboard = totals.cardboard;
-    uint256 glass = totals.glass;
+        s.userRecycleCredentialIds[user].push(tokenId);
 
-require(aluminium 
-	+ plastic 
-	+ cardboard 
-	+ glass > 0,
-    "No impact"
-        );
+        emit RecycleCredentialIssued(tokenId, user, machineId, rewardAmount, co2Saved);
+    }
 
-    uint256 co2Saved =
-        aluminium * 9 +
-        plastic * 6 +
-        cardboard * 3 +
-        glass * 1;
+    function mintImpactCredential(address user, uint256 year) external {
+        AppStorage.Layout storage s = AppStorage.layout();
 
-    uint256 tokenId = ++s.nextImpactCredentialId;
+        require(user != address(0), "Invalid user");
+        require(year >= 2025, "Invalid year");
 
-    s.impactCredentials[tokenId] = AppStorage.ImpactCredential(
-        user,
-        year,
-        aluminium,
-        plastic,
-        cardboard,
-        glass,
-        co2Saved
-    );
+        require(s.profiles[user].exists, "User not found");
 
-    s.userImpactCredentials[user].push(tokenId);
+        // 🚫 evitar doble mint por año
+        require(!s.userYearCredentialMinted[user][year], "Credential already minted for year");
 
-    // ✅ marcar como mintado
-    s.userYearCredentialMinted[user][year] = true;
+        AppStorage.UserImpactTotals storage totals = s.userImpactTotals[user];
 
-    emit ImpactCredentialMinted(
-        tokenId,
-        user,
-        year,
-        aluminium,
-        plastic,
-        cardboard,
-        glass,
-        co2Saved
-    );
+        uint256 aluminium = totals.aluminium;
+        uint256 plastic = totals.plastic;
+        uint256 cardboard = totals.cardboard;
+        uint256 glass = totals.glass;
 
-}
+        require(aluminium + plastic + cardboard + glass > 0, "No impact");
 
-    function getCredential(uint256 tokenId)
-        external
-        view
-	returns (AppStorage.ImpactCredential memory)
-    {
+        uint256 co2Saved = aluminium * 9 + plastic * 6 + cardboard * 3 + glass * 1;
+
+        uint256 tokenId = ++s.nextImpactCredentialId;
+
+        s.impactCredentials[tokenId] =
+            AppStorage.ImpactCredential(user, year, aluminium, plastic, cardboard, glass, co2Saved);
+
+        s.userImpactCredentials[user].push(tokenId);
+
+        // ✅ marcar como mintado
+        s.userYearCredentialMinted[user][year] = true;
+
+        emit ImpactCredentialMinted(tokenId, user, year, aluminium, plastic, cardboard, glass, co2Saved);
+    }
+
+    function getCredential(uint256 tokenId) external view returns (AppStorage.ImpactCredential memory) {
         AppStorage.Layout storage s = AppStorage.layout();
         return s.impactCredentials[tokenId];
     }
 
-    function getUserCredentials(address user)
-        external
-        view
-        returns (uint256[] memory)
-    {
+    function getUserCredentials(address user) external view returns (uint256[] memory) {
         AppStorage.Layout storage s = AppStorage.layout();
         return s.userImpactCredentials[user];
+    }
+
+    function getRecycleCredential(uint256 tokenId) external view returns (AppStorage.RecycleCredential memory) {
+        return AppStorage.layout().recycleCredentials[tokenId];
+    }
+
+    function getUserRecycleCredentials(address user) external view returns (uint256[] memory) {
+        return AppStorage.layout().userRecycleCredentialIds[user];
     }
 }

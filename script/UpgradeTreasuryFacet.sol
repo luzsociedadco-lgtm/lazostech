@@ -44,9 +44,7 @@ contract UpgradeTreasuryFacet is Script {
 
         // Acción: ADD (Añade el nuevo execute)
         cut[1] = IDiamondCut.FacetCut({
-            facetAddress: address(facet),
-            action: IDiamondCut.FacetCutAction.Add,
-            functionSelectors: addSelectors
+            facetAddress: address(facet), action: IDiamondCut.FacetCutAction.Add, functionSelectors: addSelectors
         });
 
         // Acción: REMOVE (Borra el withdraw viejo)

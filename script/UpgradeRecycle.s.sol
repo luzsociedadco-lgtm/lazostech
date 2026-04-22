@@ -21,7 +21,7 @@ contract UpgradeRecycle is Script {
 
         // 2. Clasificar selectores
         uint256 countReplace = 0;
-        for (uint i = 0; i < allSelectors.length; i++) {
+        for (uint256 i = 0; i < allSelectors.length; i++) {
             if (IDiamond(diamond).facetAddress(allSelectors[i]) != address(0)) {
                 countReplace++;
             }
@@ -32,7 +32,7 @@ contract UpgradeRecycle is Script {
 
         uint256 rIdx = 0;
         uint256 aIdx = 0;
-        for (uint i = 0; i < allSelectors.length; i++) {
+        for (uint256 i = 0; i < allSelectors.length; i++) {
             if (IDiamond(diamond).facetAddress(allSelectors[i]) != address(0)) {
                 toReplace[rIdx++] = allSelectors[i];
             } else {
@@ -54,15 +54,13 @@ contract UpgradeRecycle is Script {
         }
         if (toAdd.length > 0) {
             cut[currentCutIdx] = IDiamondCut.FacetCut({
-                facetAddress: address(newRecycle),
-                action: IDiamondCut.FacetCutAction.Add,
-                functionSelectors: toAdd
+                facetAddress: address(newRecycle), action: IDiamondCut.FacetCutAction.Add, functionSelectors: toAdd
             });
         }
 
         // 4. Ejecutar
         IDiamondCut(diamond).diamondCut(cut, address(0), "");
-        
+
         console.log("Upgrade Recycle completado.");
         console.log("Nueva Facet en:", address(newRecycle));
         console.log("Selectores reemplazados:", toReplace.length);

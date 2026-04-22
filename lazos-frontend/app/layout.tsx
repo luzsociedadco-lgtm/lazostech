@@ -1,5 +1,6 @@
 import "./globals.css";
 import FooterNav from "./components/FooterNav";
+import { AuthProvider } from "./providers/AuthProvider";
 import { WagmiWrapper } from "./providers/WagmiWrapper";
 
 export const metadata = {
@@ -16,10 +17,12 @@ export default function RootLayout({
     <html lang="es">
       <body>
         <WagmiWrapper>
-          <div className="app-frame">
-            {children}
-            <FooterNav />
-          </div>
+          <AuthProvider>
+            <div className="app-frame">
+              {children}
+              <FooterNav />
+            </div>
+          </AuthProvider>
         </WagmiWrapper>
       </body>
     </html>

@@ -15,10 +15,15 @@ import {MarketplaceFacet} from "src/facets/marketplace/MarketplaceFacet.sol";
 
 import {CorporateGovernanceFacet} from "src/facets/governance/corporate-governance/CorporateGovernanceFacet.sol";
 import {UniversityGovernanceFacet} from "src/facets/governance/university-governance/UniversityGovernanceFacet.sol";
-import {UniversityGovernanceViewFacet} from "src/facets/governance/university-governance/UniversityGovernanceViewFacet.sol";
-import {CorporateGovernanceViewFacet} from "src/facets/governance/corporate-governance/CorporateGovernanceViewFacet.sol";
+import {
+    UniversityGovernanceViewFacet
+} from "src/facets/governance/university-governance/UniversityGovernanceViewFacet.sol";
+import {
+    CorporateGovernanceViewFacet
+} from "src/facets/governance/corporate-governance/CorporateGovernanceViewFacet.sol";
 import {GovernanceRolesViewFacet} from "src/facets/governance/corporate-governance/GovernanceRolesViewFacet.sol";
 import {CampusFacet} from "src/facets/recycling/CampusFacet.sol";
+import {ProgramFacet} from "src/facets/recycling/ProgramFacet.sol";
 import {RecycleFacet} from "src/facets/recycling/RecycleFacet.sol";
 import {UniversityFacet} from "src/facets/recycling/UniversityFacet.sol";
 import {ImpactLeaderboardFacet} from "src/facets/impact/ImpactLeaderboardFacet.sol";
@@ -28,210 +33,254 @@ import {MachineFacet} from "src/facets/machines/MachineFacet.sol";
 import {ProfileFacet} from "src/facets/profile/ProfileFacet.sol";
 
 library SelectorLib {
+    function getDiamondCutFacetSelectors() internal pure returns (bytes4[] memory selectors) {
+        selectors = new bytes4[](1);
+        selectors[0] = DiamondCutFacet.diamondCut.selector;
+    }
 
-function getDiamondCutFacetSelectors() internal pure returns (bytes4[] memory selectors) {
-    selectors = new bytes4[](1);
-    selectors[0] = DiamondCutFacet.diamondCut.selector;
-}
+    function getDiamondLoupeFacetSelectors() internal pure returns (bytes4[] memory selectors) {
+        selectors = new bytes4[](4);
+        selectors[0] = DiamondLoupeFacet.facetAddress.selector;
+        selectors[1] = DiamondLoupeFacet.facetAddresses.selector;
+        selectors[2] = DiamondLoupeFacet.facetFunctionSelectors.selector;
+        selectors[3] = DiamondLoupeFacet.facets.selector;
+    }
 
-function getDiamondLoupeFacetSelectors() internal pure returns (bytes4[] memory selectors) {
-    selectors = new bytes4[](4);
-    selectors[0] = DiamondLoupeFacet.facetAddress.selector;
-    selectors[1] = DiamondLoupeFacet.facetAddresses.selector;
-    selectors[2] = DiamondLoupeFacet.facetFunctionSelectors.selector;
-    selectors[3] = DiamondLoupeFacet.facets.selector;
-}
+    function getOwnershipFacetSelectors() internal pure returns (bytes4[] memory selectors) {
+        selectors = new bytes4[](2);
+        selectors[0] = OwnershipFacet.owner.selector;
+        selectors[1] = OwnershipFacet.transferOwnership.selector;
+    }
 
-function getOwnershipFacetSelectors() internal pure returns (bytes4[] memory selectors) {
-    selectors = new bytes4[](2);
-    selectors[0] = OwnershipFacet.owner.selector;
-    selectors[1] = OwnershipFacet.transferOwnership.selector;
-}
+    function getParticipationFacetSelectors() internal pure returns (bytes4[] memory selectors) {
+        selectors = new bytes4[](2);
+        selectors[0] = ParticipationFacet.registerSubmission.selector;
+        selectors[1] = ParticipationFacet.validateCompletion.selector;
+    }
 
-function getParticipationFacetSelectors() internal pure returns (bytes4[] memory selectors) {
-    selectors = new bytes4[](2);
-    selectors[0] = ParticipationFacet.registerSubmission.selector;
-    selectors[1] = ParticipationFacet.validateCompletion.selector;
-}
+    function getRewardFacetSelectors() internal pure returns (bytes4[] memory selectors) {
+        selectors = new bytes4[](9);
+        selectors[0] = RewardFacet.setRewardToken.selector;
+        selectors[1] = RewardFacet.setRecycleRate.selector;
+        selectors[2] = RewardFacet.setRewardBaseUnit.selector;
+        selectors[3] = RewardFacet.grantReward.selector;
+        selectors[4] = RewardFacet.getRewardToken.selector;
+        selectors[5] = RewardFacet.getRecycleRate.selector;
+        selectors[6] = RewardFacet.getNudos.selector;
+        selectors[7] = RewardFacet.getNudosAccumulated.selector;
+        selectors[8] = RewardFacet.getRewardBaseUnit.selector;
+    }
 
-function getRewardFacetSelectors() internal pure returns (bytes4[] memory selectors) {
-    selectors = new bytes4[](7);
-selectors[0] = RewardFacet.setRewardToken.selector;
-selectors[1] = RewardFacet.setRecycleRate.selector;
-selectors[2] = RewardFacet.grantReward.selector;
-selectors[3] = RewardFacet.getRewardToken.selector;
-selectors[4] = RewardFacet.getRecycleRate.selector;
-selectors[5] = RewardFacet.getNudos.selector;
-selectors[6] = RewardFacet.getNudosAccumulated.selector;
-}
+    function getTicketsFacetSelectors() internal pure returns (bytes4[] memory selectors) {
+        selectors = new bytes4[](6);
+        selectors[0] = TicketsFacet.getTickets.selector;
+        selectors[1] = TicketsFacet.mintTicket.selector;
+        selectors[2] = TicketsFacet.redeemTickets.selector;
+        selectors[3] = TicketsFacet.transferTicket.selector;
+        selectors[4] = TicketsFacet.useTicket.selector;
+        selectors[5] = TicketsFacet.grantTicketsFromFiat.selector;
+    }
 
-function getTicketsFacetSelectors() internal pure returns (bytes4[] memory selectors) {
-    selectors = new bytes4[](6);
-    selectors[0] = TicketsFacet.getTickets.selector;
-    selectors[1] = TicketsFacet.mintTicket.selector;
-    selectors[2] = TicketsFacet.redeemTickets.selector;
-    selectors[3] = TicketsFacet.transferTicket.selector;
-    selectors[4] = TicketsFacet.useTicket.selector;
-    selectors[5] = TicketsFacet.grantTicketsFromFiat.selector;
-}
+    function getMarketplaceFacetSelectors() internal pure returns (bytes4[] memory selectors) {
+        selectors = new bytes4[](9);
+        selectors[0] = MarketplaceFacet.acceptTrade.selector;
+        selectors[1] = MarketplaceFacet.buyWithTokens.selector;
+        selectors[2] = MarketplaceFacet.createItem.selector;
+        selectors[3] = MarketplaceFacet.getItem.selector;
+        selectors[4] = MarketplaceFacet.listItem.selector;
+        selectors[5] = MarketplaceFacet.proposeTrade.selector;
+        selectors[6] = MarketplaceFacet.rateItem.selector;
+        selectors[7] = MarketplaceFacet.executeMarketplaceFee.selector;
+        selectors[8] = MarketplaceFacet.spendTreasury.selector;
+    }
 
-function getMarketplaceFacetSelectors() internal pure returns (bytes4[] memory selectors) {
-    selectors = new bytes4[](9);
-    selectors[0] = MarketplaceFacet.acceptTrade.selector;
-    selectors[1] = MarketplaceFacet.buyWithTokens.selector;
-    selectors[2] = MarketplaceFacet.createItem.selector;
-    selectors[3] = MarketplaceFacet.getItem.selector;
-    selectors[4] = MarketplaceFacet.listItem.selector;
-    selectors[5] = MarketplaceFacet.proposeTrade.selector;
-    selectors[6] = MarketplaceFacet.rateItem.selector;
-    selectors[7] = MarketplaceFacet.executeMarketplaceFee.selector;
-    selectors[8] = MarketplaceFacet.spendTreasury.selector;
-}
+    function getCampusFacetSelectors() internal pure returns (bytes4[] memory selectors) {
+        selectors = new bytes4[](7);
+        selectors[0] = CampusFacet.createCampus.selector;
+        selectors[1] = CampusFacet.updateCampus.selector;
+        selectors[2] = CampusFacet.addCampusStaff.selector;
+        selectors[3] = CampusFacet.removeCampusStaff.selector;
+        selectors[4] = CampusFacet.isCampusStaff.selector;
+        selectors[5] = CampusFacet.getCampus.selector;
+        selectors[6] = CampusFacet.listCampusIds.selector;
+    }
 
-function getCampusFacetSelectors() internal pure returns (bytes4[] memory selectors) {
-    selectors = new bytes4[](7);
-    selectors[0] = CampusFacet.createCampus.selector;
-    selectors[1] = CampusFacet.updateCampus.selector;
-    selectors[2] = CampusFacet.addCampusStaff.selector;
-    selectors[3] = CampusFacet.removeCampusStaff.selector;
-    selectors[4] = CampusFacet.isCampusStaff.selector;
-    selectors[5] = CampusFacet.getCampus.selector;
-    selectors[6] = CampusFacet.listCampusIds.selector;
-}
+    function getRecycleFacetSelectors() internal pure returns (bytes4[] memory selectors) {
+        selectors = new bytes4[](10);
+        selectors[0] = RecycleFacet.recordRecycleFromOracle.selector;
+        selectors[1] = RecycleFacet.setRecyclingOracle.selector;
+        selectors[2] = RecycleFacet.recordRecycleBatch.selector;
+        selectors[3] = RecycleFacet.getUserRecycleImpact.selector;
+        selectors[4] = RecycleFacet.getRecycleHistory.selector;
+        selectors[5] = RecycleFacet.apiUserImpact.selector;
+        selectors[6] = RecycleFacet.apiProgramImpact.selector;
+        selectors[7] = RecycleFacet.apiCampusImpact.selector;
+        selectors[8] = RecycleFacet.apiUniversityImpact.selector;
+        selectors[9] = RecycleFacet.apiGlobalImpact.selector;
+    }
 
-function getRecycleFacetSelectors() internal pure returns (bytes4[] memory selectors) {
-    selectors = new bytes4[](10);
-    selectors[0] = RecycleFacet.recordRecycleFromOracle.selector;
-    selectors[1] = RecycleFacet.setRecyclingOracle.selector;
-    selectors[2] = RecycleFacet.recordRecycleBatch.selector;
-    selectors[3] = RecycleFacet.getUserRecycleImpact.selector;
-    selectors[4] = RecycleFacet.getRecycleHistory.selector;
-    selectors[5] = RecycleFacet.apiUserImpact.selector;
-    selectors[6] = RecycleFacet.apiProgramImpact.selector;
-    selectors[7] = RecycleFacet.apiCampusImpact.selector;
-    selectors[8] = RecycleFacet.apiUniversityImpact.selector;
-    selectors[9] = RecycleFacet.apiGlobalImpact.selector;
-}
+    function getProgramFacetSelectors() internal pure returns (bytes4[] memory selectors) {
+        selectors = new bytes4[](7);
+        selectors[0] = ProgramFacet.createProgram.selector;
+        selectors[1] = ProgramFacet.updateProgram.selector;
+        selectors[2] = ProgramFacet.assignProfileAffiliation.selector;
+        selectors[3] = ProgramFacet.getProgram.selector;
+        selectors[4] = ProgramFacet.listProgramIds.selector;
+        selectors[5] = ProgramFacet.listCampusProgramIds.selector;
+        selectors[6] = ProgramFacet.getProfileAffiliation.selector;
+    }
 
-function getUniversityFacetSelectors() internal pure returns (bytes4[] memory selectors) {
-    selectors = new bytes4[](6);
-    selectors[0] = UniversityFacet.addUniversityStaff.selector;
-    selectors[1] = UniversityFacet.removeUniversityStaff.selector;
-    selectors[2] = UniversityFacet.isUniversityStaff.selector;
-    selectors[3] = UniversityFacet.createUniversity.selector;
-    selectors[4] = UniversityFacet.getUniversity.selector;
-    selectors[5] = UniversityFacet.bootstrapUniversityStaff.selector;
-}
+    function getUniversityFacetSelectors() internal pure returns (bytes4[] memory selectors) {
+        selectors = new bytes4[](10);
+        selectors[0] = UniversityFacet.addUniversityStaff.selector;
+        selectors[1] = UniversityFacet.removeUniversityStaff.selector;
+        selectors[2] = UniversityFacet.isUniversityStaff.selector;
+        selectors[3] = UniversityFacet.createUniversity.selector;
+        selectors[4] = UniversityFacet.getUniversity.selector;
+        selectors[5] = UniversityFacet.listUniversityIds.selector;
+        selectors[6] = UniversityFacet.bootstrapUniversityStaff.selector;
+        selectors[7] = UniversityFacet.setSystemAdmin.selector;
+        selectors[8] = UniversityFacet.isSystemAdmin.selector;
+        selectors[9] = UniversityFacet.updateUniversity.selector;
+    }
 
-function getCorporateGovernanceFacetSelectors() internal pure returns (bytes4[] memory selectors){
-    selectors = new bytes4[](14);
+    function getCorporateGovernanceFacetSelectors() internal pure returns (bytes4[] memory selectors) {
+        selectors = new bytes4[](17);
+        _setCorporateGovernanceSelectorsCore(selectors);
+        _setCorporateGovernanceSelectorsLifecycle(selectors);
+        _setCorporateGovernanceSelectorsExecution(selectors);
+    }
 
-    selectors[0]  = CorporateGovernanceFacet.initDao.selector;
-    selectors[1]  = CorporateGovernanceFacet.setChairperson.selector;
-    selectors[2]  = CorporateGovernanceFacet.setSecretary.selector;
-    selectors[3]  = CorporateGovernanceFacet.addBoardMember.selector;
-    selectors[4]  = CorporateGovernanceFacet.openSession.selector;
-    selectors[5]  = CorporateGovernanceFacet.createResolution.selector;
-    selectors[6]  = CorporateGovernanceFacet.startDeliberation.selector;
-    selectors[7]  = CorporateGovernanceFacet.startVoting.selector;
-    selectors[8]  = CorporateGovernanceFacet.vote.selector;
-    selectors[9]  = CorporateGovernanceFacet.closeResolution.selector;
-    selectors[10] = CorporateGovernanceFacet.executeResolution.selector;
-    selectors[11] = CorporateGovernanceFacet.verifyResolution.selector;
-    selectors[12] = CorporateGovernanceFacet.setGovernanceExecutor.selector;
-    selectors[13] = CorporateGovernanceFacet.setQuorumPercentage.selector;
-}
+    function _setCorporateGovernanceSelectorsCore(bytes4[] memory selectors) private pure {
+        selectors[0] = CorporateGovernanceFacet.initDao.selector;
+        selectors[1] = CorporateGovernanceFacet.setChairperson.selector;
+        selectors[2] = CorporateGovernanceFacet.setSecretary.selector;
+        selectors[3] = CorporateGovernanceFacet.addBoardMember.selector;
+        selectors[4] = CorporateGovernanceFacet.openSession.selector;
+        selectors[5] = CorporateGovernanceFacet.joinSession.selector;
+    }
 
-function getUniversityGovernanceFacetSelectors() internal pure returns (bytes4[] memory selectors){
-    selectors = new bytes4[](11);
+    function _setCorporateGovernanceSelectorsLifecycle(bytes4[] memory selectors) private pure {
+        selectors[6] = CorporateGovernanceFacet.leaveSession.selector;
+        selectors[7] = CorporateGovernanceFacet.createResolution.selector;
+        selectors[8] = CorporateGovernanceFacet.startDeliberation.selector;
+        selectors[9] = CorporateGovernanceFacet.startVoting.selector;
+        selectors[10] = CorporateGovernanceFacet.vote.selector;
+        selectors[11] = CorporateGovernanceFacet.closeResolution.selector;
+    }
 
-    selectors[0] = UniversityGovernanceFacet.initUniversityDao.selector;
-    selectors[1] = UniversityGovernanceFacet.addMember.selector;
-    selectors[2] = UniversityGovernanceFacet.openUniversitySession.selector;
-    selectors[3] = UniversityGovernanceFacet.createUniversityResolution.selector;
-    selectors[4] = UniversityGovernanceFacet.startUniversityDeliberation.selector;
-    selectors[5] = UniversityGovernanceFacet.startUniversityVoting.selector;
-    selectors[6] = UniversityGovernanceFacet.voteUniversity.selector;
-    selectors[7] = UniversityGovernanceFacet.closeUniversityResolution.selector;
-    selectors[8] = UniversityGovernanceFacet.assignExecutor.selector;
-    selectors[9] = UniversityGovernanceFacet.markActivityCompleted.selector;
-    selectors[10] = UniversityGovernanceFacet.redeemIncentive.selector;
-}
+    function _setCorporateGovernanceSelectorsExecution(bytes4[] memory selectors) private pure {
+        selectors[12] = CorporateGovernanceFacet.assignCorporateExecutor.selector;
+        selectors[13] = CorporateGovernanceFacet.closeSession.selector;
+        selectors[14] = CorporateGovernanceFacet.executeResolution.selector;
+        selectors[15] = CorporateGovernanceFacet.verifyResolution.selector;
+        selectors[16] = CorporateGovernanceFacet.setGovernanceExecutor.selector;
+    }
 
-function getGovernanceRolesViewFacetSelectors() internal pure returns (bytes4[] memory selectors){
-    selectors = new bytes4[](9);
-    selectors[0] = GovernanceRolesViewFacet.isChairperson.selector;
-    selectors[1] = GovernanceRolesViewFacet.isBoardMember.selector;
-    selectors[2] = GovernanceRolesViewFacet.isAssemblyAdmin.selector;
-    selectors[3] = GovernanceRolesViewFacet.isResponsible.selector;
-    selectors[4] = GovernanceRolesViewFacet.isProposer.selector;
-    selectors[5] = GovernanceRolesViewFacet.isMember.selector;
-    selectors[6] = GovernanceRolesViewFacet.isUniversityMember.selector;
-    selectors[7] = GovernanceRolesViewFacet.getChairperson.selector;
-    selectors[8] = GovernanceRolesViewFacet.getSecretary.selector;
-}
+    function getUniversityGovernanceFacetSelectors() internal pure returns (bytes4[] memory selectors) {
+        selectors = new bytes4[](14);
 
-function getCorporateGovernanceViewFacetSelectors() internal pure returns (bytes4[] memory selectors){
-    selectors = new bytes4[](2);
+        selectors[0] = UniversityGovernanceFacet.initUniversityDao.selector;
+        selectors[1] = UniversityGovernanceFacet.addMember.selector;
+        selectors[2] = UniversityGovernanceFacet.openUniversitySession.selector;
+        selectors[3] = UniversityGovernanceFacet.joinUniversitySession.selector;
+        selectors[4] = UniversityGovernanceFacet.leaveUniversitySession.selector;
+        selectors[5] = UniversityGovernanceFacet.createUniversityResolution.selector;
+        selectors[6] = UniversityGovernanceFacet.startUniversityDeliberation.selector;
+        selectors[7] = UniversityGovernanceFacet.startUniversityVoting.selector;
+        selectors[8] = UniversityGovernanceFacet.voteUniversity.selector;
+        selectors[9] = UniversityGovernanceFacet.closeUniversityResolution.selector;
+        selectors[10] = UniversityGovernanceFacet.assignExecutor.selector;
+        selectors[11] = UniversityGovernanceFacet.closeUniversitySession.selector;
+        selectors[12] = UniversityGovernanceFacet.markActivityCompleted.selector;
+        selectors[13] = UniversityGovernanceFacet.redeemIncentive.selector;
+    }
 
-    selectors[0] = CorporateGovernanceViewFacet.getResolutionCount.selector;
-    selectors[1] = CorporateGovernanceViewFacet.getResolution.selector;
-}
+    function getGovernanceRolesViewFacetSelectors() internal pure returns (bytes4[] memory selectors) {
+        selectors = new bytes4[](9);
+        selectors[0] = GovernanceRolesViewFacet.isChairperson.selector;
+        selectors[1] = GovernanceRolesViewFacet.isBoardMember.selector;
+        selectors[2] = GovernanceRolesViewFacet.isAssemblyAdmin.selector;
+        selectors[3] = GovernanceRolesViewFacet.isResponsible.selector;
+        selectors[4] = GovernanceRolesViewFacet.isProposer.selector;
+        selectors[5] = GovernanceRolesViewFacet.isMember.selector;
+        selectors[6] = GovernanceRolesViewFacet.isUniversityMember.selector;
+        selectors[7] = GovernanceRolesViewFacet.getChairperson.selector;
+        selectors[8] = GovernanceRolesViewFacet.getSecretary.selector;
+    }
 
+    function getCorporateGovernanceViewFacetSelectors() internal pure returns (bytes4[] memory selectors) {
+        selectors = new bytes4[](5);
 
-function getUniversityGovernanceViewFacetSelectors() internal pure returns (bytes4[] memory selectors){
-    selectors = new bytes4[](1);
+        selectors[0] = CorporateGovernanceViewFacet.getCorporateResolutionCount.selector;
+        selectors[1] = CorporateGovernanceViewFacet.getCorporateResolution.selector;
+        selectors[2] = CorporateGovernanceViewFacet.isCorporateActiveMember.selector;
+        selectors[3] = CorporateGovernanceViewFacet.getCorporateSessionState.selector;
+        selectors[4] = CorporateGovernanceViewFacet.getCorporateExecutionTask.selector;
+    }
 
-    selectors[0] = UniversityGovernanceViewFacet.getExecutorInfo.selector;
-}
+    function getUniversityGovernanceViewFacetSelectors() internal pure returns (bytes4[] memory selectors) {
+        selectors = new bytes4[](7);
 
-function getImpactLeaderboardFacetSelectors() internal pure returns (bytes4[] memory selectors) {
-    selectors = new bytes4[](1);
-    selectors[0] = ImpactLeaderboardFacet.getTopRecyclers.selector;
-}
+        selectors[0] = UniversityGovernanceViewFacet.getExecutorInfo.selector;
+        selectors[1] = UniversityGovernanceViewFacet.getResolution.selector;
+        selectors[2] = UniversityGovernanceViewFacet.isMember.selector;
+        selectors[3] = UniversityGovernanceViewFacet.getResolutionCount.selector;
+        selectors[4] = UniversityGovernanceViewFacet.isActiveMember.selector;
+        selectors[5] = UniversityGovernanceViewFacet.getSessionState.selector;
+        selectors[6] = UniversityGovernanceViewFacet.getExecutionTask.selector;
+    }
 
-function getMachineFacetSelectors() internal pure returns (bytes4[] memory selectors) {
-    selectors = new bytes4[](6);
-    selectors[0] = MachineFacet.registerMachine.selector;
-    selectors[1] = MachineFacet.setMachineStatus.selector;
-    selectors[2] = MachineFacet.getMachine.selector;
-    selectors[3] = MachineFacet.getMachines.selector;
-    selectors[4] = MachineFacet.linkOracleToMachine.selector;
-    selectors[5] = MachineFacet.unlinkOracle.selector;
-}
+    function getImpactLeaderboardFacetSelectors() internal pure returns (bytes4[] memory selectors) {
+        selectors = new bytes4[](1);
+        selectors[0] = ImpactLeaderboardFacet.getTopRecyclers.selector;
+    }
 
-function getProfileFacetSelectors() internal pure returns (bytes4[] memory selectors) {
-    selectors = new bytes4[](4);
+    function getMachineFacetSelectors() internal pure returns (bytes4[] memory selectors) {
+        selectors = new bytes4[](7);
+        selectors[0] = MachineFacet.registerMachine.selector;
+        selectors[1] = MachineFacet.setMachineStatus.selector;
+        selectors[2] = MachineFacet.getMachine.selector;
+        selectors[3] = MachineFacet.getMachines.selector;
+        selectors[4] = MachineFacet.getValidMachines.selector;
+        selectors[5] = MachineFacet.linkOracleToMachine.selector;
+        selectors[6] = MachineFacet.unlinkOracle.selector;
+    }
 
-    selectors[0] = ProfileFacet.registerProfile.selector;
-    selectors[1] = ProfileFacet.updateProfile.selector;
-    selectors[2] = ProfileFacet.getProfile.selector;
-    selectors[3] = ProfileFacet.listProfiles.selector;
-}
+    function getProfileFacetSelectors() internal pure returns (bytes4[] memory selectors) {
+        selectors = new bytes4[](4);
 
-function getTreasuryFacetSelectors() internal pure returns (bytes4[] memory selectors) {
-    selectors = new bytes4[](2);
+        selectors[0] = ProfileFacet.registerProfile.selector;
+        selectors[1] = ProfileFacet.updateProfile.selector;
+        selectors[2] = ProfileFacet.getProfile.selector;
+        selectors[3] = ProfileFacet.listProfiles.selector;
+    }
 
-    selectors[0] = TreasuryFacet.treasuryExecute.selector;
-    selectors[1] = TreasuryFacet.treasuryBalance.selector;
+    function getTreasuryFacetSelectors() internal pure returns (bytes4[] memory selectors) {
+        selectors = new bytes4[](3);
 
-}
+        selectors[0] = TreasuryFacet.treasuryExecute.selector;
+        selectors[1] = TreasuryFacet.treasuryBalance.selector;
+        selectors[2] = TreasuryFacet.withdrawTokens.selector;
+    }
 
-function getImpactCredentialFacetSelectors() internal pure returns (bytes4[] memory selectors){
-    selectors = new bytes4[](3);
+    function getImpactCredentialFacetSelectors() internal pure returns (bytes4[] memory selectors) {
+        selectors = new bytes4[](6);
 
-    selectors[0] = ImpactCredentialFacet.mintImpactCredential.selector;
-    selectors[1] = ImpactCredentialFacet.getCredential.selector;
-    selectors[2] = ImpactCredentialFacet.getUserCredentials.selector;
-}
+        selectors[0] = ImpactCredentialFacet.mintImpactCredential.selector;
+        selectors[1] = ImpactCredentialFacet.issueRecycleCredential.selector;
+        selectors[2] = ImpactCredentialFacet.getCredential.selector;
+        selectors[3] = ImpactCredentialFacet.getUserCredentials.selector;
+        selectors[4] = ImpactCredentialFacet.getRecycleCredential.selector;
+        selectors[5] = ImpactCredentialFacet.getUserRecycleCredentials.selector;
+    }
 
-function getImpactFacetSelectors() internal pure returns (bytes4[] memory selectors) {
-    selectors = new bytes4[](4);
+    function getImpactFacetSelectors() internal pure returns (bytes4[] memory selectors) {
+        selectors = new bytes4[](4);
 
-    selectors[0] = ImpactFacet.getCampusImpact.selector;
-    selectors[1] = ImpactFacet.getUniversityImpact.selector;
-    selectors[2] = ImpactFacet.getSustainabilityScore.selector;
-    selectors[3] = ImpactFacet.getImpactDashboard.selector;
-}
-
+        selectors[0] = ImpactFacet.getCampusImpact.selector;
+        selectors[1] = ImpactFacet.getUniversityImpact.selector;
+        selectors[2] = ImpactFacet.getSustainabilityScore.selector;
+        selectors[3] = ImpactFacet.getImpactDashboard.selector;
+    }
 }

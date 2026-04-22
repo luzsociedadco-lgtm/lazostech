@@ -8,6 +8,7 @@ import {
   ScrollText,
   Sparkles,
 } from "lucide-react";
+import { FeatureGate } from "@/app/components/FeatureGate";
 
 const history = [
   { date: "15/08/24", material: "Plastico", quantity: "5.2 kg", value: "$260.00" },
@@ -31,6 +32,7 @@ export default function ReciclajePage() {
   return (
     <main className="recycle-screen">
       <section className="recycle-shell">
+        <FeatureGate module="reciclaje">
         <header className="recycle-header">
           <h1>Recicla-Ahorro</h1>
         </header>
@@ -138,6 +140,7 @@ export default function ReciclajePage() {
           <Plus size={18} />
           <span>Nuevo Reciclaje</span>
         </button>
+        </FeatureGate>
       </section>
     </main>
   );

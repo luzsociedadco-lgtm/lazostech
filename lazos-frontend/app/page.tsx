@@ -1,9 +1,11 @@
 "use client";
 
 import Image from "next/image";
-import { EyeOff } from "lucide-react";
-import { useMemo, useState } from "react";
+import { Eye, EyeOff } from "lucide-react";
+import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
+
+import { useAuth } from "@/app/providers/AuthProvider";
 
 type AuthMode = "signup" | "signin";
 
@@ -32,26 +34,52 @@ function GoogleIcon() {
 
 export default function Home() {
   const router = useRouter();
+  const { user, loading, login, register } = useAuth();
   const [mode, setMode] = useState<AuthMode>("signup");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
+  const [error, setError] = useState("");
+  const [submitting, setSubmitting] = useState(false);
+
+  useEffect(() => {
+    if (!loading && user) {
+      router.replace("/perfil");
+    }
+  }, [loading, router, user]);
 
   const copy = useMemo(
     () =>
       mode === "signup"
         ? {
             title: "Crear Cuenta",
-            subtitle: "Crea aqui tu cuenta en LAZOS.GO",
-            button: "Iniciar",
+            subtitle: "Registra tu email para entrar a la app y comenzar el onboarding.",
+            button: "Crear cuenta"
           }
         : {
-            title: "Welcome Back",
-            subtitle: "Fill out the information below in order to access your account.",
-            button: "Sign In",
+            title: "Iniciar Sesion",
+            subtitle: "Ingresa con tu cuenta para retomar tu proceso.",
+            button: "Entrar"
           },
-    [mode],
+    [mode]
   );
 
-  const handleAccess = () => {
-    router.push("/perfil");
+  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    setSubmitting(true);
+    setError("");
+
+    const action = mode === "signup" ? register : login;
+    const result = await action({ email, password });
+
+    setSubmitting(false);
+
+    if (result.error) {
+      setError(result.error);
+      return;
+    }
+
+    router.replace("/perfil");
   };
 
   return (
@@ -91,56 +119,51 @@ export default function Home() {
             <h1 className="auth-card__title">{copy.title}</h1>
             <p className="auth-card__subtitle">{copy.subtitle}</p>
 
-            <form
-              className="auth-form"
-              onSubmit={event => {
-                event.preventDefault();
-                handleAccess();
-              }}
-            >
+            <form className="auth-form" onSubmit={handleSubmit}>
               <label className="auth-field">
                 <input
                   className="auth-input"
                   type="email"
                   placeholder="Email"
                   aria-label="Email"
+                  value={email}
+                  onChange={event => setEmail(event.target.value)}
                 />
               </label>
 
               <label className="auth-field">
                 <input
                   className="auth-input"
-                  type="password"
+                  type={showPassword ? "text" : "password"}
                   placeholder="Password"
                   aria-label="Password"
+                  value={password}
+                  onChange={event => setPassword(event.target.value)}
                 />
-                <span className="auth-field__icon">
-                  <EyeOff size={18} />
-                </span>
+                <button
+                  className="auth-field__icon"
+                  type="button"
+                  aria-label={showPassword ? "Ocultar password" : "Mostrar password"}
+                  onClick={() => setShowPassword(prev => !prev)}
+                >
+                  {showPassword ? <Eye size={18} /> : <EyeOff size={18} />}
+                </button>
               </label>
 
-              <button className="auth-submit" type="submit">
-                {copy.button}
+              {error ? <p className="auth-error">{error}</p> : null}
+
+              <button className="auth-submit" type="submit" disabled={submitting}>
+                {submitting ? "Procesando..." : copy.button}
               </button>
 
               <p className="auth-separator">
-                {mode === "signup" ? "Or sign up with" : "Or sign in with"}
+                Google queda listo como siguiente integracion OAuth real.
               </p>
 
-              <button
-                className="auth-google"
-                type="button"
-                onClick={handleAccess}
-              >
+              <button className="auth-google is-disabled" type="button" disabled>
                 <GoogleIcon />
-                <span>Continue with Google</span>
+                <span>Google pendiente</span>
               </button>
-
-              {mode === "signin" ? (
-                <button className="auth-forgot" type="button">
-                  Forgot Password?
-                </button>
-              ) : null}
             </form>
           </div>
         </article>

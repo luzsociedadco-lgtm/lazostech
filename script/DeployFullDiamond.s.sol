@@ -129,11 +129,8 @@ contract DeployFullDiamond is Script {
         }
 
         // 6️⃣ Ejecutar Diamond Cut con el stack ya limpio
-        IDiamondCut(address(diamond)).diamondCut(
-            cut,
-            address(diamondInit),
-            abi.encodeWithSelector(DiamondInit.init.selector)
-        );
+        IDiamondCut(address(diamond))
+            .diamondCut(cut, address(diamondInit), abi.encodeWithSelector(DiamondInit.init.selector));
 
         vm.stopBroadcast();
 
