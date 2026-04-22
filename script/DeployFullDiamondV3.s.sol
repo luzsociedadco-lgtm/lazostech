@@ -47,16 +47,14 @@ import {ProfileFacet} from "src/facets/profile/ProfileFacet.sol";
 
 contract DeployFullDiamondV3 is Script {
     IDiamondLoupe loupe;
-    // Usamos un array dinámico para acumular todos los cortes necesarios
-    IDiamondCut.FacetCut[] finalCuts;
+    address diamond;
 
     function run() external {
-        address diamond = vm.envAddress("DIAMOND");
+        diamond = vm.envAddress("DIAMOND");
         loupe = IDiamondLoupe(diamond);
 
         vm.startBroadcast();
 
-        // Procesar cada faceta una por una
         processFacet(address(new DiamondLoupeFacet()), SelectorLib.getDiamondLoupeFacetSelectors());
         processFacet(address(new OwnershipFacet()), SelectorLib.getOwnershipFacetSelectors());
         processFacet(address(new ParticipationFacet()), SelectorLib.getParticipationFacetSelectors());
@@ -83,46 +81,59 @@ contract DeployFullDiamondV3 is Script {
         processFacet(address(new MachineFacet()), SelectorLib.getMachineFacetSelectors());
         processFacet(address(new ProfileFacet()), SelectorLib.getProfileFacetSelectors());
 
-        // Ejecutar la actualización con todos los cortes acumulados
-        IDiamondCut(diamond).diamondCut(finalCuts, address(0), "");
-
         vm.stopBroadcast();
     }
 
-    /// @dev Separa los selectores en ADD o REPLACE y los añade al array global de cortes
     function processFacet(address facetAddress, bytes4[] memory selectors) internal {
         uint256 len = selectors.length;
         bytes4[] memory addSelectors = new bytes4[](len);
         bytes4[] memory replaceSelectors = new bytes4[](len);
-        uint256 addCount = 0;
-        uint256 replaceCount = 0;
+
+        (uint256 addCount, uint256 replaceCount) = classifySelectors(selectors, addSelectors, replaceSelectors);
+
+        executeCutIfNeeded(facetAddress, IDiamondCut.FacetCutAction.Add, addSelectors, addCount);
+        executeCutIfNeeded(facetAddress, IDiamondCut.FacetCutAction.Replace, replaceSelectors, replaceCount);
+    }
+
+    function classifySelectors(
+        bytes4[] memory selectors,
+        bytes4[] memory addSelectors,
+        bytes4[] memory replaceSelectors
+    ) internal view returns (uint256 addCount, uint256 replaceCount) {
+        uint256 len = selectors.length;
 
         for (uint256 i = 0; i < len; i++) {
-            if (loupe.facetAddress(selectors[i]) == address(0)) {
-                addSelectors[addCount] = selectors[i];
+            bytes4 selector = selectors[i];
+
+            if (loupe.facetAddress(selector) == address(0)) {
+                addSelectors[addCount] = selector;
                 addCount++;
             } else {
-                replaceSelectors[replaceCount] = selectors[i];
+                replaceSelectors[replaceCount] = selector;
                 replaceCount++;
             }
         }
+    }
 
-        // Si hay selectores para añadir, crear un FacetCut de ADD
-        if (addCount > 0) {
-            bytes4[] memory trimAdd = new bytes4[](addCount);
-            for (uint256 j = 0; j < addCount; j++) {
-                trimAdd[j] = addSelectors[j];
-            }
-            finalCuts.push(IDiamondCut.FacetCut(facetAddress, IDiamondCut.FacetCutAction.Add, trimAdd));
-        }
+    function executeCutIfNeeded(
+        address facetAddress,
+        IDiamondCut.FacetCutAction action,
+        bytes4[] memory selectors,
+        uint256 count
+    ) internal {
+        if (count == 0) return;
 
-        // Si hay selectores para reemplazar, crear un FacetCut de REPLACE
-        if (replaceCount > 0) {
-            bytes4[] memory trimReplace = new bytes4[](replaceCount);
-            for (uint256 j = 0; j < replaceCount; j++) {
-                trimReplace[j] = replaceSelectors[j];
-            }
-            finalCuts.push(IDiamondCut.FacetCut(facetAddress, IDiamondCut.FacetCutAction.Replace, trimReplace));
+        IDiamondCut.FacetCut[] memory cuts = new IDiamondCut.FacetCut[](1);
+        cuts[0] = IDiamondCut.FacetCut(facetAddress, action, trimSelectors(selectors, count));
+
+        IDiamondCut(diamond).diamondCut(cuts, address(0), "");
+    }
+
+    function trimSelectors(bytes4[] memory selectors, uint256 count) internal pure returns (bytes4[] memory trimmed) {
+        trimmed = new bytes4[](count);
+
+        for (uint256 i = 0; i < count; i++) {
+            trimmed[i] = selectors[i];
         }
     }
 }

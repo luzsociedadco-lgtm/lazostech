@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import { Eye, EyeOff } from "lucide-react";
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 
 import { useAuth } from "@/app/providers/AuthProvider";
@@ -34,19 +34,13 @@ function GoogleIcon() {
 
 export default function Home() {
   const router = useRouter();
-  const { user, loading, login, register } = useAuth();
+  const { user, loading, login, logout, register } = useAuth();
   const [mode, setMode] = useState<AuthMode>("signup");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState("");
   const [submitting, setSubmitting] = useState(false);
-
-  useEffect(() => {
-    if (!loading && user) {
-      router.replace("/perfil");
-    }
-  }, [loading, router, user]);
 
   const copy = useMemo(
     () =>
@@ -120,6 +114,26 @@ export default function Home() {
             <p className="auth-card__subtitle">{copy.subtitle}</p>
 
             <form className="auth-form" onSubmit={handleSubmit}>
+              {!loading && user ? (
+                <div className="auth-error auth-error--session">
+                  <span>Ya hay una sesion activa para {user.email}.</span>
+                  <div className="auth-error__actions">
+                    <button type="button" className="auth-submit" onClick={() => router.push("/perfil")}>
+                      Continuar en la app
+                    </button>
+                    <button
+                      type="button"
+                      className="auth-forgot"
+                      onClick={async () => {
+                        await logout();
+                      }}
+                    >
+                      Cerrar sesion actual
+                    </button>
+                  </div>
+                </div>
+              ) : null}
+
               <label className="auth-field">
                 <input
                   className="auth-input"

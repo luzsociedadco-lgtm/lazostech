@@ -5,17 +5,17 @@ import { usePathname } from "next/navigation";
 import {
   Handshake,
   Recycle,
-  Ticket,
-  UtensilsCrossed,
-  WalletCards
+  Utensils,
+  Vote,
+  WalletMinimal
 } from "lucide-react";
 
 const navItems = [
-  { href: "/perfil", label: "Perfil", Icon: WalletCards, accessKey: "perfil" },
-  { href: "/tickets", label: "Tickets", Icon: UtensilsCrossed, accessKey: "tickets" },
+  { href: "/perfil", label: "Perfil", Icon: WalletMinimal, accessKey: "perfil" },
+  { href: "/tickets", label: "Tickets", Icon: Utensils, accessKey: "tickets" },
   { href: "/reciclaje", label: "Recicla", Icon: Recycle, accessKey: "reciclaje" },
-  { href: "/dao", label: "Lazos", Icon: Handshake, accessKey: "dao" },
-  { href: "/marketplace", label: "Otros", Icon: Ticket, accessKey: "marketplace" }
+  { href: "/marketplace", label: "Marketplace", Icon: Handshake, accessKey: "marketplace" },
+  { href: "/dao", label: "DAO", Icon: Vote, accessKey: "dao" }
 ] as const;
 
 export default function FooterNav() {
@@ -35,17 +35,27 @@ export default function FooterNav() {
 
           if (!enabled) {
             return (
-              <div key={href} className="app-nav__item is-disabled">
-                <Icon size={20} strokeWidth={2} />
-                <span>{label}</span>
+              <div key={href} className="app-nav__item is-disabled" aria-label={label}>
+                <span className="app-nav__icon-shell">
+                  <Icon size={22} strokeWidth={2.2} />
+                </span>
+                <span className="app-nav__label">{label}</span>
               </div>
             );
           }
 
           return (
-            <Link key={href} href={href} className={`app-nav__item ${active ? "is-active" : ""}`}>
-              <Icon size={20} strokeWidth={active ? 2.5 : 2} />
-              <span>{label}</span>
+            <Link
+              key={href}
+              href={href}
+              className={`app-nav__item ${active ? "is-active" : ""}`}
+              aria-label={label}
+              aria-current={active ? "page" : undefined}
+            >
+              <span className="app-nav__icon-shell">
+                <Icon size={22} strokeWidth={active ? 2.6 : 2.2} />
+              </span>
+              <span className="app-nav__label">{label}</span>
             </Link>
           );
         })}
