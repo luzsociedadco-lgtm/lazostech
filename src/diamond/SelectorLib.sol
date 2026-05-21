@@ -59,7 +59,7 @@ library SelectorLib {
     }
 
     function getRewardFacetSelectors() internal pure returns (bytes4[] memory selectors) {
-        selectors = new bytes4[](9);
+        selectors = new bytes4[](10);
         selectors[0] = RewardFacet.setRewardToken.selector;
         selectors[1] = RewardFacet.setRecycleRate.selector;
         selectors[2] = RewardFacet.setRewardBaseUnit.selector;
@@ -69,20 +69,23 @@ library SelectorLib {
         selectors[6] = RewardFacet.getNudos.selector;
         selectors[7] = RewardFacet.getNudosAccumulated.selector;
         selectors[8] = RewardFacet.getRewardBaseUnit.selector;
+        selectors[9] = RewardFacet.getRewardTreasuryBalance.selector;
     }
 
     function getTicketsFacetSelectors() internal pure returns (bytes4[] memory selectors) {
-        selectors = new bytes4[](6);
+        selectors = new bytes4[](8);
         selectors[0] = TicketsFacet.getTickets.selector;
         selectors[1] = TicketsFacet.mintTicket.selector;
         selectors[2] = TicketsFacet.redeemTickets.selector;
         selectors[3] = TicketsFacet.transferTicket.selector;
         selectors[4] = TicketsFacet.useTicket.selector;
         selectors[5] = TicketsFacet.grantTicketsFromFiat.selector;
+        selectors[6] = TicketsFacet.redeemTicketsForOrder.selector;
+        selectors[7] = TicketsFacet.quoteTicketRedemption.selector;
     }
 
     function getMarketplaceFacetSelectors() internal pure returns (bytes4[] memory selectors) {
-        selectors = new bytes4[](9);
+        selectors = new bytes4[](11);
         selectors[0] = MarketplaceFacet.acceptTrade.selector;
         selectors[1] = MarketplaceFacet.buyWithTokens.selector;
         selectors[2] = MarketplaceFacet.createItem.selector;
@@ -92,6 +95,8 @@ library SelectorLib {
         selectors[6] = MarketplaceFacet.rateItem.selector;
         selectors[7] = MarketplaceFacet.executeMarketplaceFee.selector;
         selectors[8] = MarketplaceFacet.spendTreasury.selector;
+        selectors[9] = MarketplaceFacet.settleMarketplacePurchase.selector;
+        selectors[10] = MarketplaceFacet.collectMarketplaceFee.selector;
     }
 
     function getCampusFacetSelectors() internal pure returns (bytes4[] memory selectors) {

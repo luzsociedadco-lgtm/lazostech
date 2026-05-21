@@ -1,0 +1,1164 @@
+diff --git a/lazos-frontend/app/globals.css b/lazos-frontend/app/globals.css
+index e4dc4b84e..a940c809d 100644
+--- a/lazos-frontend/app/globals.css
++++ b/lazos-frontend/app/globals.css
+@@ -42,11 +42,11 @@ a {
+ }
+ 
+ .app-frame {
+-  width: min(100%, 460px);
++  width: min(100%, 360px);
+   margin: 0 auto;
+   min-height: 100vh;
+   position: relative;
+-  padding: 18px 0 96px;
++  padding: 18px 0 60px;
+ }
+ 
+ .screen-shell {
+@@ -265,18 +265,22 @@ a {
+ 
+ .profile-screen {
+   height: calc(100dvh - 112px);
++  display: flex;
++  align-items: stretch;
+   overflow: hidden;
+ }
+ 
+ .profile-shell {
+   height: calc(100dvh - 112px);
+-  background: #bd7a12;
+-  border-radius: 28px 28px 0 0;
+-  color: #fff2d6;
++  background: #b77812;
++  color: #fff4e6;
+   overflow: hidden;
+   box-shadow: 0 20px 44px rgba(0, 0, 0, 0.18);
+-  display: grid;
+-  grid-template-rows: auto auto auto auto 1fr;
++  display: flex;
++  flex-direction: column;
++  justify-content: flex-start;
++  width: 100%;
++  position: relative;
+ }
+ 
+ .profile-shell--empty {
+@@ -286,51 +290,45 @@ a {
+ }
+ 
+ .profile-topbar {
+-  padding: 18px 14px 10px;
++  padding: 7px 10px 6px;
+   display: flex;
+-  justify-content: space-between;
++  justify-content: flex-start;
+   align-items: center;
+ }
+ 
+ .profile-topbar__menu {
+-  width: 30px;
+-  height: 30px;
++  width: 24px;
++  height: 24px;
+   display: grid;
+   place-items: center;
+   border: 0;
+-  color: #241300;
+   background: transparent;
+-  color: #fff3db;
++  color: #fff8ef;
++  padding: 0;
+ }
+ 
+-.profile-topbar__brand {
+-  min-width: 118px;
+-  border-radius: 999px;
+-  border: 3px solid rgba(255, 245, 225, 0.98);
+-  background: #c9871d;
+-  color: #231300;
+-  text-align: center;
+-  font-size: 0.78rem;
+-  font-weight: 800;
+-  padding: 6px 12px;
+-}
+ 
+ .profile-status-row {
+   display: grid;
+   grid-template-columns: 1fr 1fr;
+   gap: 8px;
+-  padding: 0 10px 10px;
++  padding: 5px 10px 6px;
+ }
+ 
+ .profile-status-card {
+-  background: #e71818;
++  background: #ef0808;
+   color: white;
+-  border-radius: 7px;
+-  padding: 8px 10px;
++  border-radius: 8px;
++  padding: 7px 10px 8px;
+   display: flex;
+   gap: 8px;
+   align-items: flex-start;
+-  min-height: 46px;
++  min-height: 40px;
++  box-shadow: inset 0 -1px 0 rgba(0, 0, 0, 0.08);
++}
++
++.profile-status-card.is-success {
++  background: #ef0808;
+ }
+ 
+ .profile-status-card strong,
+@@ -338,41 +336,65 @@ a {
+   display: block;
+ }
+ 
++.profile-status-card__copy {
++  display: grid;
++  gap: 2px;
++}
++
+ .profile-status-card strong {
+-  font-size: 0.74rem;
++  font-size: 0.75rem;
++  line-height: 1;
+ }
+ 
+ .profile-status-card small {
+-  font-size: 0.56rem;
+-  opacity: 0.88;
++  font-size: 0.61rem;
++  line-height: 1.1;
++  opacity: 0.92;
+ }
+ 
+ .profile-status-card__check {
+-  width: 14px;
+-  height: 14px;
+-  border-radius: 3px;
++  width: 13px;
++  height: 13px;
++  border-radius: 2px;
+   background: #2563ff;
+   display: grid;
+   place-items: center;
+-  font-size: 0.52rem;
++  color: #fff;
++  font-size: 0.48rem;
+   margin-top: 1px;
++  flex-shrink: 0;
+ }
+ 
+ .profile-account-row {
+   display: grid;
+-  grid-template-columns: 74px 1fr;
++  grid-template-columns: 70px 1fr;
+   gap: 12px;
+-  padding: 0 12px 10px;
++  padding: 0 14px 4px;
+   align-items: center;
++  width: 100%;
++  max-width: 100%;
++  align-self: stretch;
++  box-sizing: border-box;
++}
++
++.profile-identity-stack {
++  flex: 1 1 auto;
++  display: flex;
++  flex-direction: column;
++  justify-content: center;
++  align-items: center;
++  gap: clamp(4px, 1.2vh, 10px);
++  min-height: 0;
+ }
+ 
+ .profile-avatar-ring {
+-  width: 68px;
+-  height: 68px;
++  width: 66px;
++  height: 66px;
+   border-radius: 999px;
+-  padding: 3px;
+-  background: #ef1919;
+-  border: 3px solid #fff0db;
++  padding: 2px;
++  background: #f10808;
++  border: 2px solid #ffefdb;
++  box-shadow: 0 2px 0 rgba(0, 0, 0, 0.08);
+ }
+ 
+ .profile-avatar-ring.is-small {
+@@ -392,7 +414,7 @@ a {
+ .profile-head-metrics {
+   display: grid;
+   grid-template-columns: repeat(3, 1fr);
+-  gap: 8px;
++  gap: 0;
+ }
+ 
+ .profile-head-metric strong,
+@@ -402,99 +424,132 @@ a {
+ }
+ 
+ .profile-head-metric strong {
+-  font-size: 1.75rem;
++  font-size: 1.85rem;
+   line-height: 1;
+-  color: #fff1d7;
++  color: #fff8f1;
+   font-weight: 800;
+ }
+ 
+ .profile-head-metric span {
+-  font-size: 0.68rem;
+-  color: #fff2d6;
+-  letter-spacing: 0.04em;
+-  margin-top: 6px;
++  font-size: 0.66rem;
++  color: #fff8f1;
++  letter-spacing: 0.01em;
++  margin-top: 7px;
+   font-weight: 700;
+ }
+ 
+ .profile-card-id {
+-  background: #c9871d;
+-  border-radius: 0;
+-  padding: 2px 12px 14px;
+-  position: relative;
++  --profile-barcode-width: 218px;
++  background: transparent;
++  padding: clamp(2px, 0.5vh, 4px) 14px 0;
++  min-height: clamp(96px, 14vh, 110px);
++  margin-bottom: 0;
++  display: grid;
++  width: fit-content;
++  max-width: 100%;
++  justify-self: center;
++  grid-template-columns: minmax(0, var(--profile-barcode-width)) 88px;
++  grid-template-areas:
++    "copy uni"
++    "barcode uni";
++  column-gap: 0.5px;
++  row-gap: 2px;
++  align-items: end;
++  align-content: end;
+ }
+ 
+ .profile-card-id__copy {
++  grid-area: copy;
+   text-align: left;
+-  color: #fff2d6;
+-  margin-bottom: 8px;
+-  padding-right: 88px;
++  color: #fff9ef;
++  margin-bottom: 0;
++  padding-right: 0;
++  align-self: end;
++  width: var(--profile-barcode-width);
++  max-width: 100%;
+ }
+ 
+ .profile-card-id__copy strong,
+-.profile-card-id__copy span,
+-.profile-card-id__copy small {
++.profile-card-id__meta span {
+   display: block;
+ }
+ 
+ .profile-card-id__copy strong {
+-  color: #ffffff;
+-  font-size: 1.05rem;
++  color: #fff8ef;
++  font-size: 1.12rem;
++  line-height: 1;
++  font-weight: 800;
++  letter-spacing: 0.01em;
+ }
+ 
+-.profile-card-id__copy span {
+-  font-weight: 700;
+-  color: #2c1d11;
+-  font-size: 0.7rem;
++.profile-card-id__meta {
++  margin-top: 2px;
++  display: flex;
++  flex-wrap: nowrap;
++  gap: 2px;
++  white-space: nowrap;
++  overflow: hidden;
+ }
+ 
+-.profile-card-id__copy small {
+-  font-size: 0.54rem;
+-  color: #2c1d11;
++.profile-card-id__meta span {
++  font-weight: 700;
++  color: #221000;
++  font-size: 0.62rem;
++  line-height: 1.05;
+ }
+ 
+ .profile-card-id__barcode {
+-  background: #f3efe6;
+-  border-radius: 0;
+-  padding: 8px 6px 8px;
+-  display: flex;
+-  align-items: end;
+-  justify-content: flex-start;
+-  gap: 1px;
+-  height: 74px;
++  grid-area: barcode;
++  background: transparent;
++  box-sizing: border-box;
++  padding: 0 1px 0 6px;
+   position: relative;
+-  overflow: hidden;
+-  width: calc(100% - 96px);
+-}
+-
+-.profile-card-id__bar {
+-  width: 2px;
+-  height: 48px;
+-  background: #161616;
++  overflow: visible;
++  width: min(100%, var(--profile-barcode-width));
++  max-width: min(100%, var(--profile-barcode-width));
++  margin: 0;
++  justify-self: start;
++  align-self: start;
+ }
+ 
+-.profile-card-id__bar.is-wide {
+-  width: 3px;
+-  height: 54px;
++.profile-card-id__barcode-bars {
++  width: 100%;
++  height: clamp(40px, 7.2vh, 58px);
++  background:
++    repeating-linear-gradient(
++      90deg,
++      #111 0 2px,
++      transparent 2px 3px,
++      #111 3px 4px,
++      transparent 4px 6px,
++      #111 6px 7px,
++      transparent 7px 9px
++    );
+ }
+ 
+ .profile-card-id__barcode p {
+-  position: absolute;
+-  left: 0;
+-  right: 0;
+-  bottom: 6px;
+-  margin: 0;
++  position: static;
++  margin: 4px 0 0;
++  width: 100%;
+   text-align: center;
+-  color: #7b6b5f;
+-  font-size: 0.54rem;
++  color: #3f2411;
++  font-size: clamp(0.66rem, 1.6vh, 0.74rem);
++  line-height: 1.05;
++  font-weight: 800;
++  letter-spacing: 0.01em;
++  white-space: nowrap;
++  overflow: hidden;
++  text-overflow: ellipsis;
+ }
+ 
+ .profile-card-id__uni {
+-  position: absolute;
+-  right: 12px;
+-  top: 18px;
+-  width: 78px;
++  grid-area: uni;
++  position: relative;
++  width: 88px;
+   display: grid;
+   justify-items: center;
++  align-self: center;
++  justify-self: center;
+   z-index: 2;
+ }
+ 
+@@ -502,50 +557,78 @@ a {
+   width: 66px;
+   height: 66px;
+   border-radius: 999px;
+-  background: #ea1c1c;
+-  border: 4px solid #fff2d6;
++  background: #e90e16;
++  border: 4px solid #fff9ef;
+   display: grid;
+   place-items: center;
++  overflow: hidden;
+ }
+ 
+-.profile-card-id__uni span {
+-  margin-top: 6px;
+-  font-size: 0.62rem;
+-  text-align: center;
+-  color: #fff2d6;
+-  font-weight: 700;
++.profile-card-id__uni-logo {
++  width: 100%;
++  height: 100%;
++  object-fit: cover;
+ }
+ 
+ .profile-history-grid {
+-  background: #7d7d7d;
+-  border-radius: 12px 12px 0 0;
+-  padding: 14px;
+-  margin-top: 6px;
++  margin-top: 0;
++  --profile-tile-icon-size: clamp(44px, 12vw, 52px);
++  --profile-tile-value-size: clamp(1.15rem, 4vw, 1.6rem);
++  --profile-tile-label-size: clamp(0.58rem, 1.9vw, 0.72rem);
++  background: #949494;
++  border-radius: 18px 18px 0 0;
++  padding: 20px 18px 20px;
+   display: grid;
+-  grid-template-columns: 1fr 1fr;
+-  gap: 10px;
+-  align-content: start;
+-  height: 100%;
++  grid-template-columns: repeat(2, minmax(0, 1fr));
++  grid-template-rows: repeat(2, minmax(0, 1fr));
++  row-gap: 8px;
++  column-gap: 4px;
++  place-items: center;
++  place-content: center;
++  flex: 0 0 calc((100dvh - 112px) / 2);
++  height: calc((100dvh - 112px) / 2);
++  box-shadow: 0 -5px 9px rgba(0, 0, 0, 0.28);
+ }
+ 
+ .profile-balance-tile {
+-  background: #b5b5b5;
+-  border-radius: 16px;
+-  min-height: 108px;
+-  display: grid;
+-  place-items: center;
++  background: #c3c3c3;
++  border-radius: 18px;
++  width: calc(90% - 2px);
++  max-width: 100%;
++  height: 100%;
++  min-height: 0;
++  aspect-ratio: 1 / 1;
++  display: flex;
++  flex-direction: column;
++  align-items: center;
++  justify-content: center;
+   text-align: center;
+-  padding: 10px 8px 12px;
++  padding: clamp(10px, 2.6vh, 16px) 8px 10px;
+   position: relative;
+ }
+ 
+-.profile-balance-tile__icon {
+-  width: 34px;
+-  height: 34px;
+-  border-radius: 999px;
++.profile-balance-tile__icon-shell {
++  width: var(--profile-tile-icon-size);
++  height: var(--profile-tile-icon-size);
+   display: grid;
+   place-items: center;
+-  margin-bottom: 8px;
++  margin-bottom: clamp(6px, 1.2vh, 10px);
++  flex: 0 0 auto;
++}
++
++.profile-balance-tile__icon {
++  width: var(--profile-tile-icon-size);
++  height: var(--profile-tile-icon-size);
++  display: block;
++  background-color: currentColor;
++  -webkit-mask-image: var(--icon-url);
++  mask-image: var(--icon-url);
++  -webkit-mask-repeat: no-repeat;
++  mask-repeat: no-repeat;
++  -webkit-mask-position: center;
++  mask-position: center;
++  -webkit-mask-size: contain;
++  mask-size: contain;
+ }
+ 
+ .profile-balance-tile strong,
+@@ -554,55 +637,34 @@ a {
+ }
+ 
+ .profile-balance-tile strong {
+-  font-size: 1.9rem;
++  font-size: var(--profile-tile-value-size);
+   line-height: 1;
+   font-weight: 800;
+ }
+ 
+ .profile-balance-tile span {
+-  margin-top: 8px;
+-  font-size: 0.7rem;
+-  letter-spacing: 0.04em;
+-}
+-
+-.profile-balance-tile.is-red .profile-balance-tile__icon {
+-  background: rgba(217, 21, 21, 0.14);
+-  color: #d91515;
+-}
+-
+-.profile-balance-tile.is-red strong,
+-.profile-balance-tile.is-red span {
+-  color: #d91515;
+-}
+-
+-.profile-balance-tile.is-green .profile-balance-tile__icon {
+-  background: rgba(25, 161, 68, 0.14);
+-  color: #19a144;
+-}
+-
+-.profile-balance-tile.is-green strong,
+-.profile-balance-tile.is-green span {
+-  color: #19a144;
++  margin-top: 6px;
++  font-size: var(--profile-tile-label-size);
++  letter-spacing: 0.02em;
++  font-weight: 500;
+ }
+ 
+-.profile-balance-tile.is-money .profile-balance-tile__icon {
+-  background: rgba(32, 150, 74, 0.14);
+-  color: #20964a;
++.profile-balance-tile.is-empty strong,
++.profile-balance-tile.is-empty span {
++  color: #d01005;
+ }
+ 
+-.profile-balance-tile.is-money strong,
+-.profile-balance-tile.is-money span {
+-  color: #20964a;
++.profile-balance-tile.is-positive strong,
++.profile-balance-tile.is-positive span {
++  color: #199c26;
+ }
+ 
+-.profile-balance-tile.is-token .profile-balance-tile__icon {
+-  background: rgba(32, 133, 59, 0.14);
+-  color: #20853b;
++.profile-balance-tile.is-empty .profile-balance-tile__icon {
++  color: #d01005;
+ }
+ 
+-.profile-balance-tile.is-token strong,
+-.profile-balance-tile.is-token span {
+-  color: #20853b;
++.profile-balance-tile.is-positive .profile-balance-tile__icon {
++  color: #199c26;
+ }
+ 
+ .profile-drawer-overlay {
+@@ -1063,37 +1125,64 @@ a {
+   }
+ 
+   .profile-topbar {
+-    padding: 16px 10px 8px;
++    padding: 7px 10px 6px;
+   }
+ 
+   .profile-status-row {
+     gap: 8px;
+-    padding: 0 6px 6px;
++    padding: 5px 8px 6px;
+   }
+ 
+   .profile-account-row {
+     grid-template-columns: 64px 1fr;
+-    padding: 0 8px 6px;
++    padding: 0 10px 4px;
++  }
++
++  .profile-identity-stack {
++    gap: clamp(4px, 1vh, 8px);
+   }
+ 
+   .profile-card-id {
+-    padding: 8px 8px 10px;
++    --profile-barcode-width: 204px;
++    padding: clamp(2px, 0.5vh, 4px) 12px 0;
++    min-height: clamp(92px, 13vh, 104px);
++    margin-bottom: 0;
++    grid-template-columns: minmax(0, var(--profile-barcode-width)) 82px;
+   }
+ 
+   .profile-history-grid {
+-    padding: 12px 10px 10px;
+-    gap: 8px;
++    margin-top: 0;
++    --profile-tile-icon-size: clamp(40px, 11vw, 48px);
++    padding: 20px 18px 20px;
++    row-gap: 8px;
++    column-gap: 4px;
++    flex: 0 0 calc((100dvh - 106px) / 2);
++    height: calc((100dvh - 106px) / 2);
+   }
+ 
+   .profile-balance-tile {
+-    min-height: 96px;
+-    padding: 10px 8px;
++    padding: 12px 8px 10px;
+   }
+ 
+-  .profile-balance-tile__icon {
+-    width: 30px;
+-    height: 30px;
+-    margin-bottom: 6px;
++  .profile-balance-tile strong {
++    font-size: 1.05rem;
++  }
++
++  .profile-head-metric strong {
++    font-size: 1.58rem;
++  }
++
++  .profile-head-metric span,
++  .profile-balance-tile span {
++    font-size: 0.56rem;
++  }
++
++  .profile-card-id__copy strong {
++    font-size: 1.02rem;
++  }
++
++  .profile-card-id__meta span {
++    font-size: 0.56rem;
+   }
+ 
+   .profile-drawer {
+@@ -1118,6 +1207,13 @@ a {
+     height: calc(100dvh - 104px);
+   }
+ 
++  .profile-history-grid {
++    margin-top: 0;
++    --profile-tile-icon-size: clamp(38px, 10.5vw, 46px);
++    flex: 0 0 calc((100dvh - 104px) / 2);
++    height: calc((100dvh - 104px) / 2);
++  }
++
+   .profile-topbar {
+     padding: 8px 12px 6px;
+   }
+@@ -1130,10 +1226,6 @@ a {
+     padding-bottom: 6px;
+   }
+ 
+-  .profile-card-id {
+-    padding-bottom: 10px;
+-  }
+-
+   .profile-history-grid {
+     padding-top: 12px;
+   }
+@@ -1155,43 +1247,45 @@ a {
+   }
+ 
+   .profile-card-id__barcode {
+-    height: 64px;
+-    width: calc(100% - 86px);
++    width: min(100%, var(--profile-barcode-width));
++    max-width: min(100%, var(--profile-barcode-width));
++    margin: 0;
++    padding: 0 1px 0 4px;
+   }
+ 
+-  .profile-card-id__bar {
+-    height: 34px;
++  .profile-card-id__barcode-bars {
++    height: clamp(34px, 6.2vh, 48px);
+   }
+ 
+-  .profile-card-id__bar.is-wide {
+-    height: 40px;
++  .profile-card-id__barcode p {
++    font-size: 0.66rem;
+   }
+ 
+   .profile-card-id__uni {
+-    top: 14px;
++    width: 74px;
+   }
+ 
+   .profile-card-id__uni-badge {
+-    width: 50px;
+-    height: 50px;
++    width: 54px;
++    height: 54px;
+   }
+ 
+   .profile-history-grid {
+-    padding: 10px 10px 8px;
+-    gap: 8px;
++    margin-top: 0;
++    --profile-tile-icon-size: clamp(30px, 9vw, 38px);
++    --profile-tile-value-size: clamp(1rem, 3.7vw, 1.2rem);
++    --profile-tile-label-size: clamp(0.5rem, 1.6vw, 0.64rem);
++    flex: 0 0 calc((100dvh - 98px) / 2);
++    height: calc((100dvh - 98px) / 2);
++    padding: 18px 18px 18px;
++    row-gap: 8px;
++    column-gap: 4px;
+   }
+ 
+   .profile-balance-tile {
+-    min-height: 78px;
+     padding: 8px 6px;
+   }
+ 
+-  .profile-balance-tile__icon {
+-    width: 26px;
+-    height: 26px;
+-    margin-bottom: 4px;
+-  }
+-
+   .profile-panel-card {
+     top: 128px;
+   }
+@@ -2939,9 +3033,9 @@ a {
+ .app-nav {
+   position: fixed;
+   left: 50%;
+-  bottom: 0;
++  bottom: -2px;
+   transform: translateX(-50%);
+-  width: min(100%, 460px);
++  width: min(100%, 360px);
+   z-index: 50;
+ }
+ 
+@@ -2950,21 +3044,21 @@ a {
+   grid-template-columns: repeat(5, minmax(0, 1fr));
+   gap: 0;
+   align-items: center;
+-  min-height: 58px;
++  min-height: 90px;
+   background: #070707;
+-  border-top: 1px solid rgba(255, 255, 255, 0.06);
++  border-top: 0;
+   border-radius: 0;
+   box-shadow:
+     0 -10px 28px rgba(0, 0, 0, 0.18),
+-    inset 0 1px 0 rgba(255, 255, 255, 0.04);
+-  padding: 6px 10px 8px;
++    inset 0 1px 0 rgba(255, 255, 255, 0.02);
++  padding: 6px 8px 16px;
+ }
+ 
+ .app-nav__item {
+   display: flex;
+   justify-content: center;
+   align-items: center;
+-  min-height: 44px;
++  min-height: 64px;
+   padding: 0;
+   color: rgba(255, 255, 255, 0.92);
+   border-radius: 12px;
+@@ -2976,18 +3070,63 @@ a {
+ }
+ 
+ .app-nav__icon-shell {
+-  width: 34px;
+-  height: 34px;
+-  border-radius: 6px;
++  width: 52px;
++  height: 52px;
++  border-radius: 0;
+   display: inline-flex;
+   align-items: center;
+   justify-content: center;
++  padding: 1px;
++  overflow: hidden;
+   transition:
+     background-color 180ms ease,
+     box-shadow 180ms ease,
+     color 180ms ease;
+ }
+ 
++.app-nav__asset {
++  width: 50px;
++  height: 50px;
++  display: block;
++  object-fit: contain;
++  filter: brightness(0) invert(1);
++  transform: scale(1.2);
++  transform-origin: center;
++}
++
++.app-nav__asset.is-wallet,
++.app-nav__asset.is-ticket,
++.app-nav__asset.is-market,
++.app-nav__asset.is-dao {
++  width: 50px;
++  height: 50px;
++}
++
++.app-nav__asset.is-recycle {
++  width: 50px;
++  height: 50px;
++}
++
++.app-nav__asset.is-wallet {
++  transform: scale(1.24);
++}
++
++.app-nav__asset.is-ticket {
++  transform: scale(1.22);
++}
++
++.app-nav__asset.is-recycle {
++  transform: scale(1.26);
++}
++
++.app-nav__asset.is-market {
++  transform: scale(1.25);
++}
++
++.app-nav__asset.is-dao {
++  transform: scale(1.24);
++}
++
+ .app-nav__label {
+   position: absolute;
+   width: 1px;
+@@ -3001,20 +3140,18 @@ a {
+ }
+ 
+ .app-nav__item.is-active {
+-  color: #ffffff;
++  color: #2d18ff;
+   transform: translateY(-0.5px);
+ }
+ 
+-.app-nav__item.is-active .app-nav__icon-shell {
+-  background: linear-gradient(180deg, #3f2dff 0%, #2d18ff 100%);
+-  box-shadow:
+-    0 6px 12px rgba(57, 38, 255, 0.34),
+-    inset 0 1px 0 rgba(255, 255, 255, 0.18);
++.app-nav__item.is-active .app-nav__asset {
++  filter: brightness(0) saturate(100%) invert(13%) sepia(98%) saturate(5987%) hue-rotate(248deg) brightness(107%)
++    contrast(113%);
+ }
+ 
+ .app-nav__item:not(.is-active):hover .app-nav__icon-shell,
+ .app-nav__item:not(.is-active):focus-visible .app-nav__icon-shell {
+-  background: rgba(255, 255, 255, 0.06);
++  background: transparent;
+ }
+ 
+ .app-nav__item:focus-visible {
+diff --git a/lazos-frontend/app/perfil/page.tsx b/lazos-frontend/app/perfil/page.tsx
+index ceed4e061..52876f865 100644
+--- a/lazos-frontend/app/perfil/page.tsx
++++ b/lazos-frontend/app/perfil/page.tsx
+@@ -3,30 +3,31 @@
+ import Image from "next/image";
+ import Link from "next/link";
+ import {
+-  BadgeDollarSign,
+   Bell,
+   ChevronRight,
+   ChevronDown,
+   CircleHelp,
+-  Coins,
+   CreditCard,
+   HandCoins,
+   Menu,
+   QrCode,
+-  Recycle,
+   ShieldCheck,
+-  Ticket,
+   UserCircle2,
+   Wallet,
+   X
+ } from "lucide-react";
++import type { LucideIcon } from "lucide-react";
+ import { useEffect, useMemo, useState } from "react";
++import type { CSSProperties } from "react";
+ import { useAccount } from "wagmi";
+ 
+ import { WalletConnect } from "@/app/components/WalletConnect";
+ import { useAuth } from "@/app/providers/AuthProvider";
+ 
+ const avatarSrc = "/images/user.jpg";
++const universityLogoById: Record<number, string> = {
++  1000: "/images/logo-G.png"
++};
+ 
+ const accountItems = [
+   { key: "wallet", label: "Wallet Network", detail: "Base Sepolia / Wallet vinculada", icon: Wallet },
+@@ -50,18 +51,24 @@ const notifications = [
+ function BalanceTile({
+   value,
+   label,
+-  tone,
+-  icon: Icon
++  active,
++  iconSrc,
++  iconAlt
+ }: {
+   value: string;
+   label: string;
+-  tone: "red" | "green" | "money" | "token";
+-  icon: typeof Ticket;
++  active: boolean;
++  iconSrc: string;
++  iconAlt: string;
+ }) {
++  const iconStyle = {
++    "--icon-url": `url("${iconSrc}")`
++  } as CSSProperties;
++
+   return (
+-    <article className={`profile-balance-tile is-${tone}`}>
+-      <span className="profile-balance-tile__icon">
+-        <Icon size={18} />
++    <article className={`profile-balance-tile ${active ? "is-positive" : "is-empty"}`}>
++      <span className="profile-balance-tile__icon-shell">
++        <span className="profile-balance-tile__icon" role="img" aria-label={iconAlt} style={iconStyle} />
+       </span>
+       <strong>{value}</strong>
+       <span>{label}</span>
+@@ -78,7 +85,7 @@ function DrawerRow({
+ }: {
+   label: string;
+   detail: string;
+-  icon: typeof Wallet;
++  icon: LucideIcon;
+   general?: boolean;
+   onClick?: () => void;
+ }) {
+@@ -130,6 +137,8 @@ export default function PerfilPage() {
+     () => selectedUniversity?.campuses.find(item => item.id === user?.profile.campusId) ?? null,
+     [selectedUniversity, user?.profile.campusId]
+   );
++  const universityLogoSrc =
++    universityLogoById[user?.profile.universityId || 0] || "/lazosGO.png";
+ 
+   useEffect(() => {
+     if (!user) return;
+@@ -164,7 +173,6 @@ export default function PerfilPage() {
+   const displayCode = user.profile.studentCode || user.profile.nationalId || "Sin codigo";
+   const studentTypeLabel = user.profile.studentType || "Estudiante registrado";
+   const benefitLabel = user.profile.benefitLabel || "Almuerzo regular";
+-  const universityName = selectedUniversity?.name || "Universidad vinculada";
+   const programName =
+     selectedCampus?.programs.find(program => program.id === user.profile.programId)?.name ||
+     "Programa pendiente";
+@@ -177,13 +185,21 @@ export default function PerfilPage() {
+   const internalTickets = user.balances.internal.tickets;
+   const internalNudos = user.balances.internal.nudos;
+   const walletNudos = user.balances.wallet.erc20Nudos;
+-  const recycleActions = user.syncState.walletLinked ? 56.4 : 0;
+-  const recycleSavings = user.syncState.walletLinked ? 56.4 : 0;
++  const recycleActions = 0;
++  const recycleSavings = 0;
++  const walletTokensDisplay = walletNudos !== null ? `$${walletNudos}` : "$0";
++  const internalNudosDisplay = String(internalNudos);
++  const recycleCountDisplay = String(recycleActions);
+   const identityLines = [
++    displayCode || "Codigo",
++    programName,
+     user.email,
+-    displayCode,
+-    user.profile.nationalId || "Cedula pendiente"
++    user.profile.nationalId || "Cedula"
+   ];
++  const ticketsActive = internalTickets > 0;
++  const recycleActive = recycleActions > 0;
++  const savingsActive = recycleSavings > 0;
++  const nudosActive = internalNudos > 0;
+ 
+   const handleProfileSave = async () => {
+     setSavingProfile(true);
+@@ -254,84 +270,111 @@ export default function PerfilPage() {
+             >
+               <Menu size={18} />
+             </button>
+-            <div className="profile-topbar__brand">LAZOS.GOapp</div>
+           </header>
+ 
+           <section className="profile-status-row">
+             <div className={`profile-status-card ${user.universityValidated ? "is-success" : ""}`}>
+-              <span className="profile-status-card__check">{user.universityValidated ? "OK" : "!"}</span>
+-              <div>
+-                <strong>{user.universityValidated ? "Estudiante" : "Registro"}</strong>
+-                <small>{studentTypeLabel}</small>
++              <span className="profile-status-card__check" aria-hidden="true">?</span>
++              <div className="profile-status-card__copy">
++                <strong>Estudiante</strong>
++                <small>{studentTypeLabel || "Pregrado"}</small>
+               </div>
+             </div>
+             <div className="profile-status-card">
+-              <span className="profile-status-card__check">{benefitLabel ? "OK" : "!"}</span>
+-              <div>
++              <span className="profile-status-card__check" aria-hidden="true">?</span>
++              <div className="profile-status-card__copy">
+                 <strong>Bono</strong>
+-                <small>{benefitLabel}</small>
++                <small>{benefitLabel || "Almuerzo Regular"}</small>
+               </div>
+             </div>
+           </section>
+ 
+-          <section className="profile-account-row">
+-            <div className="profile-avatar-ring">
+-              <Image
+-                src={avatarSrc}
+-                alt={studentName}
+-                width={76}
+-                height={76}
+-                className="profile-avatar-ring__image"
+-              />
+-            </div>
+-
+-            <div className="profile-head-metrics">
+-              <div className="profile-head-metric">
+-                <strong>{walletNudos ?? internalNudos}</strong>
+-                <span>TOKENS</span>
+-              </div>
+-              <div className="profile-head-metric">
+-                <strong>{internalNudos}</strong>
+-                <span>$NUDOS</span>
++          <section className="profile-identity-stack">
++            <div className="profile-account-row">
++              <div className="profile-avatar-ring">
++                <Image
++                  src={avatarSrc}
++                  alt={studentName}
++                  width={100}
++                  height={100}
++                  className="profile-avatar-ring__image"
++                />
+               </div>
+-              <div className="profile-head-metric">
+-                <strong>{user.syncState.walletLinked ? "247" : "0"}</strong>
+-                <span>RECICLA</span>
++
++              <div className="profile-head-metrics">
++                <div className="profile-head-metric">
++                  <strong>{walletTokensDisplay}</strong>
++                  <span>TOKENS</span>
++                </div>
++                <div className="profile-head-metric">
++                  <strong>{internalNudosDisplay}</strong>
++                  <span>$NUDOS</span>
++                </div>
++                <div className="profile-head-metric">
++                  <strong>{recycleCountDisplay}</strong>
++                  <span>RECICLA</span>
++                </div>
+               </div>
+             </div>
+-          </section>
+ 
+-          <section className="profile-card-id">
+-            <div className="profile-card-id__copy">
+-              <strong>{studentName}</strong>
+-              <span>{displayCode} · {programName}</span>
+-              <small>{user.email}</small>
+-              <small>{user.profile.nationalId || "Cedula pendiente"}</small>
+-            </div>
++            <div className="profile-card-id">
++              <div className="profile-card-id__copy">
++                <strong>[{studentName}]</strong>
++                <div className="profile-card-id__meta">
++                  <span>[{displayCode || "Codigo"}]</span>
++                  <span>[{programName}]</span>
++                  <span>[{user.profile.nationalId || "Cedula"}]</span>
++                </div>
++              </div>
+ 
+-            <div className="profile-card-id__barcode">
+-              {Array.from({ length: 34 }).map((_, index) => (
+-                <span
+-                  key={index}
+-                  className={`profile-card-id__bar ${index % 4 === 0 ? "is-wide" : ""}`}
+-                />
+-              ))}
+-              <p>https://lazos.go/user</p>
+-            </div>
++              <div className="profile-card-id__barcode">
++                <div className="profile-card-id__barcode-bars" aria-hidden="true" />
++                <p>{user.email}</p>
++              </div>
+ 
+-            <div className="profile-card-id__uni">
+-              <div className="profile-card-id__uni-badge">
+-                <Image src="/lazosGO.png" alt="Universidad" width={32} height={32} />
++              <div className="profile-card-id__uni">
++                <div className="profile-card-id__uni-badge">
++                  <Image
++                    src={universityLogoSrc}
++                    alt={selectedUniversity?.name || "Universidad"}
++                    width={56}
++                    height={56}
++                    className="profile-card-id__uni-logo"
++                  />
++                </div>
+               </div>
+-              <span>{selectedUniversity?.code || "NUDOS"}</span>
+             </div>
+           </section>
+ 
+           <section className="profile-history-grid">
+-            <BalanceTile value={String(internalTickets)} label="TICKETS" tone="red" icon={Ticket} />
+-            <BalanceTile value={`${recycleActions.toFixed(1)}k`} label="RECICLAJE" tone="green" icon={Recycle} />
+-            <BalanceTile value={`${recycleSavings.toFixed(1)}k`} label="AHORRO" tone="money" icon={BadgeDollarSign} />
+-            <BalanceTile value={String(internalNudos || 15)} label="$NUDOS" tone="token" icon={Coins} />
++            <BalanceTile
++              value={String(internalTickets)}
++              label="TICKETS"
++              active={ticketsActive}
++              iconSrc="/profile-panel/icon-ticket.svg"
++              iconAlt="Icono de tickets"
++            />
++            <BalanceTile
++              value={String(recycleActions)}
++              label="RECICLAJE"
++              active={recycleActive}
++              iconSrc="/profile-panel/icon-recycle.svg"
++              iconAlt="Icono de reciclaje"
++            />
++            <BalanceTile
++              value={String(recycleSavings)}
++              label="AHORRO"
++              active={savingsActive}
++              iconSrc="/profile-panel/icon-savings.svg"
++              iconAlt="Icono de ahorro"
++            />
++            <BalanceTile
++              value={String(internalNudos)}
++              label="$NUDOS"
++              active={nudosActive}
++              iconSrc="/profile-panel/icon-nudos.svg"
++              iconAlt="Icono de nudos"
++            />
+           </section>
+         </section>
+       </main>
+@@ -459,6 +502,7 @@ export default function PerfilPage() {
+                     : "Puedes conectar una wallet y luego vincular esa direccion."}
+                 </small>
+               </div>
++              {statusMessage ? <small className="profile-wallet-copy">{statusMessage}</small> : null}
+             </section>
+           ) : null}
+ 

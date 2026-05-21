@@ -1,9 +1,9 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.30;
 
-import {AppStorage} from "src/libraries/AppStorage.sol";
 import {LibNudosAccess} from "src/libraries/LibNudosAccess.sol";
 import {UniversityGovernanceStorage} from "./storage/UniversityGovernanceStorage.sol";
+import {IReward} from "src/interfaces/IReward.sol";
 
 contract UniversityGovernanceFacet {
     uint256 internal constant DEFAULT_INCENTIVE = 50 ether;
@@ -266,7 +266,7 @@ contract UniversityGovernanceFacet {
         require(reward > 0, "No rewards");
 
         ex.redeemableRewards = 0;
-        AppStorage.layout().nudosBalance[msg.sender] += reward;
+        IReward(address(this)).grantReward(msg.sender, reward);
 
         emit IncentiveRedeemed(msg.sender, reward);
     }

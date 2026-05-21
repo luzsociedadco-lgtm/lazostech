@@ -9,6 +9,7 @@
   },
   "scripts": {
     "dev": "next dev",
+    "e2e:contracts": "node scripts/frontend-backend-e2e.mjs",
     "build": "next build",
     "start": "yarn workspace @se-2/nextjs dev",
     "account": "yarn foundry:account",

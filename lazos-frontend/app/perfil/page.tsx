@@ -2,31 +2,37 @@
 
 import Image from "next/image";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import {
-  BadgeDollarSign,
   Bell,
   ChevronRight,
   ChevronDown,
   CircleHelp,
-  Coins,
   CreditCard,
   HandCoins,
   Menu,
   QrCode,
-  Recycle,
   ShieldCheck,
-  Ticket,
   UserCircle2,
   Wallet,
   X
 } from "lucide-react";
-import { useEffect, useMemo, useState } from "react";
-import { useAccount } from "wagmi";
+import type { LucideIcon } from "lucide-react";
+import { useEffect, useMemo, useRef, useState } from "react";
+import type { CSSProperties } from "react";
+import { useAccount, usePublicClient, useWriteContract } from "wagmi";
+import { waitForTransactionReceipt } from "wagmi/actions";
 
+import { useNudosErc20Balance } from "@/app/hooks/useNudosErc20Balance";
 import { WalletConnect } from "@/app/components/WalletConnect";
+import { NUDOS_DIAMOND_ADDRESS, profileFacetAbi } from "@/app/lib/diamondContracts";
 import { useAuth } from "@/app/providers/AuthProvider";
+import { config as wagmiConfig } from "@/app/providers/WagmiWrapper";
 
 const avatarSrc = "/images/user.jpg";
+const universityLogoById: Record<number, string> = {
+  1000: "/images/logo-G.png"
+};
 
 const accountItems = [
   { key: "wallet", label: "Wallet Network", detail: "Base Sepolia / Wallet vinculada", icon: Wallet },
@@ -41,27 +47,27 @@ const generalItems = [
   { label: "Invite Friends", detail: "Referidos", icon: HandCoins }
 ];
 
-const notifications = [
-  { title: "New Product View", body: "Sally Mandrus, viewed your product", time: "3m ago" },
-  { title: "New Product View", body: "Sally Mandrus, viewed your product", time: "3m ago" },
-  { title: "New Product View", body: "Sally Mandrus, viewed your product", time: "3m ago" }
-];
-
 function BalanceTile({
   value,
   label,
-  tone,
-  icon: Icon
+  active,
+  iconSrc,
+  iconAlt
 }: {
   value: string;
   label: string;
-  tone: "red" | "green" | "money" | "token";
-  icon: typeof Ticket;
+  active: boolean;
+  iconSrc: string;
+  iconAlt: string;
 }) {
+  const iconStyle = {
+    "--icon-url": `url("${iconSrc}")`
+  } as CSSProperties;
+
   return (
-    <article className={`profile-balance-tile is-${tone}`}>
-      <span className="profile-balance-tile__icon">
-        <Icon size={18} />
+    <article className={`profile-balance-tile ${active ? "is-positive" : "is-empty"}`}>
+      <span className="profile-balance-tile__icon-shell">
+        <span className="profile-balance-tile__icon" role="img" aria-label={iconAlt} style={iconStyle} />
       </span>
       <strong>{value}</strong>
       <span>{label}</span>
@@ -78,7 +84,7 @@ function DrawerRow({
 }: {
   label: string;
   detail: string;
-  icon: typeof Wallet;
+  icon: LucideIcon;
   general?: boolean;
   onClick?: () => void;
 }) {
@@ -103,13 +109,28 @@ function DrawerRow({
 }
 
 export default function PerfilPage() {
+  const router = useRouter();
   const { address } = useAccount();
-  const { user, catalog, logout, updateProfile, linkWallet, unlinkWallet } = useAuth();
+  const publicClient = usePublicClient();
+  const { writeContractAsync } = useWriteContract();
+  const { user, catalog, logout, updateProfile, linkWallet, unlinkWallet, refresh } = useAuth();
+  const { balance: erc20Balance, isLoading: erc20Loading, isConnected: erc20Connected, symbol } = useNudosErc20Balance();
   const [menuOpen, setMenuOpen] = useState(false);
-  const [activePanel, setActivePanel] = useState<"wallet" | "notifications" | "edit" | "payment" | null>(null);
+  const [activePanel, setActivePanel] = useState<"avatar" | "wallet" | "notifications" | "edit" | "payment" | null>(null);
   const [savingProfile, setSavingProfile] = useState(false);
   const [walletBusy, setWalletBusy] = useState(false);
   const [statusMessage, setStatusMessage] = useState("");
+  const [avatarPreview, setAvatarPreview] = useState<string | null>(null);
+  const [avatarStatus, setAvatarStatus] = useState("");
+  const [notificationFilter, setNotificationFilter] = useState<"new" | "all">("new");
+  const avatarInputRef = useRef<HTMLInputElement | null>(null);
+  const walletFlowRef = useRef<{
+    syncingAddress: string | null;
+    disconnecting: boolean;
+  }>({
+    syncingAddress: null,
+    disconnecting: false
+  });
   const [formState, setFormState] = useState({
     firstName: "",
     lastName: "",
@@ -130,6 +151,8 @@ export default function PerfilPage() {
     () => selectedUniversity?.campuses.find(item => item.id === user?.profile.campusId) ?? null,
     [selectedUniversity, user?.profile.campusId]
   );
+  const universityLogoSrc =
+    universityLogoById[user?.profile.universityId || 0] || "/lazosGO.png";
 
   useEffect(() => {
     if (!user) return;
@@ -145,45 +168,54 @@ export default function PerfilPage() {
     });
   }, [selectedCampus, user]);
 
-  if (!user) {
-    return (
-      <main className="profile-screen">
-        <section className="profile-shell profile-shell--empty">
-          <div className="feature-lock-card">
-            <strong>Sesion requerida</strong>
-            <p>Inicia sesion o crea una cuenta para entrar al perfil.</p>
-            <Link href="/">Volver al ingreso</Link>
-          </div>
-        </section>
-      </main>
-    );
-  }
+  useEffect(() => {
+    return () => {
+      if (avatarPreview) {
+        URL.revokeObjectURL(avatarPreview);
+      }
+    };
+  }, [avatarPreview]);
 
   const studentName =
-    `${user.profile.firstName} ${user.profile.lastName}`.trim() || user.email.split("@")[0];
-  const displayCode = user.profile.studentCode || user.profile.nationalId || "Sin codigo";
-  const studentTypeLabel = user.profile.studentType || "Estudiante registrado";
-  const benefitLabel = user.profile.benefitLabel || "Almuerzo regular";
-  const universityName = selectedUniversity?.name || "Universidad vinculada";
+    user ? `${user.profile.firstName} ${user.profile.lastName}`.trim() || user.email.split("@")[0] : "";
+  const avatarDisplaySrc = avatarPreview || avatarSrc;
+  const displayCode = user?.profile.studentCode || user?.profile.nationalId || "Sin codigo";
+  const studentTypeLabel = user?.profile.studentType || "Estudiante registrado";
+  const benefitLabel = user?.profile.benefitLabel || "Almuerzo regular";
   const programName =
-    selectedCampus?.programs.find(program => program.id === user.profile.programId)?.name ||
+    selectedCampus?.programs.find(program => program.id === user?.profile.programId)?.name ||
     "Programa pendiente";
-  const linkedWallet = user.linkedWallet?.address || "";
+  const linkedWallet = user?.linkedWallet?.address || "";
   const browserWallet = address || "";
   const connectedWalletMatchesUser =
     Boolean(browserWallet) &&
     Boolean(linkedWallet) &&
     browserWallet.toLowerCase() === linkedWallet.toLowerCase();
-  const internalTickets = user.balances.internal.tickets;
-  const internalNudos = user.balances.internal.nudos;
-  const walletNudos = user.balances.wallet.erc20Nudos;
-  const recycleActions = user.syncState.walletLinked ? 56.4 : 0;
-  const recycleSavings = user.syncState.walletLinked ? 56.4 : 0;
+  const availableTickets = user?.tickets.available ?? 0;
+  const recycleActions = 0;
+  const recycleSavings = 0;
+  const erc20BalanceDisplay = erc20Connected
+    ? erc20Loading
+      ? "..."
+      : erc20Balance ?? "0"
+    : "0";
+  const recycleCountDisplay = String(recycleActions);
   const identityLines = [
-    user.email,
-    displayCode,
-    user.profile.nationalId || "Cedula pendiente"
+    displayCode || "Codigo",
+    programName,
+    user?.email || "",
+    user?.profile.nationalId || "Cedula"
   ];
+  const ticketsActive = availableTickets > 0;
+  const recycleActive = recycleActions > 0;
+  const savingsActive = recycleSavings > 0;
+  const nudosActive = Number(erc20Balance ?? 0) > 0;
+  const filteredNotifications =
+    notificationFilter === "all"
+      ? user?.notifications ?? []
+      : (user?.notifications ?? []).filter(item => !item.isRead);
+
+  const parseJson = async (response: Response) => response.json().catch(() => ({}));
 
   const handleProfileSave = async () => {
     setSavingProfile(true);
@@ -208,23 +240,78 @@ export default function PerfilPage() {
     setActivePanel(null);
   };
 
-  const handleWalletLink = async () => {
-    if (!browserWallet) {
-      setStatusMessage("Primero conecta una wallet en el navegador.");
+  const syncBrowserWallet = async (walletAddress: string) => {
+    if (!publicClient) {
+      setStatusMessage("No hay cliente blockchain disponible en este momento.");
       return;
     }
 
     setWalletBusy(true);
     setStatusMessage("");
-    const result = await linkWallet(browserWallet);
-    setWalletBusy(false);
 
-    if (result.error) {
-      setStatusMessage(result.error);
-      return;
+    try {
+      const localLink = await linkWallet(walletAddress);
+      if (localLink.error) {
+        setStatusMessage(localLink.error);
+        return;
+      }
+
+      if (!user) {
+        setStatusMessage("No hay una sesion activa para completar la vinculacion.");
+        return;
+      }
+
+      const preferredUniversityId = user.profile.universityId === 1000 ? 1000n : 0n;
+      let profileRegistered = true;
+
+      setStatusMessage("Wallet enlazada localmente. Verificando perfil en Diamond...");
+
+      try {
+        await publicClient.readContract({
+          address: NUDOS_DIAMOND_ADDRESS,
+          abi: profileFacetAbi,
+          functionName: "getProfile",
+          args: [walletAddress as `0x${string}`]
+        });
+      } catch {
+        profileRegistered = false;
+      }
+
+      if (!profileRegistered) {
+        setStatusMessage("Registrando perfil en Diamond...");
+
+        const registerHash = await writeContractAsync({
+          address: NUDOS_DIAMOND_ADDRESS,
+          abi: profileFacetAbi,
+          functionName: "registerProfile",
+          args: [`lazos://profile/${user.id}`, preferredUniversityId, 1]
+        });
+
+        await waitForTransactionReceipt(wagmiConfig, { hash: registerHash });
+      }
+
+      setStatusMessage("Sincronizando afiliacion institucional con el operador...");
+
+      const syncResponse = await fetch("/api/wallet/sync", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" }
+      });
+      const syncJson = await parseJson(syncResponse);
+
+      await refresh();
+
+      if (!syncResponse.ok) {
+        setStatusMessage(syncJson.error || "La wallet quedo enlazada, pero no se pudo completar la sincronizacion con Diamond.");
+        return;
+      }
+
+      setStatusMessage(syncJson.sync?.message || "Wallet enlazada y sincronizada correctamente con Diamond.");
+    } catch (error) {
+      setStatusMessage(error instanceof Error ? error.message : "No se pudo completar la integracion de la wallet.");
+    } finally {
+      setWalletBusy(false);
+      walletFlowRef.current.syncingAddress = null;
     }
-
-    setStatusMessage("Wallet vinculada correctamente.");
   };
 
   const handleWalletUnlink = async () => {
@@ -232,14 +319,94 @@ export default function PerfilPage() {
     setStatusMessage("");
     const result = await unlinkWallet();
     setWalletBusy(false);
+    walletFlowRef.current.disconnecting = false;
 
     if (result.error) {
       setStatusMessage(result.error);
       return;
     }
 
-    setStatusMessage("Wallet desvinculada.");
+    setStatusMessage("Wallet desvinculada al desconectarse del navegador.");
   };
+
+  useEffect(() => {
+    if (!user) {
+      return;
+    }
+
+    if (activePanel !== "wallet") {
+      return;
+    }
+
+    if (browserWallet) {
+      const normalizedBrowserWallet = browserWallet.toLowerCase();
+
+      if (
+        connectedWalletMatchesUser ||
+        walletBusy ||
+        walletFlowRef.current.syncingAddress === normalizedBrowserWallet
+      ) {
+        return;
+      }
+
+      walletFlowRef.current.syncingAddress = normalizedBrowserWallet;
+      void syncBrowserWallet(browserWallet);
+      return;
+    }
+
+    if (
+      !browserWallet &&
+      linkedWallet &&
+      !walletBusy &&
+      !walletFlowRef.current.disconnecting
+    ) {
+      walletFlowRef.current.disconnecting = true;
+      void handleWalletUnlink();
+    }
+  }, [activePanel, browserWallet, connectedWalletMatchesUser, linkedWallet, walletBusy]);
+
+  const handleAvatarFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    if (avatarPreview) {
+      URL.revokeObjectURL(avatarPreview);
+    }
+
+    const nextPreview = URL.createObjectURL(file);
+    setAvatarPreview(nextPreview);
+    setAvatarStatus(`Foto seleccionada: ${file.name}`);
+  };
+
+  const handleNotificationClick = async (notificationId: string, href: string | null) => {
+    await fetch("/api/notifications", {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ notificationId })
+    });
+
+    await refresh();
+
+    if (href) {
+      setMenuOpen(false);
+      setActivePanel(null);
+      router.push(href);
+    }
+  };
+
+  if (!user) {
+    return (
+      <main className="profile-screen">
+        <section className="profile-shell profile-shell--empty">
+          <div className="feature-lock-card">
+            <strong>Sesion requerida</strong>
+            <p>Inicia sesion o crea una cuenta para entrar al perfil.</p>
+            <Link href="/">Volver al ingreso</Link>
+          </div>
+        </section>
+      </main>
+    );
+  }
 
   return (
     <>
@@ -254,84 +421,111 @@ export default function PerfilPage() {
             >
               <Menu size={18} />
             </button>
-            <div className="profile-topbar__brand">LAZOS.GOapp</div>
           </header>
 
           <section className="profile-status-row">
             <div className={`profile-status-card ${user.universityValidated ? "is-success" : ""}`}>
-              <span className="profile-status-card__check">{user.universityValidated ? "OK" : "!"}</span>
-              <div>
-                <strong>{user.universityValidated ? "Estudiante" : "Registro"}</strong>
-                <small>{studentTypeLabel}</small>
+              <span className="profile-status-card__check" aria-hidden="true">✓</span>
+              <div className="profile-status-card__copy">
+                <strong>Estudiante</strong>
+                <small>{studentTypeLabel || "Pregrado"}</small>
               </div>
             </div>
             <div className="profile-status-card">
-              <span className="profile-status-card__check">{benefitLabel ? "OK" : "!"}</span>
-              <div>
+              <span className="profile-status-card__check" aria-hidden="true">✓</span>
+              <div className="profile-status-card__copy">
                 <strong>Bono</strong>
-                <small>{benefitLabel}</small>
+                <small>{benefitLabel || "Almuerzo Regular"}</small>
               </div>
             </div>
           </section>
 
-          <section className="profile-account-row">
-            <div className="profile-avatar-ring">
-              <Image
-                src={avatarSrc}
-                alt={studentName}
-                width={76}
-                height={76}
-                className="profile-avatar-ring__image"
-              />
-            </div>
-
-            <div className="profile-head-metrics">
-              <div className="profile-head-metric">
-                <strong>{walletNudos ?? internalNudos}</strong>
-                <span>TOKENS</span>
-              </div>
-              <div className="profile-head-metric">
-                <strong>{internalNudos}</strong>
-                <span>$NUDOS</span>
-              </div>
-              <div className="profile-head-metric">
-                <strong>{user.syncState.walletLinked ? "247" : "0"}</strong>
-                <span>RECICLA</span>
-              </div>
-            </div>
-          </section>
-
-          <section className="profile-card-id">
-            <div className="profile-card-id__copy">
-              <strong>{studentName}</strong>
-              <span>{displayCode} · {programName}</span>
-              <small>{user.email}</small>
-              <small>{user.profile.nationalId || "Cedula pendiente"}</small>
-            </div>
-
-            <div className="profile-card-id__barcode">
-              {Array.from({ length: 34 }).map((_, index) => (
-                <span
-                  key={index}
-                  className={`profile-card-id__bar ${index % 4 === 0 ? "is-wide" : ""}`}
+          <section className="profile-identity-stack">
+            <div className="profile-account-row">
+              <div className="profile-avatar-ring">
+                <Image
+                  src={avatarDisplaySrc}
+                  alt={studentName}
+                  width={100}
+                  height={100}
+                  className="profile-avatar-ring__image"
                 />
-              ))}
-              <p>https://lazos.go/user</p>
+              </div>
+
+              <div className="profile-head-metrics">
+                <div className="profile-head-metric">
+                  <strong>{erc20BalanceDisplay}</strong>
+                  <span>{symbol}</span>
+                </div>
+                <div className="profile-head-metric">
+                  <strong>{String(availableTickets)}</strong>
+                  <span>TICKETS</span>
+                </div>
+                <div className="profile-head-metric">
+                  <strong>{recycleCountDisplay}</strong>
+                  <span>RECICLA</span>
+                </div>
+              </div>
             </div>
 
-            <div className="profile-card-id__uni">
-              <div className="profile-card-id__uni-badge">
-                <Image src="/lazosGO.png" alt="Universidad" width={32} height={32} />
+            <div className="profile-card-id">
+              <div className="profile-card-id__copy">
+                <strong>[{studentName}]</strong>
+                <div className="profile-card-id__meta">
+                  <span>[{displayCode || "Codigo"}]</span>
+                  <span>[{programName}]</span>
+                  <span>[{user.profile.nationalId || "Cedula"}]</span>
+                </div>
               </div>
-              <span>{selectedUniversity?.code || "NUDOS"}</span>
+
+              <div className="profile-card-id__barcode">
+                <div className="profile-card-id__barcode-bars" aria-hidden="true" />
+                <p>{user.email}</p>
+              </div>
+
+              <div className="profile-card-id__uni">
+                <div className="profile-card-id__uni-badge">
+                  <Image
+                    src={universityLogoSrc}
+                    alt={selectedUniversity?.name || "Universidad"}
+                    width={56}
+                    height={56}
+                    className="profile-card-id__uni-logo"
+                  />
+                </div>
+              </div>
             </div>
           </section>
 
           <section className="profile-history-grid">
-            <BalanceTile value={String(internalTickets)} label="TICKETS" tone="red" icon={Ticket} />
-            <BalanceTile value={`${recycleActions.toFixed(1)}k`} label="RECICLAJE" tone="green" icon={Recycle} />
-            <BalanceTile value={`${recycleSavings.toFixed(1)}k`} label="AHORRO" tone="money" icon={BadgeDollarSign} />
-            <BalanceTile value={String(internalNudos || 15)} label="$NUDOS" tone="token" icon={Coins} />
+            <BalanceTile
+              value={String(availableTickets)}
+              label="TICKETS"
+              active={ticketsActive}
+              iconSrc="/profile-panel/icon-ticket.svg"
+              iconAlt="Icono de tickets"
+            />
+            <BalanceTile
+              value={String(recycleActions)}
+              label="RECICLAJE"
+              active={recycleActive}
+              iconSrc="/profile-panel/icon-recycle.svg"
+              iconAlt="Icono de reciclaje"
+            />
+            <BalanceTile
+              value={String(recycleSavings)}
+              label="AHORRO"
+              active={savingsActive}
+              iconSrc="/profile-panel/icon-savings.svg"
+              iconAlt="Icono de ahorro"
+            />
+            <BalanceTile
+              value={erc20BalanceDisplay}
+              label={symbol}
+              active={nudosActive}
+              iconSrc="/profile-panel/icon-nudos.svg"
+              iconAlt="Icono de nudos"
+            />
           </section>
         </section>
       </main>
@@ -348,15 +542,25 @@ export default function PerfilPage() {
           </button>
 
           <div className="profile-drawer__identity">
-            <div className="profile-avatar-ring is-small">
-              <Image
-                src={avatarSrc}
-                alt={studentName}
-                width={52}
-                height={52}
-                className="profile-avatar-ring__image"
-              />
-            </div>
+            <button
+              type="button"
+              className="profile-avatar-trigger"
+              onClick={() => {
+                setAvatarStatus("");
+                setActivePanel("avatar");
+              }}
+              aria-label="Opciones de foto de perfil"
+            >
+              <div className="profile-avatar-ring is-small">
+                <Image
+                  src={avatarDisplaySrc}
+                  alt={studentName}
+                  width={52}
+                  height={52}
+                  className="profile-avatar-ring__image"
+                />
+              </div>
+            </button>
 
             <div>
               <strong>[ {studentName.toUpperCase()} ]</strong>
@@ -411,13 +615,48 @@ export default function PerfilPage() {
               setMenuOpen(false);
             }}
           >
-            Cerrar sesion
+            ---- cerrar sesión ----
           </button>
         </div>
       </aside>
 
       {menuOpen && activePanel ? (
         <div className="profile-panel-layer">
+          {activePanel === "avatar" ? (
+            <section className="profile-panel-card profile-panel-card--avatar">
+              <div className="profile-panel-card__top">
+                <div className="profile-panel-card__line" />
+                <button type="button" onClick={() => setActivePanel(null)} aria-label="Cerrar popup avatar">
+                  <X size={16} />
+                </button>
+              </div>
+              <h2>Foto de perfil</h2>
+              <p>Escoge si quieres actualizar la foto actual o dejar visible la ruta futura del avatar personalizable.</p>
+              <div className="profile-avatar-options">
+                <button
+                  type="button"
+                  className="profile-avatar-option"
+                  onClick={() => avatarInputRef.current?.click()}
+                >
+                  <strong>Actualizar foto de perfil</strong>
+                  <small>Selecciona una imagen desde tu dispositivo.</small>
+                </button>
+                <button type="button" className="profile-avatar-option is-disabled" disabled>
+                  <strong>Editar avatar pfp customizable</strong>
+                  <small>Visible por ahora. Esta sección llegará después.</small>
+                </button>
+              </div>
+              <input
+                ref={avatarInputRef}
+                type="file"
+                accept="image/*"
+                className="profile-avatar-input"
+                onChange={handleAvatarFileChange}
+              />
+              {avatarStatus ? <small className="profile-wallet-copy">{avatarStatus}</small> : null}
+            </section>
+          ) : null}
+
           {activePanel === "wallet" ? (
             <section className="profile-panel-card">
               <div className="profile-panel-card__top">
@@ -430,35 +669,27 @@ export default function PerfilPage() {
               <p>Conecta tu wallet y luego vincula la direccion activa a tu perfil.</p>
               <WalletConnect />
               <div className="profile-wallet-status">
-                <small className="profile-wallet-copy">Wallet del navegador: {browserWallet || "ninguna"}</small>
                 <small className="profile-wallet-copy">Wallet vinculada: {linkedWallet || "ninguna"}</small>
               </div>
-              <div className="profile-wallet-actions">
-                <button
-                  type="button"
-                  className="profile-edit-save"
-                  onClick={handleWalletLink}
-                  disabled={walletBusy || !browserWallet || connectedWalletMatchesUser}
-                >
-                  {walletBusy ? "Procesando" : connectedWalletMatchesUser ? "Wallet ya vinculada" : "Vincular wallet actual"}
-                </button>
-                <button
-                  type="button"
-                  className="profile-edit-cancel"
-                  onClick={handleWalletUnlink}
-                  disabled={walletBusy || !linkedWallet}
-                >
-                  Desvincular wallet
-                </button>
-              </div>
               <div className="profile-wallet-meta">
-                <small>{user.syncState.walletLinked ? "Wallet enlazada con backend local." : "Aun no has enlazado una wallet."}</small>
+                <small>
+                  {user.syncState.onchainAffiliationSynced
+                    ? "Wallet enlazada y sincronizada con Diamond."
+                    : user.syncState.onchainProfileRegistered
+                      ? "Perfil ya registrado en Diamond. Falta confirmar la afiliacion final."
+                      : user.syncState.walletLinked
+                        ? "Wallet enlazada localmente. Falta terminar la sincronizacion on-chain."
+                        : "Aun no has enlazado una wallet."}
+                </small>
                 <small>
                   {connectedWalletMatchesUser
-                    ? "La wallet conectada coincide con la vinculada en tu perfil."
-                    : "Puedes conectar una wallet y luego vincular esa direccion."}
+                    ? "La wallet conectada coincide con la vinculada y puede operar sobre el Diamond."
+                    : browserWallet
+                      ? "La wallet conectada se vinculara automaticamente con esta cuenta."
+                      : "Si desconectas la wallet desde WalletConnect, tambien se desvinculara de esta cuenta."}
                 </small>
               </div>
+              {statusMessage ? <small className="profile-wallet-copy">{statusMessage}</small> : null}
             </section>
           ) : null}
 
@@ -471,21 +702,40 @@ export default function PerfilPage() {
                 </button>
               </div>
               <div className="profile-panel-card__tabs">
-                <button type="button" className="is-active">New</button>
-                <button type="button">All</button>
+                <button
+                  type="button"
+                  className={notificationFilter === "new" ? "is-active" : ""}
+                  onClick={() => setNotificationFilter("new")}
+                >
+                  New
+                </button>
+                <button
+                  type="button"
+                  className={notificationFilter === "all" ? "is-active" : ""}
+                  onClick={() => setNotificationFilter("all")}
+                >
+                  All
+                </button>
               </div>
               <div className="profile-panel-card__list">
-                {notifications.map(item => (
-                  <article key={`${item.title}-${item.time}`} className="profile-notice-item">
+                {filteredNotifications.map(item => (
+                  <button
+                    key={item.id}
+                    type="button"
+                    className={`profile-notice-item ${item.type === "dao" ? "is-dao" : ""}`}
+                    onClick={() => handleNotificationClick(item.id, item.href)}
+                  >
                     <div>
                       <strong>{item.title}</strong>
                       <small>{item.body}</small>
                     </div>
-                    <span>{item.time}</span>
-                  </article>
+                    <span>{new Date(item.createdAt).toLocaleDateString("es-CO", { day: "2-digit", month: "2-digit" })}</span>
+                  </button>
                 ))}
               </div>
-              <small className="profile-wallet-copy">Fuente real pendiente. Por ahora se muestra solo la UI base.</small>
+              {!filteredNotifications.length ? (
+                <small className="profile-wallet-copy">No tienes notificaciones en esta vista.</small>
+              ) : null}
             </section>
           ) : null}
 
@@ -493,7 +743,7 @@ export default function PerfilPage() {
             <section className="profile-panel-card is-form">
               <div className="profile-panel-card__identity">
                 <div className="profile-avatar-ring">
-                  <Image src={avatarSrc} alt={studentName} width={68} height={68} className="profile-avatar-ring__image" />
+                  <Image src={avatarDisplaySrc} alt={studentName} width={68} height={68} className="profile-avatar-ring__image" />
                 </div>
                 <div>
                   <h2>Editar Perfil</h2>
