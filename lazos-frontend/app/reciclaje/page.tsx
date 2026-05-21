@@ -1,14 +1,15 @@
 "use client";
 
+import Image from "next/image";
 import {
   MapPin,
-  Plus,
   QrCode,
-  Recycle,
   ScrollText,
-  Sparkles,
 } from "lucide-react";
+import { useState } from "react";
 import { FeatureGate } from "@/app/components/FeatureGate";
+import { useNudosErc20Balance } from "@/app/hooks/useNudosErc20Balance";
+import { useAuth } from "@/app/providers/AuthProvider";
 
 const history = [
   { date: "15/08/24", material: "Plastico", quantity: "5.2 kg", value: "$260.00" },
@@ -23,12 +24,22 @@ const points = [
 ];
 
 const impact = [
-  { value: "42", label: "Kg reciclados", tone: "green" },
-  { value: "15", label: "Kg Co2", tone: "blue" },
-  { value: "220", label: "Litros agua", tone: "purple" },
+  { value: "42", unit: "kg", label: "reciclados", tone: "green" },
+  { value: "15", unit: "kg", label: "Co2", tone: "blue" },
+  { value: "220", unit: "lts", label: "agua", tone: "purple" },
 ];
 
 export default function ReciclajePage() {
+  const { user } = useAuth();
+  const { balance, isConnected, isLoading, symbol } = useNudosErc20Balance();
+  const [certificateOpen, setCertificateOpen] = useState(false);
+  const [walletQrOpen, setWalletQrOpen] = useState(false);
+  const balanceDisplay = isConnected ? (isLoading ? "..." : balance ?? "0") : "Conecta tu wallet";
+  const walletAddress = user?.linkedWallet?.address || "";
+  const walletQrUrl = walletAddress
+    ? `https://api.qrserver.com/v1/create-qr-code/?size=220x220&data=${encodeURIComponent(walletAddress)}`
+    : "";
+
   return (
     <main className="recycle-screen">
       <section className="recycle-shell">
@@ -37,32 +48,31 @@ export default function ReciclajePage() {
           <h1>Recicla-Ahorro</h1>
         </header>
 
-        <section className="recycle-balance-card">
-          <div>
-            <span>Tu Saldo $NUDOS</span>
-            <strong>$1,250.00</strong>
+        <button type="button" className="recycle-balance-card" onClick={() => setCertificateOpen(true)}>
+          <div className="recycle-balance-card__copy">
+            <span>Tu saldo $NUDOS</span>
+            <strong>{`${balanceDisplay}${isConnected ? ` ${symbol}` : ""}`}</strong>
           </div>
           <div className="recycle-balance-card__badge">
-            <Recycle size={24} />
+            <span className="recycle-balance-card__icon" aria-hidden="true" />
           </div>
-        </section>
+        </button>
 
         <section className="recycle-qr-card">
-          <h2>Escanea tu codigo QR</h2>
+          <h2>Genera tu codigo QR</h2>
           <p>
-            Futura integracion con ecobot. Captura el codigo QR que recibiste en
-            el punto de recoleccion para abonar a tu cuenta.
+            Genera y muestra el codigo QR de tu wallet para que el recolector
+            abone el reciclaje validado directamente a tu cuenta.
           </p>
 
           <div className="recycle-qr-card__panel">
             <QrCode size={70} />
-            <button type="button">Escanear Codigo QR</button>
+            <button type="button" onClick={() => setWalletQrOpen(true)}>Mostrar Codigo QR</button>
           </div>
         </section>
 
         <section className="recycle-history-card">
-          <div className="recycle-section-title">
-            <ScrollText size={18} />
+          <div className="recycle-section-title is-centered">
             <h2>Historial de Reciclaje</h2>
           </div>
 
@@ -90,8 +100,7 @@ export default function ReciclajePage() {
         </section>
 
         <section className="recycle-points-card">
-          <div className="recycle-section-title">
-            <MapPin size={18} />
+          <div className="recycle-section-title is-centered">
             <h2>Puntos de Recoleccion</h2>
           </div>
 
@@ -113,35 +122,89 @@ export default function ReciclajePage() {
         </section>
 
         <section className="recycle-impact-card">
-          <div className="recycle-section-title">
-            <Sparkles size={18} />
+          <div className="recycle-section-title is-centered">
             <h2>Impacto Ambiental</h2>
           </div>
 
           <div className="recycle-impact-card__grid">
             {impact.map(item => (
-              <article key={item.label} className={`recycle-impact-chip is-${item.tone}`}>
-                <strong>{item.value}</strong>
+              <article key={`${item.value}-${item.label}`} className={`recycle-impact-chip is-${item.tone}`}>
+                <strong>
+                  {item.value}
+                  <small>{item.unit}</small>
+                </strong>
                 <span>{item.label}</span>
               </article>
             ))}
           </div>
         </section>
 
-        <section className="recycle-future-card">
-          <h2>Proximo modulo sugerido</h2>
-          <p>
-            Aqui podemos mostrar certificados NFT de impacto, retos por campus o
-            recompensas ecológicas desbloqueadas.
-          </p>
-        </section>
-
-        <button type="button" className="recycle-floating-button">
-          <Plus size={18} />
-          <span>Nuevo Reciclaje</span>
-        </button>
         </FeatureGate>
       </section>
+
+      {certificateOpen ? (
+        <div className="recycle-popup-layer">
+          <div className="recycle-popup-overlay" onClick={() => setCertificateOpen(false)} />
+          <section className="recycle-popup-card">
+            <div className="recycle-popup-card__top">
+              <h2>Certificacion de impacto</h2>
+              <button type="button" onClick={() => setCertificateOpen(false)} aria-label="Cerrar popup">
+                <ScrollText size={16} />
+              </button>
+            </div>
+            <p>
+              Este panel mostrara la informacion del facet de certificacion para las acciones
+              ambientales registradas por cada usuario.
+            </p>
+            <div className="impact-list">
+              <div className="impact-row">
+                <span>Estado del certificado</span>
+                <strong>Activo</strong>
+              </div>
+              <div className="impact-row">
+                <span>Saldo reconocido</span>
+                <strong>{`${balanceDisplay}${isConnected ? ` ${symbol}` : ""}`}</strong>
+              </div>
+              <div className="impact-row">
+                <span>Acciones ambientales</span>
+                <strong>42 registros</strong>
+              </div>
+              <div className="impact-row">
+                <span>Ultima actualizacion</span>
+                <strong>11/05/26</strong>
+              </div>
+            </div>
+          </section>
+        </div>
+      ) : null}
+
+      {walletQrOpen ? (
+        <div className="recycle-popup-layer">
+          <div className="recycle-popup-overlay" onClick={() => setWalletQrOpen(false)} />
+          <section className="recycle-popup-card">
+            <div className="recycle-popup-card__top">
+              <h2>QR de tu wallet</h2>
+              <button type="button" onClick={() => setWalletQrOpen(false)} aria-label="Cerrar popup QR">
+                <QrCode size={16} />
+              </button>
+            </div>
+            {walletAddress ? (
+              <>
+                <p>
+                  Este codigo representa la wallet que recibira la acreditacion del reciclaje
+                  validado por el recolector.
+                </p>
+                <div className="recycle-wallet-qr">
+                  <Image src={walletQrUrl} alt="QR de la wallet" width={220} height={220} unoptimized />
+                </div>
+                <div className="recycle-wallet-qr__address">{walletAddress}</div>
+              </>
+            ) : (
+              <p>Primero vincula una wallet en tu perfil para poder emitir este codigo QR.</p>
+            )}
+          </section>
+        </div>
+      ) : null}
     </main>
   );
 }

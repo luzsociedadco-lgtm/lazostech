@@ -2,6 +2,7 @@
 pragma solidity ^0.8.30;
 
 import {AppStorage} from "src/libraries/AppStorage.sol";
+import {IERC20Minimal} from "src/interfaces/core/IERC20Minimal.sol";
 
 contract RewardFacet {
     /*//////////////////////////////////////////////////////////////
@@ -57,14 +58,17 @@ contract RewardFacet {
 
         require(user != address(0), "RewardFacet: ZERO_USER");
         require(amount > 0, "RewardFacet: ZERO_AMOUNT");
+        require(s.token != address(0), "RewardFacet: TOKEN_NOT_SET");
 
         uint256 maxReward = 100 ether;
         require(amount <= maxReward, "RewardFacet: MAX_REWARD_EXCEEDED");
 
-        s.nudosAccumulated[user] += amount;
-        s.nudosBalance[user] += amount;
+        IERC20Minimal token = IERC20Minimal(s.token);
+        require(token.balanceOf(address(this)) >= amount, "RewardFacet: INSUFFICIENT_TREASURY");
+        require(token.transfer(user, amount), "RewardFacet: TRANSFER_FAILED");
 
-        uint256 newBalance = s.nudosBalance[user];
+        s.nudosAccumulated[user] += amount;
+        uint256 newBalance = token.balanceOf(user);
 
         emit RewardGranted(user, amount, newBalance);
     }
@@ -81,7 +85,12 @@ contract RewardFacet {
     }
 
     function getNudos(address user) external view returns (uint256) {
-        return AppStorage.layout().nudosBalance[user];
+        address token = AppStorage.layout().token;
+        if (token == address(0)) {
+            return 0;
+        }
+
+        return IERC20Minimal(token).balanceOf(user);
     }
 
     function getNudosAccumulated(address user) external view returns (uint256) {
@@ -90,5 +99,14 @@ contract RewardFacet {
 
     function getRewardBaseUnit() external view returns (uint256) {
         return AppStorage.layout().rewardBaseUnit;
+    }
+
+    function getRewardTreasuryBalance() external view returns (uint256) {
+        address token = AppStorage.layout().token;
+        if (token == address(0)) {
+            return 0;
+        }
+
+        return IERC20Minimal(token).balanceOf(address(this));
     }
 }

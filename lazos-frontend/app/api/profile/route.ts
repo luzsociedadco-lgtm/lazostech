@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 
-import { updateUserProfile, toUserSnapshot } from "@/app/lib/db.server";
+import { addUserNotification, getUserById, toUserSnapshot, updateUserProfile } from "@/app/lib/db.server";
 import { getSessionUser, unauthorizedResponse } from "@/app/lib/session.server";
 
 export async function PATCH(request: Request) {
@@ -12,7 +12,7 @@ export async function PATCH(request: Request) {
   const body = await request.json();
 
   try {
-    const user = await updateUserProfile(sessionUser.id, {
+    await updateUserProfile(sessionUser.id, {
       firstName: String(body.firstName || ""),
       lastName: String(body.lastName || ""),
       phone: String(body.phone || ""),
@@ -22,6 +22,18 @@ export async function PATCH(request: Request) {
       campusId: Number(body.campusId || 1),
       programId: Number(body.programId || 0)
     });
+
+    await addUserNotification(sessionUser.id, {
+      type: "profile",
+      title: "Perfil actualizado",
+      body: "Tus datos de perfil fueron actualizados correctamente.",
+      href: null
+    });
+
+    const user = await getUserById(sessionUser.id);
+    if (!user) {
+      return unauthorizedResponse();
+    }
 
     return NextResponse.json({ user: toUserSnapshot(user) });
   } catch (error) {

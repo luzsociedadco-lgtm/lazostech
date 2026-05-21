@@ -2,20 +2,43 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import {
-  Handshake,
-  Recycle,
-  Utensils,
-  Vote,
-  WalletMinimal
-} from "lucide-react";
 
 const navItems = [
-  { href: "/perfil", label: "Perfil", Icon: WalletMinimal, accessKey: "perfil" },
-  { href: "/tickets", label: "Tickets", Icon: Utensils, accessKey: "tickets" },
-  { href: "/reciclaje", label: "Recicla", Icon: Recycle, accessKey: "reciclaje" },
-  { href: "/marketplace", label: "Marketplace", Icon: Handshake, accessKey: "marketplace" },
-  { href: "/dao", label: "DAO", Icon: Vote, accessKey: "dao" }
+  {
+    href: "/perfil",
+    label: "Perfil",
+    src: "/footer-nav/01-wallet.svg",
+    accessKey: "perfil",
+    sizeClass: "is-wallet"
+  },
+  {
+    href: "/tickets",
+    label: "Tickets",
+    src: "/footer-nav/02-tickets.svg",
+    accessKey: "tickets",
+    sizeClass: "is-ticket"
+  },
+  {
+    href: "/reciclaje",
+    label: "Recicla",
+    src: "/footer-nav/03-recycle.svg",
+    accessKey: "reciclaje",
+    sizeClass: "is-recycle"
+  },
+  {
+    href: "/marketplace",
+    label: "Marketplace",
+    src: "/footer-nav/04-handshake.svg",
+    accessKey: "marketplace",
+    sizeClass: "is-market"
+  },
+  {
+    href: "/dao",
+    label: "DAO",
+    src: "/footer-nav/05-votebox.svg",
+    accessKey: "dao",
+    sizeClass: "is-dao"
+  }
 ] as const;
 
 export default function FooterNav() {
@@ -28,7 +51,7 @@ export default function FooterNav() {
   return (
     <nav className="app-nav">
       <div className="app-nav__inner">
-        {navItems.map(({ href, label, Icon, accessKey }) => {
+        {navItems.map(({ href, label, src, accessKey, sizeClass }) => {
           const active = pathname === href;
           const enabled = true;
           // const enabled = user?.access[accessKey] ?? accessKey === "perfil";
@@ -37,7 +60,7 @@ export default function FooterNav() {
             return (
               <div key={href} className="app-nav__item is-disabled" aria-label={label}>
                 <span className="app-nav__icon-shell">
-                  <Icon size={22} strokeWidth={2.2} />
+                  <img src={src} alt="" className={`app-nav__asset ${sizeClass}`} />
                 </span>
                 <span className="app-nav__label">{label}</span>
               </div>
@@ -53,7 +76,7 @@ export default function FooterNav() {
               aria-current={active ? "page" : undefined}
             >
               <span className="app-nav__icon-shell">
-                <Icon size={22} strokeWidth={active ? 2.6 : 2.2} />
+                <img src={src} alt="" className={`app-nav__asset ${sizeClass}`} />
               </span>
               <span className="app-nav__label">{label}</span>
             </Link>

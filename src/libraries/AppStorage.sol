@@ -246,7 +246,8 @@ library AppStorage {
         mapping(address => bool) isUniversityStaff;
         mapping(address => bool) isSystemAdmin;
 
-        // ---- Tickets ----
+        // ---- Tickets (legacy on-chain ledger, deprecated in ERC20-first mode) ----
+        // DO NOT REMOVE: preserved to keep storage layout stable across Diamond upgrades.
         mapping(address => uint256) ticketBalance;
         address tokenContract;
         uint256 ticketPriceInTokens;
@@ -256,7 +257,8 @@ library AppStorage {
         mapping(Material => uint256) recycleRates;
         uint256 rewardBaseUnit;
 
-        // ---- NUDOS Economy ----
+        // ---- NUDOS Economy (legacy internal ledger, deprecated in ERC20-first mode) ----
+        // DO NOT REMOVE: preserved to keep storage layout stable across Diamond upgrades.
         mapping(address => uint256) nudosBalance; // tokens disponibles
         mapping(address => uint256) nudosAccumulated; // histórico total
         uint256 nudosPerTicket; // = 10
@@ -323,6 +325,10 @@ library AppStorage {
         uint256 nextRecycleCredentialId;
         mapping(uint256 => RecycleCredential) recycleCredentials;
         mapping(address => uint256[]) userRecycleCredentialIds;
+
+        // ---- ERC20-first settlement guards ----
+        mapping(bytes32 => bool) processedTicketOrders;
+        mapping(bytes32 => bool) processedMarketplaceOrders;
     }
 
     // =============================================================

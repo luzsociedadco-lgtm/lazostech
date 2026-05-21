@@ -11,26 +11,53 @@ import {
   QrCode,
   X,
 } from "lucide-react";
-import { useMemo, useState } from "react";
+import { useMemo, useRef, useState } from "react";
+import type { PointerEvent } from "react";
 import { FeatureGate } from "@/app/components/FeatureGate";
+import { useTicketRedemption } from "@/app/hooks/useTicketRedemption";
+import { useAuth } from "@/app/providers/AuthProvider";
 
 const days = [
-  { day: "Lunes", image: "/images/slide-1.jpg" },
-  { day: "Martes", image: "/images/slide-1.jpg" },
-  { day: "Miercoles", image: "/images/slide-1.jpg" },
-  { day: "Jueves", image: "/images/slide-1.jpg" },
-  { day: "Viernes", image: "/images/slide-1.jpg" },
+  { day: "Lunes", image: "/tickets/menu-lunes.png" },
+  { day: "Martes", image: "/tickets/menu-martes.png" },
+  { day: "Miercoles", image: "/tickets/menu-miercoles.png" },
+  { day: "Jueves", image: "/tickets/menu-jueves.png" },
+  { day: "Viernes", image: "/tickets/menu-viernes.png" },
+];
+
+type PaymentMethod = "nudos" | "card" | "nequi";
+
+const paymentMethods: Array<{ key: PaymentMethod; label: string }> = [
+  { key: "nudos", label: "Pagar con NUDOS" },
+  { key: "card", label: "Paga con tarjeta" },
+  { key: "nequi", label: "NEQUI" },
 ];
 
 export default function TicketsPage() {
+  const { user } = useAuth();
   const [quantity, setQuantity] = useState(3);
   const [turnsOpen, setTurnsOpen] = useState(false);
   const [activeDay, setActiveDay] = useState(0);
+  const [selectedPaymentMethod, setSelectedPaymentMethod] = useState<PaymentMethod | null>(null);
+  const [paymentMessage, setPaymentMessage] = useState("");
+  const menuSwipeStart = useRef<number | null>(null);
+  const {
+    quoteDisplay,
+    isLoadingQuote,
+    isSubmitting,
+    allowanceEnough,
+    statusMessage,
+    errorMessage,
+    approveAndRedeem
+  } = useTicketRedemption(quantity);
 
-  const currentTickets = 2;
-  const pricePerTicket = 2000;
-  const subtotal = quantity * pricePerTicket;
-  const total = subtotal;
+  const currentTickets = user?.tickets.available ?? 0;
+  const benefitLabel = user?.profile.benefitLabel || "";
+  const hasNegotiatedBenefit = /subsidi|negoci/i.test(benefitLabel);
+  const pricePerTicketCop = hasNegotiatedBenefit ? 2000 : 2500;
+  const subtotalCop = pricePerTicketCop * quantity;
+  const totalCop = subtotalCop;
+  const nudosEquivalent = totalCop / 250;
 
   const summary = useMemo(
     () => ({
@@ -41,8 +68,45 @@ export default function TicketsPage() {
     [quantity],
   );
 
-  const nextDay = () => setActiveDay(prev => (prev + 1) % days.length);
-  const prevDay = () => setActiveDay(prev => (prev - 1 + days.length) % days.length);
+  const nextDay = () => setActiveDay(prev => Math.min(days.length - 1, prev + 1));
+  const prevDay = () => setActiveDay(prev => Math.max(0, prev - 1));
+  const startMenuSwipe = (event: PointerEvent<HTMLDivElement>) => {
+    menuSwipeStart.current = event.clientX;
+    event.currentTarget.setPointerCapture(event.pointerId);
+  };
+  const finishMenuSwipe = (event: PointerEvent<HTMLDivElement>) => {
+    const startX = menuSwipeStart.current;
+    menuSwipeStart.current = null;
+    event.currentTarget.releasePointerCapture(event.pointerId);
+    if (startX === null) return;
+
+    const delta = event.clientX - startX;
+    if (Math.abs(delta) < 42) return;
+    if (delta < 0) {
+      nextDay();
+      return;
+    }
+    prevDay();
+  };
+  const proceedToPayment = async () => {
+    if (!selectedPaymentMethod) {
+      setPaymentMessage("Selecciona un metodo de pago antes de proceder.");
+      return;
+    }
+
+    setPaymentMessage("");
+
+    if (selectedPaymentMethod === "nudos") {
+      await approveAndRedeem();
+      return;
+    }
+
+    setPaymentMessage(
+      selectedPaymentMethod === "card"
+        ? "Metodo con tarjeta seleccionado. La pasarela se conectara en el siguiente paso."
+        : "Metodo NEQUI seleccionado. La pasarela se conectara en el siguiente paso.",
+    );
+  };
 
   return (
     <>
@@ -60,21 +124,32 @@ export default function TicketsPage() {
             <article className="tickets-info-card">
               <h2>Tickets de Almuerzo</h2>
               <p>
-                Recarga tus tickets para disfrutar de almuerzos en la cafeteria.
-                Puedes comprar desde 3 hasta 45 tickets.
+                Recarga tus tickets para disfrutar de almuerzos en la cafeteria. Puedes
+                comprar 3 hasta 45 tickets.
               </p>
             </article>
 
             <button className="tickets-turn-card" type="button" onClick={() => setTurnsOpen(true)}>
-              <span>Solicita tu turno para almorzar</span>
+              <span className="tickets-turn-card__icon" aria-hidden="true">
+                <Image src="/tickets/Ticket.svg" alt="" width={58} height={58} />
+              </span>
+              <span>
+                Solicitar turno
+                <br />
+                para almorzar.
+              </span>
             </button>
           </section>
 
           <section className="tickets-purchase-card">
             <div className="tickets-purchase-card__header">
-              <div>
-                <h2>Cantidad de tickets:</h2>
-                <p>Precio por ticket</p>
+              <div className="tickets-purchase-card__copy">
+                <h2>
+                  Cantidad
+                  <br />
+                  de tickets:
+                </h2>
+                <p>{hasNegotiatedBenefit ? "Tarifa regular con bono" : "Tarifa regular sin bono"}</p>
               </div>
               <div className="tickets-counter">
                 <button type="button" onClick={() => setQuantity(prev => Math.max(1, prev - 1))}>
@@ -90,11 +165,11 @@ export default function TicketsPage() {
             <div className="tickets-pricing">
               <div>
                 <span>Precio por ticket</span>
-                <strong>${pricePerTicket.toLocaleString("es-CO")}</strong>
+                <strong>${pricePerTicketCop.toLocaleString("es-CO")}</strong>
               </div>
               <div>
                 <span>Subtotal:</span>
-                <strong>${subtotal.toLocaleString("es-CO")}</strong>
+                <strong>${subtotalCop.toLocaleString("es-CO")}</strong>
               </div>
             </div>
           </section>
@@ -102,8 +177,12 @@ export default function TicketsPage() {
           <section className="tickets-total-card">
             <div className="tickets-total-card__line">
               <span>Total a pagar:</span>
-              <strong>${total.toLocaleString("es-CO")}</strong>
+              <strong>${totalCop.toLocaleString("es-CO")}</strong>
             </div>
+            <small>
+              <span>Equivalente a</span>
+              <em>{nudosEquivalent.toLocaleString("es-CO")} $NUDOS</em>
+            </small>
           </section>
 
           <section className="tickets-summary-card">
@@ -125,26 +204,35 @@ export default function TicketsPage() {
           <section className="tickets-payment-card">
             <h2>Metodo de pago</h2>
 
-            <div className="tickets-payment-card__chips">
-              <button type="button" className="is-active" />
-              <button type="button" />
-              <button type="button" />
-            </div>
-
             <div className="tickets-payment-card__quick">
-              <button type="button">Pagar con NUDOS</button>
-              <button type="button">Nuevo metodo</button>
+              {paymentMethods.map(method => (
+                <button
+                  key={method.key}
+                  type="button"
+                  className={selectedPaymentMethod === method.key ? "is-selected" : ""}
+                  aria-pressed={selectedPaymentMethod === method.key}
+                  onClick={() => {
+                    setSelectedPaymentMethod(method.key);
+                    setPaymentMessage("");
+                  }}
+                >
+                  {method.label}
+                </button>
+              ))}
             </div>
 
             <form className="tickets-payment-form">
-              <input type="text" placeholder="Numero de tarjeta" />
-              <div className="tickets-payment-form__row">
-                <input type="text" placeholder="MM/AA" />
-                <input type="text" placeholder="CVV" />
-              </div>
-              <input type="text" placeholder="Nombre en la tarjeta" />
-              <button type="button">Proceder al pago</button>
+              <button
+                type="button"
+                onClick={proceedToPayment}
+                disabled={!selectedPaymentMethod || isSubmitting || isLoadingQuote}
+              >
+                {isSubmitting ? "Procesando..." : "Proceder al pago"}
+              </button>
             </form>
+            {paymentMessage ? <p className="profile-wallet-copy">{paymentMessage}</p> : null}
+            {statusMessage ? <p className="profile-wallet-copy">{statusMessage}</p> : null}
+            {errorMessage ? <p className="profile-wallet-copy">{errorMessage}</p> : null}
           </section>
           </FeatureGate>
         </section>
@@ -165,17 +253,25 @@ export default function TicketsPage() {
 
         <section className="tickets-menu-carousel">
           <div className="tickets-menu-carousel__controls">
-            <button type="button" onClick={prevDay}>
+            <button type="button" onClick={prevDay} disabled={activeDay === 0}>
               <ChevronLeft size={16} />
             </button>
             <span>{days[activeDay]?.day}</span>
-            <button type="button" onClick={nextDay}>
+            <button type="button" onClick={nextDay} disabled={activeDay === days.length - 1}>
               <ChevronRight size={16} />
             </button>
           </div>
 
-          <div className="tickets-menu-carousel__image">
+          <div
+            className="tickets-menu-carousel__image"
+            onPointerDown={startMenuSwipe}
+            onPointerUp={finishMenuSwipe}
+            onPointerCancel={() => {
+              menuSwipeStart.current = null;
+            }}
+          >
             <Image
+              key={days[activeDay]?.image}
               src={days[activeDay]?.image ?? "/images/slide-1.jpg"}
               alt={`Menu ${days[activeDay]?.day}`}
               fill

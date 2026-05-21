@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import { Eye, EyeOff } from "lucide-react";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 
 import { useAuth } from "@/app/providers/AuthProvider";
@@ -41,6 +41,15 @@ export default function Home() {
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState("");
   const [submitting, setSubmitting] = useState(false);
+  const [sessionChecked, setSessionChecked] = useState(false);
+  const [hadSessionOnLoad, setHadSessionOnLoad] = useState(false);
+
+  useEffect(() => {
+    if (!loading && !sessionChecked) {
+      setHadSessionOnLoad(Boolean(user));
+      setSessionChecked(true);
+    }
+  }, [loading, sessionChecked, user]);
 
   const copy = useMemo(
     () =>
@@ -66,14 +75,13 @@ export default function Home() {
     const action = mode === "signup" ? register : login;
     const result = await action({ email, password });
 
-    setSubmitting(false);
-
     if (result.error) {
+      setSubmitting(false);
       setError(result.error);
       return;
     }
 
-    router.replace("/perfil");
+    window.location.assign("/perfil");
   };
 
   return (
@@ -114,7 +122,7 @@ export default function Home() {
             <p className="auth-card__subtitle">{copy.subtitle}</p>
 
             <form className="auth-form" onSubmit={handleSubmit}>
-              {!loading && user ? (
+              {!loading && user && hadSessionOnLoad ? (
                 <div className="auth-error auth-error--session">
                   <span>Ya hay una sesion activa para {user.email}.</span>
                   <div className="auth-error__actions">

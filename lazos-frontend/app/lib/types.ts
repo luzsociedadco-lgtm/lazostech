@@ -60,16 +60,21 @@ export type UserSyncState = {
   onchainAffiliationSynced: boolean;
 };
 
-export type UserBalanceBuckets = {
-  internal: {
-    nudos: number;
-    tickets: number;
-    source: "diamond_internal";
-  };
-  wallet: {
-    erc20Nudos: number | null;
-    source: "erc20_wallet";
-  };
+export type UserTicketState = {
+  available: number;
+  source: "ticket_system";
+};
+
+export type UserNotificationType = "recycling" | "tickets" | "profile" | "dao";
+
+export type UserNotification = {
+  id: string;
+  type: UserNotificationType;
+  title: string;
+  body: string;
+  createdAt: string;
+  isRead: boolean;
+  href: string | null;
 };
 
 export type AppUser = {
@@ -83,7 +88,8 @@ export type AppUser = {
   linkedWallet: LinkedWallet | null;
   universityValidated: boolean;
   syncState: UserSyncState;
-  balances: UserBalanceBuckets;
+  tickets: UserTicketState;
+  notifications: UserNotification[];
 };
 
 export type AuthSessionPayload = {
@@ -110,7 +116,8 @@ export type UserSnapshot = {
   linkedWallet: LinkedWallet | null;
   universityValidated: boolean;
   syncState: UserSyncState;
-  balances: UserBalanceBuckets;
+  tickets: UserTicketState;
+  notifications: UserNotification[];
   access: FeatureAccess;
   completion: {
     profileComplete: boolean;
