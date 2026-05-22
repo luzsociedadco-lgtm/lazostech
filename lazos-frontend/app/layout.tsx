@@ -4,8 +4,8 @@ import { AuthProvider } from "./providers/AuthProvider";
 import { WagmiWrapper } from "./providers/WagmiWrapper";
 
 export const metadata = {
-  title: "NUDOS",
-  description: "Frontend de la dapp NUDOS sobre Base Sepolia",
+  title: "LazosTech",
+  description: "Frontend de la dapp LazosTech sobre Base Sepolia",
 };
 
 export default function RootLayout({
