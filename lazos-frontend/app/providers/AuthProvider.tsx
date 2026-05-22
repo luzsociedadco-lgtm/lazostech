@@ -84,11 +84,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         if (!response.ok) {
           return { error: json.error || "No se pudo crear la cuenta" };
         }
+        if (json.message && !json.user) {
+          return { error: json.message };
+        }
         await syncSession(json.user ?? null);
         return {};
       },
       async logout() {
-        await fetch("/api/auth/logout", { method: "POST" });
+        await fetch("/api/auth/logout", { method: "POST", credentials: "include" });
         setUser(null);
       },
       async updateProfile(payload) {

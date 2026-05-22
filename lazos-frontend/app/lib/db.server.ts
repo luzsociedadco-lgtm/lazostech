@@ -282,7 +282,10 @@ export async function getUserById(id: string) {
   return db.users.find(user => user.id === id) ?? null;
 }
 
-export async function createUser(input: Pick<AppUser, "email" | "passwordHash" | "authProvider">) {
+export async function createUser(input: Pick<AppUser, "email" | "authProvider"> & {
+  id?: string;
+  passwordHash?: string;
+}) {
   const db = await readDb();
   const now = new Date().toISOString();
 
@@ -298,7 +301,7 @@ export async function createUser(input: Pick<AppUser, "email" | "passwordHash" |
     : applyInstitutionalDefaults(baseProfile, input.email);
 
   const user: AppUser = {
-    id: `usr_${Math.random().toString(36).slice(2, 10)}`,
+    id: input.id || `usr_${Math.random().toString(36).slice(2, 10)}`,
     email: input.email.trim(),
     passwordHash: input.passwordHash,
     authProvider: input.authProvider,
@@ -324,6 +327,24 @@ export async function createUser(input: Pick<AppUser, "email" | "passwordHash" |
   db.users.push(user);
   await writeDb(db);
   return user;
+}
+
+export async function getOrCreateUserFromAuth(input: {
+  id: string;
+  email: string;
+  authProvider?: AppUser["authProvider"];
+}) {
+  const existingById = await getUserById(input.id);
+  if (existingById) return existingById;
+
+  const existingByEmail = await getUserByEmail(input.email);
+  if (existingByEmail) return existingByEmail;
+
+  return createUser({
+    id: input.id,
+    email: input.email,
+    authProvider: input.authProvider ?? "email"
+  });
 }
 
 export async function updateUserProfile(

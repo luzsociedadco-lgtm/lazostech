@@ -80,7 +80,7 @@ export type UserNotification = {
 export type AppUser = {
   id: string;
   email: string;
-  passwordHash: string;
+  passwordHash?: string;
   authProvider: "email" | "google";
   createdAt: string;
   updatedAt: string;
@@ -90,12 +90,6 @@ export type AppUser = {
   syncState: UserSyncState;
   tickets: UserTicketState;
   notifications: UserNotification[];
-};
-
-export type AuthSessionPayload = {
-  userId: string;
-  email: string;
-  issuedAt: number;
 };
 
 export type FeatureAccess = {

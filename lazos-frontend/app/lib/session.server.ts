@@ -1,16 +1,36 @@
 import { NextResponse } from "next/server";
 
-import { readSession } from "@/app/lib/auth.server";
-import { getUserById, toUserSnapshot } from "@/app/lib/db.server";
+import { getOrCreateUserFromAuth, getUserByEmail, getUserById, toUserSnapshot } from "@/app/lib/db.server";
+import { createClient } from "@/app/lib/supabase/server";
 
 export async function getSessionUser() {
-  const session = await readSession();
-  if (!session) return null;
+  try {
+    const supabase = await createClient();
+    const { data, error } = await supabase.auth.getClaims();
+    const claims = data?.claims;
 
-  const user = await getUserById(session.userId);
-  if (!user) return null;
+    if (error || !claims?.sub) return null;
 
-  return toUserSnapshot(user);
+    const authUserId = String(claims.sub);
+    const email = typeof claims.email === "string" ? claims.email : "";
+
+    const user =
+      (await getUserById(authUserId)) ||
+      (email ? await getUserByEmail(email) : null) ||
+      (email
+        ? await getOrCreateUserFromAuth({
+            id: authUserId,
+            email,
+            authProvider: "email"
+          })
+        : null);
+
+    if (!user) return null;
+
+    return toUserSnapshot(user);
+  } catch {
+    return null;
+  }
 }
 
 export function unauthorizedResponse(message = "No autorizado") {
