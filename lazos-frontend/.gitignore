@@ -1,6 +1,11 @@
 # Dependencies
 node_modules/
-.yarn/
+.yarn/*
+!.yarn/releases/
+!.yarn/releases/yarn-3.2.3.cjs
+!.yarn/plugins/
+!.yarn/plugins/@yarnpkg/
+!.yarn/plugins/@yarnpkg/*.cjs
 
 # Build output
 .next/
@@ -26,3 +31,5 @@ yarn-error.log*
 # System files
 .DS_Store
 Thumbs.db
+
+.vercel
