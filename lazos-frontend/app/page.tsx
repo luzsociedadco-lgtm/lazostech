@@ -34,7 +34,7 @@ function GoogleIcon() {
 
 export default function Home() {
   const router = useRouter();
-  const { user, loading, login, logout, register } = useAuth();
+  const { user, loading, login, logout, register, loginWithGoogle } = useAuth();
   const [mode, setMode] = useState<AuthMode>("signup");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -179,13 +179,24 @@ export default function Home() {
               </button>
 
               <p className="auth-separator">
-                Google queda listo como siguiente integracion OAuth real.
+                O continua con tu cuenta Google.
               </p>
 
-              <button className="auth-google is-disabled" type="button" disabled>
+              <button
+                className="auth-google"
+                type="button"
+                onClick={async () => {
+                  const { error } = await loginWithGoogle();
+
+                  if (error) {
+                    setError(error);
+                  }
+                }}
+              >
                 <GoogleIcon />
-                <span>Google pendiente</span>
+                <span>Continuar con Google</span>
               </button>
+
             </form>
           </div>
         </article>

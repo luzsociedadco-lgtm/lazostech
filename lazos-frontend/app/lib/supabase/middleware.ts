@@ -58,10 +58,12 @@ export async function updateSession(request: NextRequest) {
     }
   );
 
-  const { data, error } = await supabase.auth.getClaims();
-  const claims = data?.claims;
+  const {
+    data: { user },
+    error
+  } = await supabase.auth.getUser();
 
-  if (error || !claims) {
+  if (error || !user) {
     if (isProtectedApiPath(pathname)) {
       return NextResponse.json({ error: "No autorizado" }, { status: 401 });
     }

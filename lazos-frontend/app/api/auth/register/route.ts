@@ -5,6 +5,7 @@ import { createClient } from "@/app/lib/supabase/server";
 
 export async function POST(request: Request) {
   try {
+    const requestUrl = new URL(request.url);
     const body = await request.json();
     const email = String(body.email || "").trim();
     const password = String(body.password || "");
@@ -20,10 +21,20 @@ export async function POST(request: Request) {
     const supabase = await createClient();
     const { data, error } = await supabase.auth.signUp({
       email,
-      password
+      password,
+      options: {
+        emailRedirectTo: `${requestUrl.origin}/auth/callback?next=/perfil`
+      }
     });
 
     if (error) {
+      if (error.code === "over_email_send_rate_limit" || error.status === 429) {
+        return NextResponse.json(
+          { error: "Supabase limito temporalmente el envio de emails. Espera unos minutos e intenta de nuevo." },
+          { status: 429 }
+        );
+      }
+
       const alreadyRegistered = error.message.toLowerCase().includes("already registered");
       return NextResponse.json(
         { error: alreadyRegistered ? "Ese email ya existe" : error.message },
@@ -32,7 +43,13 @@ export async function POST(request: Request) {
     }
 
     if (!data.user?.email) {
-      return NextResponse.json({ error: "No se pudo crear la cuenta" }, { status: 500 });
+      return NextResponse.json(
+        {
+          user: null,
+          message: "Si el correo es valido, Supabase enviara un enlace de confirmacion para activar la cuenta."
+        },
+        { status: 202 }
+      );
     }
 
     const user = await getOrCreateUserFromAuth({
@@ -43,7 +60,10 @@ export async function POST(request: Request) {
 
     if (!data.session) {
       return NextResponse.json(
-        { user: null, message: "Cuenta creada. Revisa tu email para confirmar el acceso." },
+        {
+          user: null,
+          message: "Cuenta creada. Revisa tu email y confirma el acceso para iniciar sesion."
+        },
         { status: 202 }
       );
     }

@@ -11,6 +11,7 @@ type AuthContextValue = {
   login: (payload: { email: string; password: string }) => Promise<{ error?: string }>;
   register: (payload: { email: string; password: string }) => Promise<{ error?: string }>;
   logout: () => Promise<void>;
+  loginWithGoogle: () => Promise<{ error?: string }>;
   refresh: () => Promise<void>;
   updateProfile: (payload: Record<string, unknown>) => Promise<{ error?: string }>;
   linkWallet: (address: string) => Promise<{ error?: string }>;
@@ -93,6 +94,27 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       async logout() {
         await fetch("/api/auth/logout", { method: "POST", credentials: "include" });
         setUser(null);
+      },
+      async loginWithGoogle() {
+        try {
+          const { createClient } = await import("@/app/lib/supabase/client");
+          const supabase = createClient();
+          const redirectTo = `${window.location.origin}/auth/callback?next=/perfil`;
+          const { error } = await supabase.auth.signInWithOAuth({
+            provider: "google",
+            options: {
+              redirectTo
+            }
+          });
+
+          if (error) {
+            return { error: error.message };
+          }
+
+          return {};
+        } catch {
+          return { error: "No se pudo iniciar sesion con Google" };
+        }
       },
       async updateProfile(payload) {
         const response = await fetch("/api/profile", {
