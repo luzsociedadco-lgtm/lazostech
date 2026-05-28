@@ -51,6 +51,12 @@ export default function Home() {
     }
   }, [loading, sessionChecked, user]);
 
+  useEffect(() => {
+    if (!loading && user) {
+      router.replace("/perfil");
+    }
+  }, [loading, router, user]);
+
   const copy = useMemo(
     () =>
       mode === "signup"
