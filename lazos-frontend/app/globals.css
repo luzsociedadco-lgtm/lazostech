@@ -264,14 +264,14 @@ a {
 }
 
 .profile-screen {
-  height: calc(100dvh - 112px);
+  height: calc(100dvh - 60px);
   display: flex;
   align-items: stretch;
   overflow: hidden;
 }
 
 .profile-shell {
-  height: calc(100dvh - 112px);
+  height: calc(100dvh - 60px);
   background: #b77812;
   color: #fff4e6;
   overflow: hidden;
@@ -1232,7 +1232,7 @@ a {
 @media (max-width: 399px) {
   .profile-screen,
   .profile-shell {
-    height: calc(100dvh - 106px);
+    height: calc(100dvh - 60px);
   }
 
   .profile-topbar {
@@ -1316,14 +1316,14 @@ a {
 @media (max-height: 820px) {
   .profile-screen,
   .profile-shell {
-    height: calc(100dvh - 104px);
+    height: calc(100dvh - 60px);
   }
 
   .profile-history-grid {
     margin-top: 0;
     --profile-tile-icon-size: clamp(42px, 11.55vw, 51px);
-    flex: 0 0 calc((100dvh - 104px) / 2);
-    height: calc((100dvh - 104px) / 2);
+    flex: 0 0 calc((100dvh - 60px) / 2);
+    height: calc((100dvh - 60px) / 2);
   }
 
   .profile-topbar {
@@ -1346,7 +1346,7 @@ a {
 @media (max-height: 740px) {
   .profile-screen,
   .profile-shell {
-    height: calc(100dvh - 98px);
+    height: calc(100dvh - 60px);
   }
 
   .profile-status-card {
@@ -1387,8 +1387,8 @@ a {
     --profile-tile-icon-size: clamp(33px, 9.9vw, 42px);
     --profile-tile-value-size: clamp(1rem, 3.7vw, 1.2rem);
     --profile-tile-label-size: clamp(0.5rem, 1.6vw, 0.64rem);
-    flex: 0 0 calc((100dvh - 98px) / 2);
-    height: calc((100dvh - 98px) / 2);
+    flex: 0 0 calc((100dvh - 60px) / 2);
+    height: calc((100dvh - 60px) / 2);
     padding: 16px 18px 16px;
     row-gap: 8px;
     column-gap: 4px;
@@ -2379,8 +2379,8 @@ a {
   align-items: end;
   color: #ffffff;
   margin: 0 -18px 0;
-  padding: 40px 18px 10px;
-  min-height: 76px;
+  padding: 24px 18px 9px;
+  min-height: 58px;
   background: #e9560e;
 }
 

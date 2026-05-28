@@ -3,14 +3,10 @@ import { NextResponse, type NextRequest } from "next/server";
 
 import { hasSupabaseConfig } from "@/app/lib/supabase/config";
 
-const protectedPagePrefixes = ["/perfil", "/tickets", "/reciclaje", "/marketplace", "/dao"];
 const protectedApiPrefixes = ["/api/profile", "/api/wallet", "/api/notifications"];
 
 function isProtectedPath(pathname: string) {
-  return (
-    protectedPagePrefixes.some(prefix => pathname.startsWith(prefix)) ||
-    protectedApiPrefixes.some(prefix => pathname.startsWith(prefix))
-  );
+  return protectedApiPrefixes.some(prefix => pathname.startsWith(prefix));
 }
 
 function isProtectedApiPath(pathname: string) {
