@@ -24,6 +24,59 @@ async function parseJson(response: Response) {
   return response.json().catch(() => ({}));
 }
 
+function buildSupabaseUserSnapshot(input: {
+  id: string;
+  email: string;
+  provider?: string;
+}): UserSnapshot {
+  const now = new Date().toISOString();
+
+  return {
+    id: input.id,
+    email: input.email,
+    authProvider: input.provider === "google" ? "google" : "email",
+    createdAt: now,
+    updatedAt: now,
+    profile: {
+      firstName: "",
+      lastName: "",
+      phone: "",
+      nationalId: "",
+      studentCode: "",
+      universityId: 0,
+      campusId: 1,
+      programId: 0,
+      studentType: "Pregrado",
+      benefitLabel: "Almuerzo Regular"
+    },
+    linkedWallet: null,
+    universityValidated: false,
+    syncState: {
+      directoryMatched: false,
+      profileComplete: false,
+      walletLinked: false,
+      onchainProfileRegistered: false,
+      onchainAffiliationSynced: false
+    },
+    tickets: {
+      available: 0,
+      source: "ticket_system"
+    },
+    notifications: [],
+    access: {
+      perfil: true,
+      tickets: false,
+      reciclaje: false,
+      marketplace: false,
+      dao: false
+    },
+    completion: {
+      profileComplete: false,
+      walletLinked: false
+    }
+  };
+}
+
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<UserSnapshot | null>(null);
   const [catalog, setCatalog] = useState<UniversityDirectory | null>(null);
@@ -38,7 +91,29 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     const sessionJson = await parseJson(sessionResponse);
     const catalogJson = await parseJson(catalogResponse);
 
-    setUser(sessionJson.user ?? null);
+    let nextUser = sessionJson.user ?? null;
+
+    if (!nextUser) {
+      try {
+        const { createClient } = await import("@/app/lib/supabase/client");
+        const supabase = createClient();
+        const {
+          data: { user: supabaseUser }
+        } = await supabase.auth.getUser();
+
+        if (supabaseUser?.id && supabaseUser.email) {
+          nextUser = buildSupabaseUserSnapshot({
+            id: supabaseUser.id,
+            email: supabaseUser.email,
+            provider: supabaseUser.app_metadata?.provider
+          });
+        }
+      } catch {
+        nextUser = null;
+      }
+    }
+
+    setUser(nextUser);
     setCatalog(catalogJson ?? null);
   };
 
