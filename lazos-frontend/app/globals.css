@@ -15,6 +15,7 @@
   --brand-strong: #0b6a54;
   --gold: #c78528;
   --shadow: 0 20px 60px rgba(58, 40, 18, 0.12);
+  --app-nav-height: 90px;
 }
 
 * {
@@ -264,14 +265,14 @@ a {
 }
 
 .profile-screen {
-  height: calc(100dvh - 60px);
+  height: calc(100dvh - var(--app-nav-height));
   display: flex;
   align-items: stretch;
   overflow: hidden;
 }
 
 .profile-shell {
-  height: calc(100dvh - 60px);
+  height: calc(100dvh - var(--app-nav-height));
   background: #b77812;
   color: #fff4e6;
   overflow: hidden;
@@ -1232,7 +1233,7 @@ a {
 @media (max-width: 399px) {
   .profile-screen,
   .profile-shell {
-    height: calc(100dvh - 60px);
+    height: calc(100dvh - var(--app-nav-height));
   }
 
   .profile-topbar {
@@ -1316,14 +1317,14 @@ a {
 @media (max-height: 820px) {
   .profile-screen,
   .profile-shell {
-    height: calc(100dvh - 60px);
+    height: calc(100dvh - var(--app-nav-height));
   }
 
   .profile-history-grid {
     margin-top: 0;
     --profile-tile-icon-size: clamp(42px, 11.55vw, 51px);
-    flex: 0 0 calc((100dvh - 60px) / 2);
-    height: calc((100dvh - 60px) / 2);
+    flex: 0 0 calc((100dvh - var(--app-nav-height)) / 2);
+    height: calc((100dvh - var(--app-nav-height)) / 2);
   }
 
   .profile-topbar {
@@ -1346,7 +1347,7 @@ a {
 @media (max-height: 740px) {
   .profile-screen,
   .profile-shell {
-    height: calc(100dvh - 60px);
+    height: calc(100dvh - var(--app-nav-height));
   }
 
   .profile-status-card {
@@ -1387,8 +1388,8 @@ a {
     --profile-tile-icon-size: clamp(33px, 9.9vw, 42px);
     --profile-tile-value-size: clamp(1rem, 3.7vw, 1.2rem);
     --profile-tile-label-size: clamp(0.5rem, 1.6vw, 0.64rem);
-    flex: 0 0 calc((100dvh - 60px) / 2);
-    height: calc((100dvh - 60px) / 2);
+    flex: 0 0 calc((100dvh - var(--app-nav-height)) / 2);
+    height: calc((100dvh - var(--app-nav-height)) / 2);
     padding: 16px 18px 16px;
     row-gap: 8px;
     column-gap: 4px;
@@ -2379,15 +2380,14 @@ a {
   align-items: end;
   color: #ffffff;
   margin: 0 -18px 0;
-  padding: 24px 18px 9px;
-  min-height: 58px;
+  padding: 10px 18px;
   background: #e9560e;
 }
 
 .market-topbar h1 {
   grid-column: 2;
   margin: 0;
-  font-size: 1.36rem;
+  font-size: 1.61rem;
   line-height: 1;
   text-align: center;
   font-weight: 800;
