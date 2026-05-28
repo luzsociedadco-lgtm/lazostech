@@ -94,6 +94,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       async logout() {
         await fetch("/api/auth/logout", { method: "POST", credentials: "include" });
         setUser(null);
+        window.location.assign("/");
       },
       async loginWithGoogle() {
         try {
