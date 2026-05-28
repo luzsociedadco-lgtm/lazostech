@@ -83,5 +83,9 @@
     "react-dom": "19.2.6",
     "viem": "^2.8.0",
     "wagmi": "^2.18.2"
+  },
+  "optionalDependencies": {
+    "lightningcss-linux-x64-gnu": "^1.30.2",
+    "lightningcss-linux-x64-musl": "^1.30.2"
   }
 }
