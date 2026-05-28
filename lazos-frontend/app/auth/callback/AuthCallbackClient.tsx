@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { useRef } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 
 import { createClient } from "@/app/lib/supabase/client";
@@ -11,8 +12,12 @@ export function AuthCallbackClient() {
   const searchParams = useSearchParams();
   const { refresh } = useAuth();
   const [message, setMessage] = useState("Validando ingreso...");
+  const hasProcessedCallback = useRef(false);
 
   useEffect(() => {
+    if (hasProcessedCallback.current) return;
+    hasProcessedCallback.current = true;
+
     let mounted = true;
 
     async function completeSignIn() {
