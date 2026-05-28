@@ -46,7 +46,7 @@ export async function POST(request: Request) {
       return NextResponse.json(
         {
           user: null,
-          message: "Si el correo es valido, Supabase enviara un enlace de confirmacion para activar la cuenta."
+          message: "Enviamos un correo electronico para que valides tu cuenta."
         },
         { status: 202 }
       );
@@ -62,7 +62,7 @@ export async function POST(request: Request) {
       return NextResponse.json(
         {
           user: null,
-          message: "Cuenta creada. Revisa tu email y confirma el acceso para iniciar sesion."
+          message: "Enviamos un correo electronico para que valides tu cuenta."
         },
         { status: 202 }
       );

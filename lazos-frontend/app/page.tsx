@@ -102,7 +102,6 @@ export default function Home() {
             className="auth-brand__mark"
             priority
           />
-          <p className="auth-brand__text">$LAZOS.GO</p>
         </div>
 
         <article className="auth-card">
