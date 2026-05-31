@@ -65,6 +65,34 @@ export type UserTicketState = {
   source: "ticket_system";
 };
 
+export type TicketTurnStatus = "active" | "reserved" | "expired" | "completed" | "cancelled";
+
+export type TicketTurn = {
+  id: string;
+  userId: string;
+  number: string;
+  status: TicketTurnStatus;
+  type: "regular" | "special";
+  qrCodeId: string;
+  createdAt: string;
+  updatedAt: string;
+  expiresAt: string;
+  reactivationsUsed: number;
+  reactivationEvents?: string[];
+};
+
+export type TicketTurnSnapshot = TicketTurn & {
+  queuePosition: number;
+  estimatedMinutes: number;
+  estimatedTimeLabel: string;
+  queuePaused?: boolean;
+  reactivationsAvailable: number;
+  monthlyReactivationsUsed: number;
+  monthlyReactivationsLimit: number;
+  monthlyReservationsUsed: number;
+  monthlyReservationsLimit: number;
+};
+
 export type UserNotificationType = "recycling" | "tickets" | "profile" | "dao";
 
 export type UserNotification = {
@@ -121,6 +149,7 @@ export type UserSnapshot = {
 
 export type AppDatabase = {
   users: AppUser[];
+  ticketTurns?: TicketTurn[];
 };
 
 export type UniversityDirectory = {

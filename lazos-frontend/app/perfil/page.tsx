@@ -30,6 +30,7 @@ import { useAuth } from "@/app/providers/AuthProvider";
 import { config as wagmiConfig } from "@/app/providers/WagmiWrapper";
 
 const avatarSrc = "/images/user.jpg";
+const univalleDefaultAvatarSrc = "/images/univalle-default-avatar.png";
 const universityLogoById: Record<number, string> = {
   1000: "/images/logo-G.png"
 };
@@ -114,7 +115,7 @@ export default function PerfilPage() {
   const publicClient = usePublicClient();
   const { writeContractAsync } = useWriteContract();
   const { user, catalog, logout, updateProfile, linkWallet, unlinkWallet, refresh } = useAuth();
-  const { balance: erc20Balance, isLoading: erc20Loading, isConnected: erc20Connected, symbol } = useNudosErc20Balance();
+  const { balance: erc20Balance, isLoading: erc20Loading, isConnected: erc20Connected } = useNudosErc20Balance();
   const [menuOpen, setMenuOpen] = useState(false);
   const [activePanel, setActivePanel] = useState<"avatar" | "wallet" | "notifications" | "edit" | "payment" | null>(null);
   const [savingProfile, setSavingProfile] = useState(false);
@@ -136,9 +137,9 @@ export default function PerfilPage() {
     lastName: "",
     studentCode: "",
     nationalId: "",
-    program: "",
-    birthCity: "",
-    birthDate: "",
+    universityId: 0,
+    campusId: 1,
+    programId: 0,
     phone: ""
   });
 
@@ -151,6 +152,14 @@ export default function PerfilPage() {
     () => selectedUniversity?.campuses.find(item => item.id === user?.profile.campusId) ?? null,
     [selectedUniversity, user?.profile.campusId]
   );
+  const formUniversity = useMemo(
+    () => catalog?.universities.find(item => item.id === formState.universityId) ?? null,
+    [catalog, formState.universityId]
+  );
+  const formCampus = useMemo(
+    () => formUniversity?.campuses.find(item => item.id === formState.campusId) ?? null,
+    [formUniversity, formState.campusId]
+  );
   const universityLogoSrc =
     universityLogoById[user?.profile.universityId || 0] || "/lazosGO.png";
 
@@ -161,12 +170,12 @@ export default function PerfilPage() {
       lastName: user.profile.lastName || "",
       studentCode: user.profile.studentCode || "",
       nationalId: user.profile.nationalId || "",
-      program: selectedCampus?.programs.find(program => program.id === user.profile.programId)?.name || "",
-      birthCity: "",
-      birthDate: "",
+      universityId: user.profile.universityId || 0,
+      campusId: user.profile.campusId || 1,
+      programId: user.profile.programId || 0,
       phone: user.profile.phone || ""
     });
-  }, [selectedCampus, user]);
+  }, [user]);
 
   useEffect(() => {
     return () => {
@@ -178,7 +187,10 @@ export default function PerfilPage() {
 
   const studentName =
     user ? `${user.profile.firstName} ${user.profile.lastName}`.trim() || user.email.split("@")[0] : "";
-  const avatarDisplaySrc = avatarPreview || avatarSrc;
+  const defaultAvatarSrc = user?.email.toLowerCase().endsWith("@correounivalle.edu.co")
+    ? univalleDefaultAvatarSrc
+    : avatarSrc;
+  const avatarDisplaySrc = avatarPreview || defaultAvatarSrc;
   const displayCode = user?.profile.studentCode || user?.profile.nationalId || "Sin codigo";
   const studentTypeLabel = user?.profile.studentType || "Estudiante registrado";
   const benefitLabel = user?.profile.benefitLabel || "Almuerzo regular";
@@ -199,6 +211,7 @@ export default function PerfilPage() {
       ? "..."
       : erc20Balance ?? "0"
     : "0";
+  const nudosSymbol = "$NUDOS";
   const recycleCountDisplay = String(recycleActions);
   const identityLines = [
     displayCode || "Codigo",
@@ -226,7 +239,10 @@ export default function PerfilPage() {
       lastName: formState.lastName,
       nationalId: formState.nationalId,
       phone: formState.phone,
-      studentCode: formState.studentCode
+      studentCode: formState.studentCode,
+      universityId: formState.universityId,
+      campusId: formState.campusId,
+      programId: formState.programId
     });
 
     setSavingProfile(false);
@@ -455,7 +471,7 @@ export default function PerfilPage() {
               <div className="profile-head-metrics">
                 <div className="profile-head-metric">
                   <strong>{erc20BalanceDisplay}</strong>
-                  <span>{symbol}</span>
+                  <span>{nudosSymbol}</span>
                 </div>
                 <div className="profile-head-metric">
                   <strong>{String(availableTickets)}</strong>
@@ -521,7 +537,7 @@ export default function PerfilPage() {
             />
             <BalanceTile
               value={erc20BalanceDisplay}
-              label={symbol}
+              label={nudosSymbol}
               active={nudosActive}
               iconSrc="/profile-panel/icon-nudos.svg"
               iconAlt="Icono de nudos"
@@ -755,15 +771,51 @@ export default function PerfilPage() {
                 <input value={formState.lastName} onChange={event => setFormState(prev => ({ ...prev, lastName: event.target.value }))} placeholder="[apellido]" />
                 <input value={formState.studentCode} onChange={event => setFormState(prev => ({ ...prev, studentCode: event.target.value }))} placeholder="[codigoestudiantil]" />
                 <input value={formState.nationalId} onChange={event => setFormState(prev => ({ ...prev, nationalId: event.target.value }))} placeholder="[cedula]" />
-                <input value={formState.program} onChange={event => setFormState(prev => ({ ...prev, program: event.target.value }))} placeholder="[programa]" />
-                <div className="profile-edit-select is-static">
-                  <span>{selectedUniversity?.name || "Universidad pendiente"}</span>
-                  <QrCode size={16} />
-                </div>
-                <div className="profile-edit-select is-static">
-                  <span>{selectedCampus?.name || "Campus pendiente"}</span>
-                  <ChevronDown size={16} />
-                </div>
+                <select
+                  className="profile-edit-select"
+                  value={formState.universityId}
+                  onChange={event => {
+                    const universityId = Number(event.target.value);
+                    const university = catalog?.universities.find(item => item.id === universityId);
+                    const campusId = university?.campuses[0]?.id ?? 1;
+                    const programId = university?.campuses[0]?.programs[0]?.id ?? 0;
+                    setFormState(prev => ({ ...prev, universityId, campusId, programId }));
+                  }}
+                >
+                  <option value={0}>Universidad pendiente</option>
+                  {catalog?.universities.map(university => (
+                    <option key={university.id} value={university.id}>
+                      {university.name}
+                    </option>
+                  ))}
+                </select>
+                <select
+                  className="profile-edit-select"
+                  value={formState.campusId}
+                  onChange={event => {
+                    const campusId = Number(event.target.value);
+                    const campus = formUniversity?.campuses.find(item => item.id === campusId);
+                    setFormState(prev => ({ ...prev, campusId, programId: campus?.programs[0]?.id ?? 0 }));
+                  }}
+                >
+                  {(formUniversity?.campuses.length ? formUniversity.campuses : selectedUniversity?.campuses ?? []).map(campus => (
+                    <option key={campus.id} value={campus.id}>
+                      {campus.name}
+                    </option>
+                  ))}
+                </select>
+                <select
+                  className="profile-edit-select"
+                  value={formState.programId}
+                  onChange={event => setFormState(prev => ({ ...prev, programId: Number(event.target.value) }))}
+                >
+                  <option value={0}>Programa pendiente</option>
+                  {formCampus?.programs.map(program => (
+                    <option key={program.id} value={program.id}>
+                      {program.name}
+                    </option>
+                  ))}
+                </select>
                 <input value={formState.phone} onChange={event => setFormState(prev => ({ ...prev, phone: event.target.value }))} placeholder="[telefono]" />
               </div>
               <div className="profile-edit-actions">

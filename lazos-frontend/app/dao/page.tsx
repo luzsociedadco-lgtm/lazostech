@@ -4,6 +4,7 @@ import { ArrowLeft, ChevronRight, CircleUserRound, Clock3, FileText, Paperclip }
 import { useRef, useState } from "react";
 import type { PointerEvent } from "react";
 import { FeatureGate } from "@/app/components/FeatureGate";
+import ComingSoonCover from "@/app/components/ComingSoonCover";
 
 const sessions = [
   { day: "03", month: "Febrero", year: "de 2025", code: "019", status: "Cerrado", participants: "18/26", quorum: "12" },
@@ -685,6 +686,7 @@ export default function DaoPage() {
           </section>
         </div>
       ) : null}
+      <ComingSoonCover imageSrc="/coming-soon/dao.png" tone="dao" />
     </main>
   );
 }

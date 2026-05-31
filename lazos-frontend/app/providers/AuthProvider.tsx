@@ -11,7 +11,7 @@ type AuthContextValue = {
   login: (payload: { email: string; password: string }) => Promise<{ error?: string }>;
   register: (payload: { email: string; password: string }) => Promise<{ error?: string }>;
   logout: () => Promise<void>;
-  loginWithGoogle: () => Promise<{ error?: string }>;
+  loginWithGoogle: (nextPath?: string) => Promise<{ error?: string }>;
   refresh: () => Promise<void>;
   updateProfile: (payload: Record<string, unknown>) => Promise<{ error?: string }>;
   linkWallet: (address: string) => Promise<{ error?: string }>;
@@ -171,11 +171,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         setUser(null);
         window.location.assign("/");
       },
-      async loginWithGoogle() {
+      async loginWithGoogle(nextPath = "/perfil") {
         try {
           const { createClient } = await import("@/app/lib/supabase/client");
           const supabase = createClient();
-          const redirectTo = `${window.location.origin}/auth/callback?next=/perfil`;
+          const safeNextPath = nextPath.startsWith("/") ? nextPath : "/perfil";
+          const redirectTo = `${window.location.origin}/auth/callback?next=${encodeURIComponent(safeNextPath)}`;
           const { error } = await supabase.auth.signInWithOAuth({
             provider: "google",
             options: {

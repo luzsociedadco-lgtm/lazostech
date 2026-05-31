@@ -23,7 +23,8 @@ export function AuthCallbackClient() {
     async function completeSignIn() {
       const code = searchParams.get("code");
       const nextParam = searchParams.get("next");
-      const next = nextParam?.startsWith("/") ? nextParam : "/perfil";
+      const decodedNextParam = nextParam ? decodeURIComponent(nextParam) : null;
+      const next = decodedNextParam?.startsWith("/") ? decodedNextParam : "/perfil";
 
       if (!code) {
         router.replace("/?auth=callback-error");

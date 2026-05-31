@@ -14,7 +14,7 @@ const walletConnectProjectId =
   process.env.NEXT_PUBLIC_WALLETCONNECT_ID || "1d7f6b2a8e9f4a72b31f8e909f4f0d1c";
 
 export const config = getDefaultConfig({
-  appName: "NUDOS",
+  appName: "$NUDOS",
   projectId: walletConnectProjectId,
   chains: [baseSepolia],
   transports: {

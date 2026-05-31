@@ -8,6 +8,8 @@ import type {
   FeatureAccess,
   ProfileRecord,
   StudentDirectoryRecord,
+  TicketTurn,
+  TicketTurnSnapshot,
   UniversityDirectory,
   UserNotification,
   UserNotificationType,
@@ -18,6 +20,13 @@ const DB_PATH = path.join(process.cwd(), "app", "data", "app-db.json");
 const UNIVALLE_EMAIL_DOMAIN = "@correounivalle.edu.co";
 const UNIVALLE_UNIVERSITY_ID = 1000;
 const UNIVALLE_DEFAULT_CAMPUS_ID = 1001;
+const LUNCH_TURN_QR_ID = "lazos-lunch-turns-v1";
+const MONTHLY_TURN_REACTIVATION_LIMIT = 10;
+const MONTHLY_SPECIAL_TURN_LIMIT = 5;
+const TURN_DURATION_MINUTES = 30;
+const SPECIAL_TURN_DURATION_MINUTES = 90;
+const LUNCH_OPERATION_START_HOUR = 12;
+const PEOPLE_SERVED_PER_MINUTE = 3;
 
 function createNotification(input: {
   type: UserNotificationType;
@@ -44,7 +53,7 @@ function buildNotificationSeed() {
     createNotification({
       type: "recycling",
       title: "Reciclaje validado",
-      body: "Depositaste 4 unidades y recibiste 1.00 NUDOS.",
+      body: "Depositaste 4 unidades y recibiste 1.00 $NUDOS.",
       href: "/reciclaje",
       createdAt: new Date(now - 1000 * 60 * 8).toISOString()
     }),
@@ -133,7 +142,8 @@ export async function readDb() {
   });
 
   const normalizedDb = {
-    users: users.map(({ balances, ...user }) => user)
+    users: users.map(({ balances, ...user }) => user),
+    ticketTurns: parsed.ticketTurns ?? []
   } as AppDatabase;
 
   if (didMigrate) {
@@ -144,7 +154,7 @@ export async function readDb() {
 }
 
 export async function writeDb(db: AppDatabase) {
-  await fs.writeFile(DB_PATH, JSON.stringify(db, null, 2), "utf8");
+  await fs.writeFile(DB_PATH, JSON.stringify({ ...db, ticketTurns: db.ticketTurns ?? [] }, null, 2), "utf8");
 }
 
 export function getUniversityDirectory() {
@@ -493,4 +503,196 @@ export async function markUserNotificationRead(userId: string, notificationId: s
   user.updatedAt = new Date().toISOString();
   await writeDb(db);
   return notification;
+}
+
+function addMinutes(date: Date, minutes: number) {
+  return new Date(date.getTime() + minutes * 60 * 1000);
+}
+
+function isLiveTurn(turn: TicketTurn, now = new Date()) {
+  return (turn.status === "active" || turn.status === "reserved") && new Date(turn.expiresAt) > now;
+}
+
+function sameMonth(value: string, now = new Date()) {
+  const date = new Date(value);
+  return date.getUTCFullYear() === now.getUTCFullYear() && date.getUTCMonth() === now.getUTCMonth();
+}
+
+function turnPrefixFromIndex(index: number) {
+  let value = index;
+  let prefix = "";
+
+  do {
+    prefix = String.fromCharCode(65 + (value % 26)) + prefix;
+    value = Math.floor(value / 26) - 1;
+  } while (value >= 0);
+
+  return prefix;
+}
+
+function nextTurnNumber(turns: TicketTurn[], now = new Date()) {
+  const today = now.toISOString().slice(0, 10);
+  const countToday = turns.filter(turn => turn.createdAt.slice(0, 10) === today).length;
+  const prefix = turnPrefixFromIndex(Math.floor(countToday / 100));
+  return `${prefix}-${String(countToday % 100).padStart(2, "0")}`;
+}
+
+function getLunchStart(now = new Date()) {
+  const start = new Date(now);
+  start.setHours(LUNCH_OPERATION_START_HOUR, 0, 0, 0);
+  return start;
+}
+
+function formatEstimatedTime(minutes: number, now = new Date()) {
+  const estimated = addMinutes(getLunchStart(now), minutes);
+  return estimated.toLocaleTimeString("es-CO", {
+    hour: "2-digit",
+    minute: "2-digit",
+    hour12: false
+  });
+}
+
+function getMonthlyReactivationCount(userId: string, turns: TicketTurn[], now = new Date()) {
+  return turns
+    .filter(turn => turn.userId === userId)
+    .flatMap(turn => turn.reactivationEvents ?? [])
+    .filter(timestamp => sameMonth(timestamp, now)).length;
+}
+
+function toTicketTurnSnapshot(turn: TicketTurn, turns: TicketTurn[], now = new Date()): TicketTurnSnapshot {
+  const liveTurns = turns
+    .filter(item => isLiveTurn(item, now))
+    .sort((a, b) => a.createdAt.localeCompare(b.createdAt));
+  const index = liveTurns.findIndex(item => item.id === turn.id);
+  const queuePosition = index >= 0 ? index + 1 : 0;
+  const estimatedMinutes = queuePosition > 0 ? Math.ceil(Math.max(0, queuePosition - 1) / PEOPLE_SERVED_PER_MINUTE) : 0;
+  const monthlyReactivationsUsed = getMonthlyReactivationCount(turn.userId, turns, now);
+
+  return {
+    ...turn,
+    queuePosition,
+    estimatedMinutes,
+    estimatedTimeLabel: formatEstimatedTime(estimatedMinutes, now),
+    reactivationsAvailable: Math.max(0, MONTHLY_TURN_REACTIVATION_LIMIT - monthlyReactivationsUsed),
+    monthlyReactivationsUsed,
+    monthlyReactivationsLimit: MONTHLY_TURN_REACTIVATION_LIMIT,
+    monthlyReservationsUsed: turns.filter(
+      item => item.userId === turn.userId && item.type === "special" && sameMonth(item.createdAt, now)
+    ).length,
+    monthlyReservationsLimit: MONTHLY_SPECIAL_TURN_LIMIT
+  };
+}
+
+export async function getTicketTurnState(userId: string) {
+  const db = await readDb();
+  const now = new Date();
+  let didUpdate = false;
+
+  for (const turn of db.ticketTurns ?? []) {
+    if ((turn.status === "active" || turn.status === "reserved") && new Date(turn.expiresAt) <= now) {
+      turn.status = "expired";
+      turn.updatedAt = now.toISOString();
+      didUpdate = true;
+    }
+  }
+
+  if (didUpdate) {
+    await writeDb(db);
+  }
+
+  const activeTurn = (db.ticketTurns ?? [])
+    .filter(turn => turn.userId === userId && isLiveTurn(turn, now))
+    .sort((a, b) => b.createdAt.localeCompare(a.createdAt))[0];
+
+  return activeTurn ? toTicketTurnSnapshot(activeTurn, db.ticketTurns ?? [], now) : null;
+}
+
+export async function requestTicketTurn(userId: string, type: TicketTurn["type"], qrCodeId: string) {
+  const db = await readDb();
+  const user = db.users.find(item => item.id === userId);
+  if (!user) {
+    throw new Error("USER_NOT_FOUND");
+  }
+
+  if (qrCodeId !== LUNCH_TURN_QR_ID) {
+    throw new Error("INVALID_TURN_QR");
+  }
+
+  if (!computeAccess(user).tickets) {
+    throw new Error("TICKETS_LOCKED");
+  }
+
+  const now = new Date();
+  const existingTurn = (db.ticketTurns ?? []).find(turn => turn.userId === userId && isLiveTurn(turn, now));
+  if (existingTurn) {
+    return toTicketTurnSnapshot(existingTurn, db.ticketTurns ?? [], now);
+  }
+
+  if (type === "special") {
+    const reservationsUsed = (db.ticketTurns ?? []).filter(
+      turn => turn.userId === userId && turn.type === "special" && sameMonth(turn.createdAt, now)
+    ).length;
+    if (reservationsUsed >= MONTHLY_SPECIAL_TURN_LIMIT) {
+      throw new Error("SPECIAL_TURN_LIMIT_REACHED");
+    }
+  }
+
+  const createdAt = now.toISOString();
+  const expiresAt = addMinutes(
+    now,
+    type === "special" ? SPECIAL_TURN_DURATION_MINUTES : TURN_DURATION_MINUTES
+  ).toISOString();
+  const turn: TicketTurn = {
+    id: `trn_${Math.random().toString(36).slice(2, 10)}`,
+    userId,
+    number: nextTurnNumber(db.ticketTurns ?? [], now),
+    status: type === "special" ? "reserved" : "active",
+    type,
+    qrCodeId,
+    createdAt,
+    updatedAt: createdAt,
+    expiresAt,
+    reactivationsUsed: 0,
+    reactivationEvents: []
+  };
+
+  db.ticketTurns = [...(db.ticketTurns ?? []), turn];
+  user.updatedAt = createdAt;
+  user.notifications.unshift(createNotification({
+    type: "tickets",
+    title: type === "special" ? "Reserva de almuerzo creada" : "Turno asignado",
+    body:
+      type === "special"
+        ? `Tu reserva especial quedo asignada con el turno ${turn.number}.`
+        : `Tu turno ${turn.number} quedo activo para la fila de almuerzo.`,
+    href: "/tickets"
+  }));
+
+  await writeDb(db);
+  return toTicketTurnSnapshot(turn, db.ticketTurns, now);
+}
+
+export async function reactivateTicketTurn(userId: string) {
+  const db = await readDb();
+  const now = new Date();
+  const turn = (db.ticketTurns ?? [])
+    .filter(item => item.userId === userId && item.status !== "completed" && item.status !== "cancelled")
+    .sort((a, b) => b.createdAt.localeCompare(a.createdAt))[0];
+
+  if (!turn) {
+    throw new Error("TURN_NOT_FOUND");
+  }
+
+  const monthlyReactivationsUsed = getMonthlyReactivationCount(userId, db.ticketTurns ?? [], now);
+  if (monthlyReactivationsUsed >= MONTHLY_TURN_REACTIVATION_LIMIT) {
+    throw new Error("TURN_REACTIVATION_LIMIT_REACHED");
+  }
+
+  turn.status = turn.type === "special" ? "reserved" : "active";
+  turn.reactivationsUsed += 1;
+  turn.reactivationEvents = [...(turn.reactivationEvents ?? []), now.toISOString()];
+  turn.updatedAt = now.toISOString();
+  turn.expiresAt = addMinutes(now, 10).toISOString();
+  await writeDb(db);
+  return toTicketTurnSnapshot(turn, db.ticketTurns ?? [], now);
 }

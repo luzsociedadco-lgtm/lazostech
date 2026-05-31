@@ -21,6 +21,7 @@ import {
 } from "lucide-react";
 import { useRef, useState } from "react";
 import { FeatureGate } from "@/app/components/FeatureGate";
+import ComingSoonCover from "@/app/components/ComingSoonCover";
 import { useNudosErc20Balance } from "@/app/hooks/useNudosErc20Balance";
 import { useAuth } from "@/app/providers/AuthProvider";
 
@@ -304,7 +305,7 @@ export default function MarketplacePage() {
   const { balance, isConnected, isLoading, symbol } = useNudosErc20Balance();
   const balanceDisplay = isConnected ? (isLoading ? "..." : balance ?? "0") : "Conecta tu wallet";
   const walletAddress = user?.linkedWallet?.address || "";
-  const drawerUserName = [user?.profile.firstName, user?.profile.lastName].filter(Boolean).join(" ") || "Usuario NUDOS";
+  const drawerUserName = [user?.profile.firstName, user?.profile.lastName].filter(Boolean).join(" ") || "Usuario $NUDOS";
   const drawerUserEmail = user?.email || "correo no vinculado";
   const walletQrUrl = walletAddress
     ? `https://api.qrserver.com/v1/create-qr-code/?size=220x220&data=${encodeURIComponent(walletAddress)}`
@@ -515,6 +516,7 @@ export default function MarketplacePage() {
           </section>
         </div>
       ) : null}
+      <ComingSoonCover imageSrc="/coming-soon/marketplace.png" tone="marketplace" />
     </>
   );
 }

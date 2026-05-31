@@ -183,22 +183,23 @@ library SelectorLib {
     }
 
     function getUniversityGovernanceFacetSelectors() internal pure returns (bytes4[] memory selectors) {
-        selectors = new bytes4[](14);
+        selectors = new bytes4[](15);
 
         selectors[0] = UniversityGovernanceFacet.initUniversityDao.selector;
-        selectors[1] = UniversityGovernanceFacet.addMember.selector;
-        selectors[2] = UniversityGovernanceFacet.openUniversitySession.selector;
-        selectors[3] = UniversityGovernanceFacet.joinUniversitySession.selector;
-        selectors[4] = UniversityGovernanceFacet.leaveUniversitySession.selector;
-        selectors[5] = UniversityGovernanceFacet.createUniversityResolution.selector;
-        selectors[6] = UniversityGovernanceFacet.startUniversityDeliberation.selector;
-        selectors[7] = UniversityGovernanceFacet.startUniversityVoting.selector;
-        selectors[8] = UniversityGovernanceFacet.voteUniversity.selector;
-        selectors[9] = UniversityGovernanceFacet.closeUniversityResolution.selector;
-        selectors[10] = UniversityGovernanceFacet.assignExecutor.selector;
-        selectors[11] = UniversityGovernanceFacet.closeUniversitySession.selector;
-        selectors[12] = UniversityGovernanceFacet.markActivityCompleted.selector;
-        selectors[13] = UniversityGovernanceFacet.redeemIncentive.selector;
+        selectors[1] = UniversityGovernanceFacet.setUniversityAssemblyAdmin.selector;
+        selectors[2] = UniversityGovernanceFacet.addMember.selector;
+        selectors[3] = UniversityGovernanceFacet.openUniversitySession.selector;
+        selectors[4] = UniversityGovernanceFacet.joinUniversitySession.selector;
+        selectors[5] = UniversityGovernanceFacet.leaveUniversitySession.selector;
+        selectors[6] = UniversityGovernanceFacet.createUniversityResolution.selector;
+        selectors[7] = UniversityGovernanceFacet.startUniversityDeliberation.selector;
+        selectors[8] = UniversityGovernanceFacet.startUniversityVoting.selector;
+        selectors[9] = UniversityGovernanceFacet.voteUniversity.selector;
+        selectors[10] = UniversityGovernanceFacet.closeUniversityResolution.selector;
+        selectors[11] = UniversityGovernanceFacet.assignExecutor.selector;
+        selectors[12] = UniversityGovernanceFacet.closeUniversitySession.selector;
+        selectors[13] = UniversityGovernanceFacet.markActivityCompleted.selector;
+        selectors[14] = UniversityGovernanceFacet.redeemIncentive.selector;
     }
 
     function getGovernanceRolesViewFacetSelectors() internal pure returns (bytes4[] memory selectors) {

@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.30;
 
+import {LibAccessControl} from "src/libraries/LibAccessControl.sol";
 import {LibNudosAccess} from "src/libraries/LibNudosAccess.sol";
 import {UniversityGovernanceStorage} from "./storage/UniversityGovernanceStorage.sol";
 import {IReward} from "src/interfaces/IReward.sol";
@@ -25,6 +26,7 @@ contract UniversityGovernanceFacet {
     event ExecutionTaskCreated(uint256 indexed taskId, uint256 indexed resolutionId, address executor);
     event ActivityCompleted(uint256 indexed taskId, address executor);
     event IncentiveRedeemed(address executor, uint256 amount);
+    event UniversityAssemblyAdminUpdated(address indexed account, bool enabled);
 
     function initUniversityDao() external onlyAdmin {
         UniversityGovernanceStorage.Layout storage s = us();
@@ -60,8 +62,29 @@ contract UniversityGovernanceFacet {
     }
 
     modifier onlyAdmin() {
-        require(LibNudosAccess.isOwnerOrSystemAdmin(msg.sender), "Not admin");
+        require(
+            LibNudosAccess.isOwnerOrSystemAdmin(msg.sender)
+                || LibAccessControl.hasRole(LibAccessControl.ASSEMBLY_ADMIN_ROLE, msg.sender),
+            "Not admin"
+        );
         _;
+    }
+
+    modifier onlySystemAuthority() {
+        require(LibNudosAccess.isOwnerOrSystemAdmin(msg.sender), "Not system authority");
+        _;
+    }
+
+    function setUniversityAssemblyAdmin(address account, bool enabled) external onlySystemAuthority {
+        require(account != address(0), "Invalid admin");
+
+        if (enabled) {
+            LibAccessControl.grantRole(LibAccessControl.ASSEMBLY_ADMIN_ROLE, account);
+        } else {
+            LibAccessControl.revokeRole(LibAccessControl.ASSEMBLY_ADMIN_ROLE, account);
+        }
+
+        emit UniversityAssemblyAdminUpdated(account, enabled);
     }
 
     function openUniversitySession() external onlyAdmin {

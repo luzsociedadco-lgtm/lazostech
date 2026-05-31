@@ -92,7 +92,7 @@ export function useTicketRedemption(quantity: number): RedemptionState {
     }
 
     if (quoteWei === null) {
-      setErrorMessage("No se pudo calcular el costo en NUDOS.");
+      setErrorMessage("No se pudo calcular el costo en $NUDOS.");
       return;
     }
 
@@ -101,7 +101,7 @@ export function useTicketRedemption(quantity: number): RedemptionState {
 
     try {
       if (!allowanceEnough) {
-        setStatusMessage("Aprobando NUDOS para la compra...");
+        setStatusMessage("Aprobando $NUDOS para la compra...");
 
         const approveHash = await writeContractAsync({
           address: NUDOS_CONTRACT.address,

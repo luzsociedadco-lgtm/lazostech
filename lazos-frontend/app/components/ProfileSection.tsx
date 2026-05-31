@@ -26,7 +26,7 @@ export default function ProfileSection() {
         </div>
         <div className="text-center">
           <p className="text-xl font-bold">15</p>
-          <p className="text-xs text-white/80">NUDOS</p>
+          <p className="text-xs text-white/80">$NUDOS</p>
         </div>
         <div className="text-center">
           <p className="text-xl font-bold">247</p>

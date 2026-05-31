@@ -8,6 +8,7 @@ import {
 } from "lucide-react";
 import { useState } from "react";
 import { FeatureGate } from "@/app/components/FeatureGate";
+import ComingSoonCover from "@/app/components/ComingSoonCover";
 import { useNudosErc20Balance } from "@/app/hooks/useNudosErc20Balance";
 import { useAuth } from "@/app/providers/AuthProvider";
 
@@ -205,6 +206,7 @@ export default function ReciclajePage() {
           </section>
         </div>
       ) : null}
+      <ComingSoonCover imageSrc="/coming-soon/recycle.png" tone="recycle" />
     </main>
   );
 }

@@ -1,0 +1,3 @@
+-- Baseline placeholder for an already-applied remote Supabase migration.
+-- The remote project had version 20260522201124 in schema_migrations before
+-- local Supabase migrations were added to this repository.

@@ -6,10 +6,10 @@
       "passwordHash": "edf22513d0b7850022659eb155c52448:838e961e7521a68798850cdd36d29dda46c8c02ff382be36f7d2c174c1aca5143e8baf3c7df2f98e4738b1893514e5092c4ac3e579804c70d319d3125f5eb87a",
       "authProvider": "email",
       "createdAt": "2026-04-22T04:03:42.666Z",
-      "updatedAt": "2026-05-04T00:23:34.552Z",
+      "updatedAt": "2026-05-31T20:23:39.840Z",
       "profile": {
         "firstName": "alehandre10",
-        "lastName": "",
+        "lastName": "Realpe Rivera",
         "phone": "",
         "nationalId": "",
         "studentCode": "",
@@ -34,10 +34,37 @@
       },
       "notifications": [
         {
+          "id": "ntf_sc7qlprx",
+          "type": "profile",
+          "title": "Perfil actualizado",
+          "body": "Tus datos de perfil fueron actualizados correctamente.",
+          "createdAt": "2026-05-31T20:23:39.840Z",
+          "isRead": false,
+          "href": null
+        },
+        {
+          "id": "ntf_r7u0c362",
+          "type": "profile",
+          "title": "Perfil actualizado",
+          "body": "Tus datos de perfil fueron actualizados correctamente.",
+          "createdAt": "2026-05-31T20:16:56.330Z",
+          "isRead": false,
+          "href": null
+        },
+        {
+          "id": "ntf_72ux9zdb",
+          "type": "profile",
+          "title": "Perfil actualizado",
+          "body": "Tus datos de perfil fueron actualizados correctamente.",
+          "createdAt": "2026-05-30T02:44:00.144Z",
+          "isRead": false,
+          "href": null
+        },
+        {
           "id": "ntf_hjb0ezr2",
           "type": "recycling",
           "title": "Reciclaje validado",
-          "body": "Depositaste 4 unidades y recibiste 1.00 NUDOS.",
+          "body": "Depositaste 4 unidades y recibiste 1.00 $NUDOS.",
           "createdAt": "2026-05-04T01:09:37.823Z",
           "isRead": false,
           "href": "/reciclaje"
@@ -108,7 +135,7 @@
           "id": "ntf_tjv1rerh",
           "type": "recycling",
           "title": "Reciclaje validado",
-          "body": "Depositaste 4 unidades y recibiste 1.00 NUDOS.",
+          "body": "Depositaste 4 unidades y recibiste 1.00 $NUDOS.",
           "createdAt": "2026-05-04T01:09:37.823Z",
           "isRead": false,
           "href": "/reciclaje"
@@ -179,7 +206,7 @@
           "id": "ntf_k4p43oo2",
           "type": "recycling",
           "title": "Reciclaje validado",
-          "body": "Depositaste 4 unidades y recibiste 1.00 NUDOS.",
+          "body": "Depositaste 4 unidades y recibiste 1.00 $NUDOS.",
           "createdAt": "2026-05-04T01:09:37.824Z",
           "isRead": false,
           "href": "/reciclaje"
@@ -250,7 +277,7 @@
           "id": "ntf_2kqkcdn7",
           "type": "recycling",
           "title": "Reciclaje validado",
-          "body": "Depositaste 4 unidades y recibiste 1.00 NUDOS.",
+          "body": "Depositaste 4 unidades y recibiste 1.00 $NUDOS.",
           "createdAt": "2026-05-04T01:09:37.824Z",
           "isRead": false,
           "href": "/reciclaje"
@@ -321,7 +348,7 @@
           "id": "ntf_z391ubkx",
           "type": "recycling",
           "title": "Reciclaje validado",
-          "body": "Depositaste 4 unidades y recibiste 1.00 NUDOS.",
+          "body": "Depositaste 4 unidades y recibiste 1.00 $NUDOS.",
           "createdAt": "2026-05-04T01:09:37.824Z",
           "isRead": false,
           "href": "/reciclaje"
@@ -395,7 +422,7 @@
           "id": "ntf_w5t33978",
           "type": "recycling",
           "title": "Reciclaje validado",
-          "body": "Depositaste 4 unidades y recibiste 1.00 NUDOS.",
+          "body": "Depositaste 4 unidades y recibiste 1.00 $NUDOS.",
           "createdAt": "2026-05-04T01:09:37.824Z",
           "isRead": true,
           "href": "/reciclaje"
@@ -429,5 +456,6 @@
         }
       ]
     }
-  ]
+  ],
+  "ticketTurns": []
 }

@@ -1,4 +1,5 @@
 import "./globals.css";
+import AppAuthGate from "./components/AppAuthGate";
 import FooterNav from "./components/FooterNav";
 import { AuthProvider } from "./providers/AuthProvider";
 import { WagmiWrapper } from "./providers/WagmiWrapper";
@@ -7,6 +8,11 @@ import Script from "next/script";
 export const metadata = {
   title: "LazosTech",
   description: "Frontend de la dapp LazosTech sobre Base Sepolia",
+  icons: {
+    icon: "/favicon-lazostech.png",
+    shortcut: "/favicon-lazostech.png",
+    apple: "/favicon-lazostech.png",
+  },
 };
 
 export default function RootLayout({
@@ -37,8 +43,10 @@ export default function RootLayout({
         <WagmiWrapper>
           <AuthProvider>
             <div className="app-frame">
-              {children}
-              <FooterNav />
+              <AppAuthGate>
+                {children}
+                <FooterNav />
+              </AppAuthGate>
             </div>
           </AuthProvider>
         </WagmiWrapper>
