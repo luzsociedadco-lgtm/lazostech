@@ -20,7 +20,6 @@ export async function PATCH(request: Request) {
     const profileUpdates = {
       firstName: String(body.firstName || ""),
       lastName: String(body.lastName || ""),
-      avatarUrl: String(body.avatarUrl || sessionUser.profile.avatarUrl || ""),
       phone: String(body.phone || ""),
       nationalId: String(body.nationalId || ""),
       studentCode: String(body.studentCode || ""),
@@ -71,16 +70,6 @@ export async function PATCH(request: Request) {
               : 1001
             : profileUpdates.campusId
         };
-
-    if (profileUpdates.avatarUrl) {
-      const { error: avatarError } = await supabase.auth.updateUser({
-        data: { avatar_url: profileUpdates.avatarUrl }
-      });
-
-      if (avatarError) {
-        return NextResponse.json({ error: "No se pudo guardar la foto de perfil" }, { status: 500 });
-      }
-    }
 
     const { error: profileError } = await supabase
       .from("user_profiles")

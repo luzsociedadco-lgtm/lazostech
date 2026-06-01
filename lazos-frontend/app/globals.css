@@ -402,6 +402,9 @@ a {
   background: #f10808;
   border: 2px solid #ffefdb;
   box-shadow: 0 2px 0 rgba(0, 0, 0, 0.08);
+  display: grid;
+  place-items: center;
+  color: #fff5e1;
 }
 
 .profile-avatar-ring.is-small {
@@ -416,6 +419,12 @@ a {
   height: 100%;
   object-fit: cover;
   border-radius: 999px;
+}
+
+.profile-avatar-ring svg {
+  width: 78%;
+  height: 78%;
+  stroke-width: 1.8;
 }
 
 .profile-head-metrics {

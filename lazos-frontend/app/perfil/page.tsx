@@ -29,39 +29,10 @@ import { NUDOS_DIAMOND_ADDRESS, profileFacetAbi } from "@/app/lib/diamondContrac
 import { useAuth } from "@/app/providers/AuthProvider";
 import { config as wagmiConfig } from "@/app/providers/WagmiWrapper";
 
-const avatarSrc = "/images/user.jpg";
-const univalleDefaultAvatarSrc = "/images/univalle-default-avatar.png";
 const universityLogoById: Record<number, string> = {
   1000: "/images/logo-G.png"
 };
-
-async function compressAvatarFile(file: File) {
-  const objectUrl = URL.createObjectURL(file);
-
-  try {
-    const image = await new Promise<HTMLImageElement>((resolve, reject) => {
-      const img = new window.Image();
-      img.onload = () => resolve(img);
-      img.onerror = reject;
-      img.src = objectUrl;
-    });
-    const size = 256;
-    const canvas = document.createElement("canvas");
-    canvas.width = size;
-    canvas.height = size;
-    const context = canvas.getContext("2d");
-    if (!context) throw new Error("CANVAS_UNAVAILABLE");
-
-    const sourceSize = Math.min(image.naturalWidth, image.naturalHeight);
-    const sourceX = Math.max(0, (image.naturalWidth - sourceSize) / 2);
-    const sourceY = Math.max(0, (image.naturalHeight - sourceSize) / 2);
-    context.drawImage(image, sourceX, sourceY, sourceSize, sourceSize, 0, 0, size, size);
-
-    return canvas.toDataURL("image/jpeg", 0.82);
-  } finally {
-    URL.revokeObjectURL(objectUrl);
-  }
-}
+const univalleDefaultAvatarSrc = "/images/univalle-default-avatar.png";
 
 const accountItems = [
   { key: "wallet", label: "Wallet Network", detail: "Base Sepolia / Wallet vinculada", icon: Wallet },
@@ -147,10 +118,8 @@ export default function PerfilPage() {
   const [menuOpen, setMenuOpen] = useState(false);
   const [activePanel, setActivePanel] = useState<"avatar" | "wallet" | "notifications" | "edit" | "payment" | null>(null);
   const [savingProfile, setSavingProfile] = useState(false);
-  const [savingAvatar, setSavingAvatar] = useState(false);
   const [walletBusy, setWalletBusy] = useState(false);
   const [statusMessage, setStatusMessage] = useState("");
-  const [avatarPreview, setAvatarPreview] = useState<string | null>(null);
   const [avatarStatus, setAvatarStatus] = useState("");
   const [notificationFilter, setNotificationFilter] = useState<"new" | "all">("new");
   const avatarInputRef = useRef<HTMLInputElement | null>(null);
@@ -208,10 +177,8 @@ export default function PerfilPage() {
 
   const studentName =
     user ? `${user.profile.firstName} ${user.profile.lastName}`.trim() || user.email.split("@")[0] : "";
-  const defaultAvatarSrc = user?.email.toLowerCase().endsWith("@correounivalle.edu.co")
-    ? univalleDefaultAvatarSrc
-    : avatarSrc;
-  const avatarDisplaySrc = avatarPreview || user?.profile.avatarUrl || defaultAvatarSrc;
+  const isUnivalleEmail = Boolean(user?.email.toLowerCase().endsWith("@correounivalle.edu.co"));
+  const avatarDisplaySrc = isUnivalleEmail ? univalleDefaultAvatarSrc : "";
   const displayCode = user?.profile.studentCode || user?.profile.nationalId || "Sin codigo";
   const studentTypeLabel = user?.profile.studentType || "Estudiante registrado";
   const benefitLabel = user?.profile.benefitLabel || "Almuerzo regular";
@@ -402,36 +369,8 @@ export default function PerfilPage() {
     }
   }, [activePanel, browserWallet, connectedWalletMatchesUser, linkedWallet, walletBusy]);
 
-  const handleAvatarFileChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0];
-    if (!file) return;
-
-    try {
-      const nextPreview = await compressAvatarFile(file);
-      setAvatarPreview(nextPreview);
-      setAvatarStatus("Foto cargada. Presiona guardar cambios para conservarla.");
-    } catch {
-      setAvatarStatus("No pudimos preparar esa imagen. Intenta con otra foto.");
-    }
-  };
-
-  const handleAvatarSave = async () => {
-    if (!avatarPreview) {
-      setAvatarStatus("Selecciona una foto antes de guardar.");
-      return;
-    }
-
-    setSavingAvatar(true);
-    const result = await updateProfile({ ...formState, avatarUrl: avatarPreview });
-    setSavingAvatar(false);
-
-    if (result.error) {
-      setAvatarStatus(result.error);
-      return;
-    }
-
-    setAvatarPreview(null);
-    setAvatarStatus("Foto guardada correctamente.");
+  const handleAvatarFileChange = () => {
+    setAvatarStatus("La actualizacion de foto estara disponible mas adelante.");
   };
 
   const handleNotificationClick = async (notificationId: string, href: string | null) => {
@@ -499,13 +438,17 @@ export default function PerfilPage() {
           <section className="profile-identity-stack">
             <div className="profile-account-row">
               <div className="profile-avatar-ring">
-                <Image
-                  src={avatarDisplaySrc}
-                  alt={studentName}
-                  width={100}
-                  height={100}
-                  className="profile-avatar-ring__image"
-                />
+                {avatarDisplaySrc ? (
+                  <Image
+                    src={avatarDisplaySrc}
+                    alt={studentName}
+                    width={100}
+                    height={100}
+                    className="profile-avatar-ring__image"
+                  />
+                ) : (
+                  <UserCircle2 size={72} aria-label={studentName || "Usuario"} />
+                )}
               </div>
 
               <div className="profile-head-metrics">
@@ -608,13 +551,17 @@ export default function PerfilPage() {
               aria-label="Opciones de foto de perfil"
             >
               <div className="profile-avatar-ring is-small">
-                <Image
-                  src={avatarDisplaySrc}
-                  alt={studentName}
-                  width={52}
-                  height={52}
-                  className="profile-avatar-ring__image"
-                />
+                {avatarDisplaySrc ? (
+                  <Image
+                    src={avatarDisplaySrc}
+                    alt={studentName}
+                    width={52}
+                    height={52}
+                    className="profile-avatar-ring__image"
+                  />
+                ) : (
+                  <UserCircle2 size={38} aria-label={studentName || "Usuario"} />
+                )}
               </div>
             </button>
 
@@ -692,10 +639,13 @@ export default function PerfilPage() {
                 <button
                   type="button"
                   className="profile-avatar-option"
-                  onClick={() => avatarInputRef.current?.click()}
+                  disabled
+                  onClick={() => {
+                    setAvatarStatus("La actualizacion de foto estara disponible mas adelante.");
+                  }}
                 >
                   <strong>Actualizar foto de perfil</strong>
-                  <small>Selecciona una imagen desde tu dispositivo.</small>
+                  <small>Esta funcion queda deshabilitada por ahora.</small>
                 </button>
                 <button type="button" className="profile-avatar-option is-disabled" disabled>
                   <strong>Editar avatar pfp customizable</strong>
@@ -708,14 +658,17 @@ export default function PerfilPage() {
                 accept="image/*"
                 className="profile-avatar-input"
                 onChange={handleAvatarFileChange}
+                disabled
               />
               <button
                 type="button"
                 className="profile-avatar-save"
-                disabled={savingAvatar || !avatarPreview}
-                onClick={handleAvatarSave}
+                disabled
+                onClick={() => {
+                  setAvatarStatus("La actualizacion de foto estara disponible mas adelante.");
+                }}
               >
-                {savingAvatar ? "Guardando..." : "Guardar cambios"}
+                Guardar cambios
               </button>
               {avatarStatus ? <small className="profile-wallet-copy">{avatarStatus}</small> : null}
             </section>
@@ -807,7 +760,17 @@ export default function PerfilPage() {
             <section className="profile-panel-card is-form">
               <div className="profile-panel-card__identity">
                 <div className="profile-avatar-ring">
-                  <Image src={avatarDisplaySrc} alt={studentName} width={68} height={68} className="profile-avatar-ring__image" />
+                  {avatarDisplaySrc ? (
+                    <Image
+                      src={avatarDisplaySrc}
+                      alt={studentName}
+                      width={68}
+                      height={68}
+                      className="profile-avatar-ring__image"
+                    />
+                  ) : (
+                    <UserCircle2 size={52} aria-label={studentName || "Usuario"} />
+                  )}
                 </div>
                 <div>
                   <h2>Editar Perfil</h2>

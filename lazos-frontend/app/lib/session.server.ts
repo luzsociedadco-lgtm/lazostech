@@ -28,7 +28,6 @@ function buildAuthUserSnapshot(input: {
     profile: {
       firstName: "",
       lastName: "",
-      avatarUrl: "",
       phone: "",
       nationalId: "",
       studentCode: "",
@@ -97,7 +96,7 @@ async function mergeSupabaseProfile(
   supabase: Awaited<ReturnType<typeof createClient>>,
   snapshot: UserSnapshot,
   authUserId: string,
-  authAvatarUrl: string
+  _authAvatarUrl: string
 ) {
   const { data: profileRow } = await supabase
     .from("user_profiles")
@@ -109,7 +108,6 @@ async function mergeSupabaseProfile(
   const mergedProfile = {
     ...institutionalDefaults,
     ...snapshot.profile,
-    avatarUrl: authAvatarUrl || snapshot.profile.avatarUrl || "",
     ...(profileRow
       ? {
           firstName: String(profileRow.first_name || ""),
@@ -166,7 +164,7 @@ export async function getSessionUser() {
         supabase,
         toUserSnapshot(user),
         authUserId,
-        String(authUser.user_metadata?.avatar_url || "")
+        ""
       );
     } catch {
       return email
@@ -178,7 +176,7 @@ export async function getSessionUser() {
               authProvider
             }),
             authUserId,
-            String(authUser.user_metadata?.avatar_url || "")
+            ""
           )
         : null;
     }

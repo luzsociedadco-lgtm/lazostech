@@ -84,7 +84,6 @@ function buildNotificationSeed() {
 const EMPTY_PROFILE: ProfileRecord = {
   firstName: "",
   lastName: "",
-  avatarUrl: "",
   phone: "",
   nationalId: "",
   studentCode: "",

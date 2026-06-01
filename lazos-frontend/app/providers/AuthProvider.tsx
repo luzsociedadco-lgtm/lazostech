@@ -40,7 +40,6 @@ function buildSupabaseUserSnapshot(input: {
     profile: {
       firstName: "",
       lastName: "",
-      avatarUrl: "",
       phone: "",
       nationalId: "",
       studentCode: "",
