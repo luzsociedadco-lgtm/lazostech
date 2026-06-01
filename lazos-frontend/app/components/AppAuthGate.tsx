@@ -1,6 +1,7 @@
 "use client";
 
-import { usePathname, useSearchParams } from "next/navigation";
+import { usePathname } from "next/navigation";
+import { useEffect, useState } from "react";
 
 import AuthPrompt from "@/app/components/AuthPrompt";
 import { useAuth } from "@/app/providers/AuthProvider";
@@ -11,15 +12,18 @@ function isPublicPath(pathname: string) {
 
 export default function AppAuthGate({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
-  const searchParams = useSearchParams();
   const { user, loading } = useAuth();
+  const [search, setSearch] = useState("");
+
+  useEffect(() => {
+    setSearch(window.location.search);
+  }, [pathname]);
 
   if (isPublicPath(pathname)) {
     return <>{children}</>;
   }
 
-  const query = searchParams.toString();
-  const nextPath = `${pathname}${query ? `?${query}` : ""}`;
+  const nextPath = `${pathname}${search}`;
 
   if (loading) {
     return (
