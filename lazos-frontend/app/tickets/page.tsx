@@ -24,6 +24,7 @@ import type { PointerEvent } from "react";
 import { FeatureGate } from "@/app/components/FeatureGate";
 import { useTicketRedemption } from "@/app/hooks/useTicketRedemption";
 import { useAuth } from "@/app/providers/AuthProvider";
+import { createClient as createSupabaseBrowserClient } from "@/app/lib/supabase/client";
 import type { TicketTurnSnapshot } from "@/app/lib/types";
 
 const days = [
@@ -115,8 +116,10 @@ export default function TicketsPage() {
   const [specialPopupOpen, setSpecialPopupOpen] = useState(false);
   const [monitorQrOpen, setMonitorQrOpen] = useState(false);
   const [studentScanOpen, setStudentScanOpen] = useState(false);
+  const [cameraPopupOpen, setCameraPopupOpen] = useState(false);
   const [scanMessage, setScanMessage] = useState("");
   const [scannerActive, setScannerActive] = useState(false);
+  const [pendingMonitorAssignments, setPendingMonitorAssignments] = useState(0);
   const [specialStudentCode, setSpecialStudentCode] = useState("");
   const [specialStudentPreview, setSpecialStudentPreview] = useState<{
     student_code: string;
@@ -130,7 +133,6 @@ export default function TicketsPage() {
   const [historyQuery, setHistoryQuery] = useState("");
   const [isMonitorActionLoading, setIsMonitorActionLoading] = useState(false);
   const menuSwipeStart = useRef<number | null>(null);
-  const undoTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const galleryInputRef = useRef<HTMLInputElement | null>(null);
   const scannerVideoRef = useRef<HTMLVideoElement | null>(null);
   const scannerStreamRef = useRef<MediaStream | null>(null);
@@ -243,16 +245,35 @@ export default function TicketsPage() {
       turns: Array.isArray(json.turns) ? json.turns : [],
       summary: json.summary ?? emptyMonitorState.summary,
     });
+    setPendingMonitorAssignments(0);
   }, [user]);
 
   useEffect(() => {
     if (!user || !monitorState.isRestaurantMonitor) return;
 
-    const intervalId = window.setInterval(() => {
-      void refreshMonitorTools();
-    }, 5000);
+    const supabase = createSupabaseBrowserClient();
+    const channel = supabase
+      .channel("ticket-turn-monitor-inserts")
+      .on(
+        "postgres_changes",
+        { event: "INSERT", schema: "public", table: "ticket_turns" },
+        () => {
+          setPendingMonitorAssignments(previous => {
+            const next = previous + 1;
+            if (next >= 50) {
+              void refreshMonitorTools();
+              return 0;
+            }
 
-    return () => window.clearInterval(intervalId);
+            return next;
+          });
+        }
+      )
+      .subscribe();
+
+    return () => {
+      void supabase.removeChannel(channel);
+    };
   }, [monitorState.isRestaurantMonitor, refreshMonitorTools, user]);
 
   const submitMonitorAction = async (payload: {
@@ -286,23 +307,11 @@ export default function TicketsPage() {
     await submitMonitorAction({ action: monitorState.isQueuePaused ? "resume_queue" : "pause_queue" });
   };
 
-  const markTurnPassed = async (turnId: string) => {
-    await submitMonitorAction({ turnId, status: "atendido" });
-  };
-
-  const startUndoPassed = (turnId: string) => {
-    if (undoTimerRef.current) clearTimeout(undoTimerRef.current);
-    undoTimerRef.current = setTimeout(() => {
-      submitMonitorAction({ turnId, status: "en_fila" });
-      undoTimerRef.current = null;
-    }, 3000);
-  };
-
-  const cancelUndoPassed = () => {
-    if (undoTimerRef.current) {
-      clearTimeout(undoTimerRef.current);
-      undoTimerRef.current = null;
-    }
+  const toggleTurnPassed = async (turn: MonitorTurn) => {
+    await submitMonitorAction({
+      turnId: turn.id,
+      status: turn.status === "atendido" ? "en_fila" : "atendido"
+    });
   };
 
   const assignSpecialTurn = async () => {
@@ -380,6 +389,7 @@ export default function TicketsPage() {
     stopQrScanner();
     await submitTurnAction("request");
     setScanMessage("Lectura completada.");
+    setCameraPopupOpen(false);
     setStudentScanOpen(false);
     return true;
   }
@@ -476,8 +486,21 @@ export default function TicketsPage() {
   };
 
   useEffect(() => {
-    if (!studentScanOpen) {
+    if (!cameraPopupOpen) {
       stopQrScanner();
+      return;
+    }
+
+    const frameId = window.requestAnimationFrame(() => {
+      void startQrScanner();
+    });
+
+    return () => window.cancelAnimationFrame(frameId);
+  }, [cameraPopupOpen]);
+
+  useEffect(() => {
+    if (!studentScanOpen) {
+      setCameraPopupOpen(false);
     }
 
     return () => stopQrScanner();
@@ -726,6 +749,7 @@ export default function TicketsPage() {
           specialPopupOpen ||
           monitorQrOpen ||
           studentScanOpen ||
+          cameraPopupOpen ||
           historyPopupDate
             ? "is-open"
             : ""
@@ -737,6 +761,7 @@ export default function TicketsPage() {
           setSpecialPopupOpen(false);
           setMonitorQrOpen(false);
           setStudentScanOpen(false);
+          setCameraPopupOpen(false);
           setHistoryPopupDate(null);
         }}
       />
@@ -775,6 +800,7 @@ export default function TicketsPage() {
           <button type="button" className="tickets-monitor-list-button" onClick={() => setQueuePopupOpen(true)}>
             <ListChecks size={18} />
             Ver lista en curso
+            {pendingMonitorAssignments > 0 ? <small>{pendingMonitorAssignments}/50 nuevos</small> : null}
           </button>
 
           <section className="tickets-monitor-tools">
@@ -882,11 +908,8 @@ export default function TicketsPage() {
                     <button
                       type="button"
                       className="tickets-monitor-check"
-                      onClick={() => (isChecked ? undefined : markTurnPassed(item.id))}
-                      onPointerDown={() => (isChecked ? startUndoPassed(item.id) : undefined)}
-                      onPointerUp={cancelUndoPassed}
-                      onPointerLeave={cancelUndoPassed}
-                      aria-label={isChecked ? "Mantener para desmarcar turno" : "Marcar turno como pasado"}
+                      onClick={() => toggleTurnPassed(item)}
+                      aria-label={isChecked ? "Desmarcar turno atendido" : "Marcar turno como atendido"}
                     >
                       <Check size={16} />
                     </button>
@@ -968,6 +991,7 @@ export default function TicketsPage() {
               type="button"
               onClick={() => {
                 stopQrScanner();
+                setCameraPopupOpen(false);
                 setStudentScanOpen(false);
               }}
               aria-label="Cerrar lector de QR"
@@ -975,15 +999,15 @@ export default function TicketsPage() {
               <X size={18} />
             </button>
           </header>
-          <video
-            ref={scannerVideoRef}
-            className={`tickets-scan-video ${scannerActive ? "is-active" : ""}`}
-            muted
-            playsInline
-          />
           <div className="tickets-scan-options">
-            <button type="button" onClick={startQrScanner}>
-              {scannerActive ? "Escaneando..." : "Abrir camara"}
+            <button
+              type="button"
+              onClick={() => {
+                setScanMessage("");
+                setCameraPopupOpen(true);
+              }}
+            >
+              Abrir camara
             </button>
             <button type="button" onClick={() => galleryInputRef.current?.click()}>
               Leer imagen de galeria
@@ -995,6 +1019,31 @@ export default function TicketsPage() {
             type="file"
             accept="image/*"
             onChange={event => handleQrImageInput(event.target.files?.[0])}
+          />
+          {scanMessage ? <p className="tickets-special-message">{scanMessage}</p> : null}
+        </section>
+      ) : null}
+
+      {cameraPopupOpen ? (
+        <section className="tickets-monitor-modal is-compact" role="dialog" aria-modal="true">
+          <header>
+            <h2>Camara QR</h2>
+            <button
+              type="button"
+              onClick={() => {
+                stopQrScanner();
+                setCameraPopupOpen(false);
+              }}
+              aria-label="Cerrar camara QR"
+            >
+              <X size={18} />
+            </button>
+          </header>
+          <video
+            ref={scannerVideoRef}
+            className={`tickets-scan-video ${scannerActive ? "is-active" : ""}`}
+            muted
+            playsInline
           />
           {scanMessage ? <p className="tickets-special-message">{scanMessage}</p> : null}
         </section>

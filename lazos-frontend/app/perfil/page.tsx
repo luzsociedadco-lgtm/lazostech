@@ -556,28 +556,30 @@ export default function PerfilPage() {
         <div className="profile-drawer__body">
           <section className="profile-drawer__section">
             <p>Cuenta</p>
-            {accountItems.map(item => (
-              <DrawerRow
-                key={item.key}
-                label={item.label}
-                detail={
-                  item.key === "wallet"
-                    ? "Deshabilitado por ahora"
-                    : item.key === "edit"
-                      ? user.completion.profileComplete
-                        ? "Perfil listo para operar"
-                        : "Completa tus datos"
-                      : item.detail
-                }
-                icon={item.icon}
-                disabled={item.key === "wallet"}
-                onClick={() => {
-                  if (item.key === "notifications") setActivePanel("notifications");
-                  if (item.key === "edit") setActivePanel("edit");
-                  if (item.key === "payment") setActivePanel("payment");
-                }}
-              />
-            ))}
+            {accountItems.map(item => {
+              const isTemporarilyDisabled = item.key === "wallet" || item.key === "payment";
+              return (
+                <DrawerRow
+                  key={item.key}
+                  label={item.label}
+                  detail={
+                    isTemporarilyDisabled
+                      ? "Deshabilitado por ahora"
+                      : item.key === "edit"
+                        ? user.completion.profileComplete
+                          ? "Perfil listo para operar"
+                          : "Completa tus datos"
+                        : item.detail
+                  }
+                  icon={item.icon}
+                  disabled={isTemporarilyDisabled}
+                  onClick={() => {
+                    if (item.key === "notifications") setActivePanel("notifications");
+                    if (item.key === "edit") setActivePanel("edit");
+                  }}
+                />
+              );
+            })}
           </section>
 
           <section className="profile-drawer__section">
