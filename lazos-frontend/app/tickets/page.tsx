@@ -135,6 +135,7 @@ export default function TicketsPage() {
   const scannerVideoRef = useRef<HTMLVideoElement | null>(null);
   const scannerStreamRef = useRef<MediaStream | null>(null);
   const scannerFrameRef = useRef<number | null>(null);
+  const qrScannerRef = useRef<{ start: () => Promise<void>; stop: () => void; destroy: () => void } | null>(null);
   const {
     quoteDisplay,
     isLoadingQuote,
@@ -346,6 +347,10 @@ export default function TicketsPage() {
       scannerFrameRef.current = null;
     }
 
+    qrScannerRef.current?.stop();
+    qrScannerRef.current?.destroy();
+    qrScannerRef.current = null;
+
     scannerStreamRef.current?.getTracks().forEach(track => track.stop());
     scannerStreamRef.current = null;
 
@@ -369,7 +374,7 @@ export default function TicketsPage() {
     return true;
   }
 
-  const startQrScanner = async () => {
+  const startBarcodeDetectorScanner = async () => {
     setScanMessage("Abriendo camara...");
 
     const Detector = getBarcodeDetector();
@@ -418,6 +423,45 @@ export default function TicketsPage() {
     } catch {
       stopQrScanner();
       setScanMessage("No pudimos acceder a la camara. Revisa permisos o usa la galeria.");
+    }
+  };
+
+  const startQrScanner = async () => {
+    stopQrScanner();
+    setScanMessage("Abriendo camara...");
+
+    const video = scannerVideoRef.current;
+    if (!video) {
+      setScanMessage("No pudimos iniciar el visor de camara.");
+      return;
+    }
+
+    try {
+      const { default: QrScanner } = await import("qr-scanner");
+      const scanner = new QrScanner(
+        video,
+        result => {
+          const qrValue = typeof result === "string" ? result : result.data;
+          if (qrValue) {
+            void assignTurnFromQr(qrValue);
+          }
+        },
+        {
+          preferredCamera: "environment",
+          returnDetailedScanResult: true,
+          highlightScanRegion: true,
+          highlightCodeOutline: true,
+          maxScansPerSecond: 10
+        }
+      );
+
+      qrScannerRef.current = scanner;
+      setScannerActive(true);
+      await scanner.start();
+      setScanMessage("Apunta la camara al QR oficial de turnos.");
+    } catch {
+      stopQrScanner();
+      await startBarcodeDetectorScanner();
     }
   };
 
