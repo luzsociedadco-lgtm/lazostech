@@ -245,6 +245,16 @@ export default function TicketsPage() {
     });
   }, [user]);
 
+  useEffect(() => {
+    if (!user || !monitorState.isRestaurantMonitor) return;
+
+    const intervalId = window.setInterval(() => {
+      void refreshMonitorTools();
+    }, 5000);
+
+    return () => window.clearInterval(intervalId);
+  }, [monitorState.isRestaurantMonitor, refreshMonitorTools, user]);
+
   const submitMonitorAction = async (payload: {
     action?: string;
     turnId?: string;

@@ -79,18 +79,21 @@ function DrawerRow({
   detail,
   icon: Icon,
   general = false,
+  disabled = false,
   onClick
 }: {
   label: string;
   detail: string;
   icon: LucideIcon;
   general?: boolean;
+  disabled?: boolean;
   onClick?: () => void;
 }) {
   return (
     <button
-      className={`profile-drawer__row ${general ? "is-general" : ""}`}
+      className={`profile-drawer__row ${general ? "is-general" : ""} ${disabled ? "is-disabled" : ""}`}
       type="button"
+      disabled={disabled}
       onClick={onClick}
     >
       <span className="profile-drawer__row-main">
@@ -237,8 +240,7 @@ export default function PerfilPage() {
       return;
     }
 
-    setStatusMessage("Perfil actualizado.");
-    setActivePanel(null);
+    setStatusMessage("Perfil actualizado correctamente.");
   };
 
   const syncBrowserWallet = async (walletAddress: string) => {
@@ -560,9 +562,7 @@ export default function PerfilPage() {
                 label={item.label}
                 detail={
                   item.key === "wallet"
-                    ? linkedWallet
-                      ? `${linkedWallet.slice(0, 6)}...${linkedWallet.slice(-4)}`
-                      : "Sin wallet vinculada"
+                    ? "Deshabilitado por ahora"
                     : item.key === "edit"
                       ? user.completion.profileComplete
                         ? "Perfil listo para operar"
@@ -570,8 +570,8 @@ export default function PerfilPage() {
                       : item.detail
                 }
                 icon={item.icon}
+                disabled={item.key === "wallet"}
                 onClick={() => {
-                  if (item.key === "wallet") setActivePanel("wallet");
                   if (item.key === "notifications") setActivePanel("notifications");
                   if (item.key === "edit") setActivePanel("edit");
                   if (item.key === "payment") setActivePanel("payment");

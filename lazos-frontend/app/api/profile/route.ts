@@ -1,7 +1,6 @@
 import { NextResponse } from "next/server";
 
 import {
-  findDirectoryMatch,
   hasUnivalleEmailDomain,
   updateUserProfile
 } from "@/app/lib/db.server";
@@ -40,36 +39,17 @@ export async function PATCH(request: Request) {
       return unauthorizedResponse();
     }
 
-    const directoryMatch = findDirectoryMatch({
-      email: authUser.email,
-      studentCode: profileUpdates.studentCode,
-      nationalId: profileUpdates.nationalId
-    });
-    const finalProfile = directoryMatch
-      ? {
-          firstName: directoryMatch.firstName,
-          lastName: directoryMatch.lastName,
-          phone: directoryMatch.phone,
-          nationalId: directoryMatch.nationalId,
-          studentCode: directoryMatch.studentCode,
-          universityId: directoryMatch.universityId,
-          campusId: directoryMatch.campusId,
-          programId: directoryMatch.programId,
-          studentType: directoryMatch.studentType,
-          benefitLabel: directoryMatch.benefitLabel
-        }
-      : {
-          ...sessionUser.profile,
-          ...profileUpdates,
-          universityId: hasUnivalleEmailDomain(authUser.email)
-            ? profileUpdates.universityId || 1000
-            : profileUpdates.universityId,
-          campusId: hasUnivalleEmailDomain(authUser.email)
-            ? profileUpdates.campusId && profileUpdates.campusId !== 1
-              ? profileUpdates.campusId
-              : 1001
-            : profileUpdates.campusId
-        };
+    const isInstitutionalEmail = hasUnivalleEmailDomain(authUser.email);
+    const finalProfile = {
+      ...sessionUser.profile,
+      ...profileUpdates,
+      universityId: isInstitutionalEmail ? profileUpdates.universityId || 1000 : profileUpdates.universityId,
+      campusId: isInstitutionalEmail
+        ? profileUpdates.campusId && profileUpdates.campusId !== 1
+          ? profileUpdates.campusId
+          : 1001
+        : profileUpdates.campusId
+    };
 
     const { error: profileError } = await supabase
       .from("user_profiles")
@@ -87,7 +67,7 @@ export async function PATCH(request: Request) {
           program_id: finalProfile.programId,
           student_type: finalProfile.studentType,
           benefit_label: finalProfile.benefitLabel,
-          university_validated: Boolean(directoryMatch)
+          university_validated: isInstitutionalEmail
         },
         { onConflict: "user_id" }
       );

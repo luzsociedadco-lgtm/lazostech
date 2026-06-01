@@ -274,6 +274,8 @@ a {
   display: flex;
   align-items: stretch;
   overflow: hidden;
+  overscroll-behavior: none;
+  touch-action: pan-y;
 }
 
 .profile-shell {
@@ -399,7 +401,7 @@ a {
   justify-self: end;
   border-radius: 999px;
   padding: 2px;
-  background: #ffffff;
+  background: #ece9e2;
   border: 2px solid #111111;
   box-shadow: 0 2px 0 rgba(0, 0, 0, 0.08);
   display: grid;
@@ -410,7 +412,7 @@ a {
 .profile-avatar-ring.is-small {
   width: 54px;
   height: 54px;
-  background: #ffffff;
+  background: #ece9e2;
   border: 2px solid #111111;
 }
 
@@ -422,9 +424,9 @@ a {
 }
 
 .profile-avatar-ring svg {
-  width: 78%;
-  height: 78%;
-  stroke-width: 1.8;
+  width: 88%;
+  height: 88%;
+  stroke-width: 1.65;
 }
 
 .profile-head-metrics {
@@ -814,6 +816,11 @@ a {
   color: #1b2328;
 }
 
+.profile-drawer__row.is-disabled {
+  opacity: 0.62;
+  cursor: not-allowed;
+}
+
 .profile-drawer__row-main {
   display: flex;
   align-items: center;
@@ -1052,7 +1059,7 @@ a {
 }
 
 .profile-panel-card.is-form .profile-avatar-ring {
-  background: #ffffff;
+  background: #ece9e2;
   border-color: #111111;
 }
 
@@ -2250,7 +2257,7 @@ a {
 }
 
 .tickets-scan-video {
-  display: none;
+  display: block;
   width: 100%;
   aspect-ratio: 1 / 1;
   object-fit: cover;
@@ -2259,8 +2266,8 @@ a {
   border: 2px solid rgba(255, 255, 255, 0.16);
 }
 
-.tickets-scan-video.is-active {
-  display: block;
+.tickets-scan-video:not(.is-active) {
+  min-height: 220px;
 }
 
 .tickets-scan-options button {
