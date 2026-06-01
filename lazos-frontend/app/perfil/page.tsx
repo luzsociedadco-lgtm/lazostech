@@ -32,7 +32,6 @@ import { config as wagmiConfig } from "@/app/providers/WagmiWrapper";
 const universityLogoById: Record<number, string> = {
   1000: "/images/logo-G.png"
 };
-const univalleDefaultAvatarSrc = "/images/univalle-default-avatar.png";
 
 const accountItems = [
   { key: "wallet", label: "Wallet Network", detail: "Base Sepolia / Wallet vinculada", icon: Wallet },
@@ -177,8 +176,6 @@ export default function PerfilPage() {
 
   const studentName =
     user ? `${user.profile.firstName} ${user.profile.lastName}`.trim() || user.email.split("@")[0] : "";
-  const isUnivalleEmail = Boolean(user?.email.toLowerCase().endsWith("@correounivalle.edu.co"));
-  const avatarDisplaySrc = isUnivalleEmail ? univalleDefaultAvatarSrc : "";
   const displayCode = user?.profile.studentCode || user?.profile.nationalId || "Sin codigo";
   const studentTypeLabel = user?.profile.studentType || "Estudiante registrado";
   const benefitLabel = user?.profile.benefitLabel || "Almuerzo regular";
@@ -438,17 +435,7 @@ export default function PerfilPage() {
           <section className="profile-identity-stack">
             <div className="profile-account-row">
               <div className="profile-avatar-ring">
-                {avatarDisplaySrc ? (
-                  <Image
-                    src={avatarDisplaySrc}
-                    alt={studentName}
-                    width={100}
-                    height={100}
-                    className="profile-avatar-ring__image"
-                  />
-                ) : (
-                  <UserCircle2 size={72} aria-label={studentName || "Usuario"} />
-                )}
+                <UserCircle2 size={72} aria-label={studentName || "Usuario"} />
               </div>
 
               <div className="profile-head-metrics">
@@ -551,17 +538,7 @@ export default function PerfilPage() {
               aria-label="Opciones de foto de perfil"
             >
               <div className="profile-avatar-ring is-small">
-                {avatarDisplaySrc ? (
-                  <Image
-                    src={avatarDisplaySrc}
-                    alt={studentName}
-                    width={52}
-                    height={52}
-                    className="profile-avatar-ring__image"
-                  />
-                ) : (
-                  <UserCircle2 size={38} aria-label={studentName || "Usuario"} />
-                )}
+                <UserCircle2 size={38} aria-label={studentName || "Usuario"} />
               </div>
             </button>
 
@@ -645,7 +622,7 @@ export default function PerfilPage() {
                   }}
                 >
                   <strong>Actualizar foto de perfil</strong>
-                  <small>Esta funcion queda deshabilitada por ahora.</small>
+                  <small>Esta funcion esta deshabilitada por ahora.</small>
                 </button>
                 <button type="button" className="profile-avatar-option is-disabled" disabled>
                   <strong>Editar avatar pfp customizable</strong>
@@ -760,17 +737,7 @@ export default function PerfilPage() {
             <section className="profile-panel-card is-form">
               <div className="profile-panel-card__identity">
                 <div className="profile-avatar-ring">
-                  {avatarDisplaySrc ? (
-                    <Image
-                      src={avatarDisplaySrc}
-                      alt={studentName}
-                      width={68}
-                      height={68}
-                      className="profile-avatar-ring__image"
-                    />
-                  ) : (
-                    <UserCircle2 size={52} aria-label={studentName || "Usuario"} />
-                  )}
+                  <UserCircle2 size={52} aria-label={studentName || "Usuario"} />
                 </div>
                 <div>
                   <h2>Editar Perfil</h2>

@@ -399,19 +399,19 @@ a {
   justify-self: end;
   border-radius: 999px;
   padding: 2px;
-  background: #f10808;
-  border: 2px solid #ffefdb;
+  background: #ffffff;
+  border: 2px solid #111111;
   box-shadow: 0 2px 0 rgba(0, 0, 0, 0.08);
   display: grid;
   place-items: center;
-  color: #fff5e1;
+  color: #111111;
 }
 
 .profile-avatar-ring.is-small {
   width: 54px;
   height: 54px;
-  background: linear-gradient(180deg, #6fe2d0, #37c6d0);
-  border: 0;
+  background: #ffffff;
+  border: 2px solid #111111;
 }
 
 .profile-avatar-ring__image {
@@ -1052,8 +1052,8 @@ a {
 }
 
 .profile-panel-card.is-form .profile-avatar-ring {
-  background: linear-gradient(180deg, #6fe2d0, #37c6d0);
-  border-color: #c9fbff;
+  background: #ffffff;
+  border-color: #111111;
 }
 
 .profile-panel-card__identity h2 {
