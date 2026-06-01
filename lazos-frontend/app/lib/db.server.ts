@@ -84,6 +84,7 @@ function buildNotificationSeed() {
 const EMPTY_PROFILE: ProfileRecord = {
   firstName: "",
   lastName: "",
+  avatarUrl: "",
   phone: "",
   nationalId: "",
   studentCode: "",
@@ -165,7 +166,7 @@ export function normalizeText(value: string) {
   return value.trim().toLowerCase();
 }
 
-function hasUnivalleEmailDomain(email: string) {
+export function hasUnivalleEmailDomain(email: string) {
   return normalizeText(email).endsWith(UNIVALLE_EMAIL_DOMAIN);
 }
 
@@ -252,7 +253,7 @@ export function computeAccess(user: AppUser): FeatureAccess {
 
   return {
     perfil: true,
-    tickets: user.universityValidated || profileComplete,
+    tickets: user.universityValidated || profileComplete || hasUnivalleEmailDomain(user.email),
     reciclaje: walletLinked,
     marketplace: walletLinked,
     dao: walletLinked

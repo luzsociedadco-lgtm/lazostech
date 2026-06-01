@@ -35,6 +35,34 @@ const universityLogoById: Record<number, string> = {
   1000: "/images/logo-G.png"
 };
 
+async function compressAvatarFile(file: File) {
+  const objectUrl = URL.createObjectURL(file);
+
+  try {
+    const image = await new Promise<HTMLImageElement>((resolve, reject) => {
+      const img = new window.Image();
+      img.onload = () => resolve(img);
+      img.onerror = reject;
+      img.src = objectUrl;
+    });
+    const size = 256;
+    const canvas = document.createElement("canvas");
+    canvas.width = size;
+    canvas.height = size;
+    const context = canvas.getContext("2d");
+    if (!context) throw new Error("CANVAS_UNAVAILABLE");
+
+    const sourceSize = Math.min(image.naturalWidth, image.naturalHeight);
+    const sourceX = Math.max(0, (image.naturalWidth - sourceSize) / 2);
+    const sourceY = Math.max(0, (image.naturalHeight - sourceSize) / 2);
+    context.drawImage(image, sourceX, sourceY, sourceSize, sourceSize, 0, 0, size, size);
+
+    return canvas.toDataURL("image/jpeg", 0.82);
+  } finally {
+    URL.revokeObjectURL(objectUrl);
+  }
+}
+
 const accountItems = [
   { key: "wallet", label: "Wallet Network", detail: "Base Sepolia / Wallet vinculada", icon: Wallet },
   { key: "notifications", label: "Notificaciones", detail: "Historial del sistema", icon: Bell },
@@ -119,6 +147,7 @@ export default function PerfilPage() {
   const [menuOpen, setMenuOpen] = useState(false);
   const [activePanel, setActivePanel] = useState<"avatar" | "wallet" | "notifications" | "edit" | "payment" | null>(null);
   const [savingProfile, setSavingProfile] = useState(false);
+  const [savingAvatar, setSavingAvatar] = useState(false);
   const [walletBusy, setWalletBusy] = useState(false);
   const [statusMessage, setStatusMessage] = useState("");
   const [avatarPreview, setAvatarPreview] = useState<string | null>(null);
@@ -177,20 +206,12 @@ export default function PerfilPage() {
     });
   }, [user]);
 
-  useEffect(() => {
-    return () => {
-      if (avatarPreview) {
-        URL.revokeObjectURL(avatarPreview);
-      }
-    };
-  }, [avatarPreview]);
-
   const studentName =
     user ? `${user.profile.firstName} ${user.profile.lastName}`.trim() || user.email.split("@")[0] : "";
   const defaultAvatarSrc = user?.email.toLowerCase().endsWith("@correounivalle.edu.co")
     ? univalleDefaultAvatarSrc
     : avatarSrc;
-  const avatarDisplaySrc = avatarPreview || defaultAvatarSrc;
+  const avatarDisplaySrc = avatarPreview || user?.profile.avatarUrl || defaultAvatarSrc;
   const displayCode = user?.profile.studentCode || user?.profile.nationalId || "Sin codigo";
   const studentTypeLabel = user?.profile.studentType || "Estudiante registrado";
   const benefitLabel = user?.profile.benefitLabel || "Almuerzo regular";
@@ -381,17 +402,36 @@ export default function PerfilPage() {
     }
   }, [activePanel, browserWallet, connectedWalletMatchesUser, linkedWallet, walletBusy]);
 
-  const handleAvatarFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleAvatarFileChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (!file) return;
 
-    if (avatarPreview) {
-      URL.revokeObjectURL(avatarPreview);
+    try {
+      const nextPreview = await compressAvatarFile(file);
+      setAvatarPreview(nextPreview);
+      setAvatarStatus("Foto cargada. Presiona guardar cambios para conservarla.");
+    } catch {
+      setAvatarStatus("No pudimos preparar esa imagen. Intenta con otra foto.");
+    }
+  };
+
+  const handleAvatarSave = async () => {
+    if (!avatarPreview) {
+      setAvatarStatus("Selecciona una foto antes de guardar.");
+      return;
     }
 
-    const nextPreview = URL.createObjectURL(file);
-    setAvatarPreview(nextPreview);
-    setAvatarStatus(`Foto seleccionada: ${file.name}`);
+    setSavingAvatar(true);
+    const result = await updateProfile({ ...formState, avatarUrl: avatarPreview });
+    setSavingAvatar(false);
+
+    if (result.error) {
+      setAvatarStatus(result.error);
+      return;
+    }
+
+    setAvatarPreview(null);
+    setAvatarStatus("Foto guardada correctamente.");
   };
 
   const handleNotificationClick = async (notificationId: string, href: string | null) => {
@@ -669,6 +709,14 @@ export default function PerfilPage() {
                 className="profile-avatar-input"
                 onChange={handleAvatarFileChange}
               />
+              <button
+                type="button"
+                className="profile-avatar-save"
+                disabled={savingAvatar || !avatarPreview}
+                onClick={handleAvatarSave}
+              >
+                {savingAvatar ? "Guardando..." : "Guardar cambios"}
+              </button>
               {avatarStatus ? <small className="profile-wallet-copy">{avatarStatus}</small> : null}
             </section>
           ) : null}

@@ -40,6 +40,7 @@ function buildSupabaseUserSnapshot(input: {
     profile: {
       firstName: "",
       lastName: "",
+      avatarUrl: "",
       phone: "",
       nationalId: "",
       studentCode: "",
@@ -65,7 +66,7 @@ function buildSupabaseUserSnapshot(input: {
     notifications: [],
     access: {
       perfil: true,
-      tickets: false,
+      tickets: input.email.toLowerCase().endsWith("@correounivalle.edu.co"),
       reciclaje: false,
       marketplace: false,
       dao: false

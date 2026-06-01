@@ -37,6 +37,7 @@ export type StudentDirectoryRecord = {
 export type ProfileRecord = {
   firstName: string;
   lastName: string;
+  avatarUrl: string;
   phone: string;
   nationalId: string;
   studentCode: string;

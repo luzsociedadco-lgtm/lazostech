@@ -116,6 +116,7 @@ export default function TicketsPage() {
   const [monitorQrOpen, setMonitorQrOpen] = useState(false);
   const [studentScanOpen, setStudentScanOpen] = useState(false);
   const [scanMessage, setScanMessage] = useState("");
+  const [scannerActive, setScannerActive] = useState(false);
   const [specialStudentCode, setSpecialStudentCode] = useState("");
   const [specialStudentPreview, setSpecialStudentPreview] = useState<{
     student_code: string;
@@ -130,8 +131,10 @@ export default function TicketsPage() {
   const [isMonitorActionLoading, setIsMonitorActionLoading] = useState(false);
   const menuSwipeStart = useRef<number | null>(null);
   const undoTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-  const cameraInputRef = useRef<HTMLInputElement | null>(null);
   const galleryInputRef = useRef<HTMLInputElement | null>(null);
+  const scannerVideoRef = useRef<HTMLVideoElement | null>(null);
+  const scannerStreamRef = useRef<MediaStream | null>(null);
+  const scannerFrameRef = useRef<number | null>(null);
   const {
     quoteDisplay,
     isLoadingQuote,
@@ -325,29 +328,122 @@ export default function TicketsPage() {
     setHistoryTurns(Array.isArray(json.turns) ? json.turns : []);
   };
 
+  const getBarcodeDetector = () =>
+    (window as unknown as {
+      BarcodeDetector?: new (options: { formats: string[] }) => {
+        detect: (source: ImageBitmap | HTMLVideoElement) => Promise<Array<{ rawValue: string }>>;
+      };
+    }).BarcodeDetector;
+
+  const isOfficialLunchQr = (qrValue: string) => {
+    const normalized = qrValue.trim();
+    return normalized === lunchTurnQrId || normalized.includes(lunchTurnQrId);
+  };
+
+  const stopQrScanner = useCallback(() => {
+    if (scannerFrameRef.current !== null) {
+      cancelAnimationFrame(scannerFrameRef.current);
+      scannerFrameRef.current = null;
+    }
+
+    scannerStreamRef.current?.getTracks().forEach(track => track.stop());
+    scannerStreamRef.current = null;
+
+    if (scannerVideoRef.current) {
+      scannerVideoRef.current.srcObject = null;
+    }
+
+    setScannerActive(false);
+  }, []);
+
+  async function assignTurnFromQr(qrValue: string) {
+    if (!isOfficialLunchQr(qrValue)) {
+      setScanMessage("Ese QR no corresponde al servicio de almuerzos.");
+      return false;
+    }
+
+    stopQrScanner();
+    await submitTurnAction("request");
+    setScanMessage("Lectura completada.");
+    setStudentScanOpen(false);
+    return true;
+  }
+
+  const startQrScanner = async () => {
+    setScanMessage("Abriendo camara...");
+
+    const Detector = getBarcodeDetector();
+    if (!Detector || !navigator.mediaDevices?.getUserMedia) {
+      setScanMessage("Este navegador no tiene lector QR en vivo. Usa la galeria como alternativa.");
+      return;
+    }
+
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({
+        video: { facingMode: { ideal: "environment" } },
+        audio: false
+      });
+      const video = scannerVideoRef.current;
+      if (!video) {
+        stream.getTracks().forEach(track => track.stop());
+        setScanMessage("No pudimos iniciar el visor de camara.");
+        return;
+      }
+
+      scannerStreamRef.current = stream;
+      video.srcObject = stream;
+      video.setAttribute("playsinline", "true");
+      await video.play();
+      setScannerActive(true);
+      setScanMessage("Apunta la camara al QR oficial de turnos.");
+
+      const detector = new Detector({ formats: ["qr_code"] });
+      const scanFrame = async () => {
+        if (!scannerStreamRef.current || !scannerVideoRef.current) return;
+
+        try {
+          const codes = await detector.detect(scannerVideoRef.current);
+          const qrValue = codes[0]?.rawValue ?? "";
+          if (qrValue && (await assignTurnFromQr(qrValue))) {
+            return;
+          }
+        } catch {
+          // Continue scanning; some browsers throw while the video is warming up.
+        }
+
+        scannerFrameRef.current = requestAnimationFrame(scanFrame);
+      };
+
+      scannerFrameRef.current = requestAnimationFrame(scanFrame);
+    } catch {
+      stopQrScanner();
+      setScanMessage("No pudimos acceder a la camara. Revisa permisos o usa la galeria.");
+    }
+  };
+
+  useEffect(() => {
+    if (!studentScanOpen) {
+      stopQrScanner();
+    }
+
+    return () => stopQrScanner();
+  }, [studentScanOpen, stopQrScanner]);
+
   const readQrFromImage = async (file: File) => {
     setScanMessage("Leyendo imagen...");
     try {
-      const Detector = (window as unknown as {
-        BarcodeDetector?: new (options: { formats: string[] }) => {
-          detect: (source: ImageBitmap) => Promise<Array<{ rawValue: string }>>;
-        };
-      }).BarcodeDetector;
+      const Detector = getBarcodeDetector();
 
-      if (Detector) {
-        const bitmap = await createImageBitmap(file);
-        const detector = new Detector({ formats: ["qr_code"] });
-        const codes = await detector.detect(bitmap);
-        const qrValue = codes[0]?.rawValue ?? "";
-        if (!qrValue.includes(lunchTurnQrId)) {
-          setScanMessage("Ese QR no corresponde al servicio de almuerzos.");
-          return;
-        }
+      if (!Detector) {
+        setScanMessage("Este navegador no puede leer QR desde imagen. Usa la camara en vivo.");
+        return;
       }
 
-      await submitTurnAction("request");
-      setScanMessage("Lectura completada.");
-      setStudentScanOpen(false);
+      const bitmap = await createImageBitmap(file);
+      const detector = new Detector({ formats: ["qr_code"] });
+      const codes = await detector.detect(bitmap);
+      const qrValue = codes[0]?.rawValue ?? "";
+      await assignTurnFromQr(qrValue);
     } catch {
       setScanMessage("No pudimos leer el QR. Intenta con otra imagen.");
     }
@@ -814,26 +910,31 @@ export default function TicketsPage() {
         <section className="tickets-monitor-modal is-compact" role="dialog" aria-modal="true">
           <header>
             <h2>Leer QR de turno</h2>
-            <button type="button" onClick={() => setStudentScanOpen(false)} aria-label="Cerrar lector de QR">
+            <button
+              type="button"
+              onClick={() => {
+                stopQrScanner();
+                setStudentScanOpen(false);
+              }}
+              aria-label="Cerrar lector de QR"
+            >
               <X size={18} />
             </button>
           </header>
+          <video
+            ref={scannerVideoRef}
+            className={`tickets-scan-video ${scannerActive ? "is-active" : ""}`}
+            muted
+            playsInline
+          />
           <div className="tickets-scan-options">
-            <button type="button" onClick={() => cameraInputRef.current?.click()}>
-              Abrir camara
+            <button type="button" onClick={startQrScanner}>
+              {scannerActive ? "Escaneando..." : "Abrir camara"}
             </button>
             <button type="button" onClick={() => galleryInputRef.current?.click()}>
               Leer imagen de galeria
             </button>
           </div>
-          <input
-            ref={cameraInputRef}
-            className="tickets-hidden-input"
-            type="file"
-            accept="image/*"
-            capture="environment"
-            onChange={event => handleQrImageInput(event.target.files?.[0])}
-          />
           <input
             ref={galleryInputRef}
             className="tickets-hidden-input"

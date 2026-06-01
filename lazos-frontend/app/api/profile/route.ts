@@ -1,6 +1,10 @@
 import { NextResponse } from "next/server";
 
-import { addUserNotification, getUserById, toUserSnapshot, updateUserProfile } from "@/app/lib/db.server";
+import {
+  findDirectoryMatch,
+  hasUnivalleEmailDomain,
+  updateUserProfile
+} from "@/app/lib/db.server";
 import { getSessionUser, unauthorizedResponse } from "@/app/lib/session.server";
 import { createClient } from "@/app/lib/supabase/server";
 
@@ -16,6 +20,7 @@ export async function PATCH(request: Request) {
     const profileUpdates = {
       firstName: String(body.firstName || ""),
       lastName: String(body.lastName || ""),
+      avatarUrl: String(body.avatarUrl || sessionUser.profile.avatarUrl || ""),
       phone: String(body.phone || ""),
       nationalId: String(body.nationalId || ""),
       studentCode: String(body.studentCode || ""),
@@ -24,12 +29,7 @@ export async function PATCH(request: Request) {
       programId: Number(body.programId || 0)
     };
 
-    await updateUserProfile(sessionUser.id, profileUpdates);
-
-    const updatedUser = await getUserById(sessionUser.id);
-    if (!updatedUser) {
-      return unauthorizedResponse();
-    }
+    await updateUserProfile(sessionUser.id, profileUpdates).catch(() => null);
 
     const supabase = await createClient();
     const {
@@ -41,23 +41,64 @@ export async function PATCH(request: Request) {
       return unauthorizedResponse();
     }
 
+    const directoryMatch = findDirectoryMatch({
+      email: authUser.email,
+      studentCode: profileUpdates.studentCode,
+      nationalId: profileUpdates.nationalId
+    });
+    const finalProfile = directoryMatch
+      ? {
+          firstName: directoryMatch.firstName,
+          lastName: directoryMatch.lastName,
+          phone: directoryMatch.phone,
+          nationalId: directoryMatch.nationalId,
+          studentCode: directoryMatch.studentCode,
+          universityId: directoryMatch.universityId,
+          campusId: directoryMatch.campusId,
+          programId: directoryMatch.programId,
+          studentType: directoryMatch.studentType,
+          benefitLabel: directoryMatch.benefitLabel
+        }
+      : {
+          ...sessionUser.profile,
+          ...profileUpdates,
+          universityId: hasUnivalleEmailDomain(authUser.email)
+            ? profileUpdates.universityId || 1000
+            : profileUpdates.universityId,
+          campusId: hasUnivalleEmailDomain(authUser.email)
+            ? profileUpdates.campusId && profileUpdates.campusId !== 1
+              ? profileUpdates.campusId
+              : 1001
+            : profileUpdates.campusId
+        };
+
+    if (profileUpdates.avatarUrl) {
+      const { error: avatarError } = await supabase.auth.updateUser({
+        data: { avatar_url: profileUpdates.avatarUrl }
+      });
+
+      if (avatarError) {
+        return NextResponse.json({ error: "No se pudo guardar la foto de perfil" }, { status: 500 });
+      }
+    }
+
     const { error: profileError } = await supabase
       .from("user_profiles")
       .upsert(
         {
           user_id: authUser.id,
           email: authUser.email,
-          first_name: updatedUser.profile.firstName,
-          last_name: updatedUser.profile.lastName,
-          phone: updatedUser.profile.phone,
-          national_id: updatedUser.profile.nationalId,
-          student_code: updatedUser.profile.studentCode,
-          university_id: updatedUser.profile.universityId,
-          campus_id: updatedUser.profile.campusId,
-          program_id: updatedUser.profile.programId,
-          student_type: updatedUser.profile.studentType,
-          benefit_label: updatedUser.profile.benefitLabel,
-          university_validated: updatedUser.universityValidated
+          first_name: finalProfile.firstName,
+          last_name: finalProfile.lastName,
+          phone: finalProfile.phone,
+          national_id: finalProfile.nationalId,
+          student_code: finalProfile.studentCode,
+          university_id: finalProfile.universityId,
+          campus_id: finalProfile.campusId,
+          program_id: finalProfile.programId,
+          student_type: finalProfile.studentType,
+          benefit_label: finalProfile.benefitLabel,
+          university_validated: Boolean(directoryMatch)
         },
         { onConflict: "user_id" }
       );
@@ -66,17 +107,10 @@ export async function PATCH(request: Request) {
       return NextResponse.json({ error: "No se pudo guardar el perfil en Supabase" }, { status: 500 });
     }
 
-    await addUserNotification(sessionUser.id, {
-      type: "profile",
-      title: "Perfil actualizado",
-      body: "Tus datos de perfil fueron actualizados correctamente.",
-      href: null
-    });
-
-    const user = await getUserById(sessionUser.id);
+    const user = await getSessionUser();
     if (!user) return unauthorizedResponse();
 
-    return NextResponse.json({ user: toUserSnapshot(user) });
+    return NextResponse.json({ user });
   } catch (error) {
     return NextResponse.json({ error: "No se pudo actualizar el perfil" }, { status: 500 });
   }

@@ -1,10 +1,6 @@
 import { NextResponse } from "next/server";
 
-import {
-  getTicketTurnState,
-  reactivateTicketTurn,
-  requestTicketTurn
-} from "@/app/lib/db.server";
+import { hasUnivalleEmailDomain } from "@/app/lib/db.server";
 import { createClient } from "@/app/lib/supabase/server";
 import type { TicketTurn } from "@/app/lib/types";
 import { getSessionUser, unauthorizedResponse } from "@/app/lib/session.server";
@@ -43,22 +39,38 @@ function errorResponse(error: unknown) {
   return NextResponse.json({ error: response.error }, { status: response.status });
 }
 
+function getStudentPayload(sessionUser: Awaited<ReturnType<typeof getSessionUser>>) {
+  if (!sessionUser) {
+    return {
+      studentCode: "",
+      studentEmail: "",
+      studentName: ""
+    };
+  }
+
+  const studentName =
+    `${sessionUser.profile.firstName} ${sessionUser.profile.lastName}`.trim() ||
+    sessionUser.email.split("@")[0] ||
+    "Estudiante";
+
+  return {
+    studentCode: sessionUser.profile.studentCode || sessionUser.profile.nationalId || sessionUser.email.split("@")[0] || "",
+    studentEmail: sessionUser.email,
+    studentName
+  };
+}
+
 export async function GET() {
   const sessionUser = await getSessionUser();
   if (!sessionUser) {
     return unauthorizedResponse();
   }
 
-  const turn = await getTicketTurnState(sessionUser.id);
   const supabase = await createClient();
-  const { data: service } = await supabase
-    .from("ticket_turn_services")
-    .select("queue_paused")
-    .eq("code", "univalle-lunch-main")
-    .maybeSingle();
+  const { data: turn, error } = await supabase.rpc("get_lunch_turn_state");
 
   return NextResponse.json({
-    turn: turn ? { ...turn, queuePaused: Boolean(service?.queue_paused) } : null
+    turn: error ? null : turn ?? null
   });
 }
 
@@ -71,15 +83,31 @@ export async function POST(request: Request) {
   try {
     const body = await request.json().catch(() => ({}));
     const action = String(body.action || "request");
+    const supabase = await createClient();
 
     if (action === "reactivate") {
-      const turn = await reactivateTicketTurn(sessionUser.id);
+      const { data: turn, error } = await supabase.rpc("reactivate_lunch_turn");
+      if (error) throw new Error(error.message);
       return NextResponse.json({ turn });
     }
 
     const type: TicketTurn["type"] = body.type === "special" ? "special" : "regular";
     const qrCodeId = String(body.qrCodeId || "");
-    const turn = await requestTicketTurn(sessionUser.id, type, qrCodeId);
+    if (!sessionUser.access.tickets && !hasUnivalleEmailDomain(sessionUser.email)) {
+      throw new Error("TICKETS_LOCKED");
+    }
+    if (type === "special") {
+      throw new Error("SPECIAL_TURN_LIMIT_REACHED");
+    }
+
+    const student = getStudentPayload(sessionUser);
+    const { data: turn, error } = await supabase.rpc("request_lunch_turn", {
+      qr_code_id: qrCodeId,
+      student_code: student.studentCode,
+      student_email: student.studentEmail,
+      student_name: student.studentName
+    });
+    if (error) throw new Error(error.message);
     return NextResponse.json({ turn });
   } catch (error) {
     return errorResponse(error);
