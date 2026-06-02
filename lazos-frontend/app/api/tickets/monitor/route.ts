@@ -44,7 +44,16 @@ function getServiceScope(roles: MonitorRole[]) {
 }
 
 function normalizeDate(value: string | null) {
-  return /^\d{4}-\d{2}-\d{2}$/.test(value ?? "") ? String(value) : new Date().toISOString().slice(0, 10);
+  return /^\d{4}-\d{2}-\d{2}$/.test(value ?? "") ? String(value) : getBogotaDate();
+}
+
+function getBogotaDate() {
+  return new Intl.DateTimeFormat("en-CA", {
+    timeZone: "America/Bogota",
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit"
+  }).format(new Date());
 }
 
 export async function GET(request: Request) {
@@ -240,7 +249,7 @@ export async function PATCH(request: Request) {
         return NextResponse.json({ error: "No encontramos ese codigo en la fila" }, { status: 404 });
       }
 
-      const today = new Date().toISOString().slice(0, 10);
+      const today = getBogotaDate();
       const { data: latestTurns } = await supabase
         .from("ticket_turns")
         .select("sequence_number, turn_code")
@@ -281,7 +290,7 @@ export async function PATCH(request: Request) {
       let query = supabase
         .from("ticket_turns")
         .select("id")
-        .eq("turn_date", new Date().toISOString().slice(0, 10))
+        .eq("turn_date", getBogotaDate())
         .eq("status", "activo")
         .order("sequence_number", { ascending: true })
         .limit(1);
