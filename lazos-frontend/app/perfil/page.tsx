@@ -179,6 +179,7 @@ export default function PerfilPage() {
 
   const studentName =
     user ? `${user.profile.firstName} ${user.profile.lastName}`.trim() || user.email.split("@")[0] : "";
+  const displayStudentName = studentName.toUpperCase();
   const displayCode = user?.profile.studentCode || user?.profile.nationalId || "Sin codigo";
   const studentTypeLabel = user?.profile.studentType || "Estudiante registrado";
   const benefitLabel = user?.profile.benefitLabel || "Almuerzo regular";
@@ -458,7 +459,7 @@ export default function PerfilPage() {
 
             <div className="profile-card-id">
               <div className="profile-card-id__copy">
-                <strong>[{studentName}]</strong>
+                <strong>{displayStudentName}</strong>
                 <div className="profile-card-id__meta">
                   <span>[{displayCode || "Codigo"}]</span>
                   <span>[{programName}]</span>
@@ -545,7 +546,7 @@ export default function PerfilPage() {
             </button>
 
             <div>
-              <strong>[ {studentName.toUpperCase()} ]</strong>
+              <strong>{displayStudentName}</strong>
               {identityLines.map(line => (
                 <small key={line}>[ {line} ]</small>
               ))}

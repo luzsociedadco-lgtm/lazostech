@@ -12,6 +12,7 @@ type TurnRow = {
   id: string;
   service_id: string;
   user_id: string;
+  turn_date?: string;
   student_code: string;
   student_email: string;
   student_name: string;
@@ -20,6 +21,8 @@ type TurnRow = {
   sequence_number: number;
   assigned_at: string;
   is_special?: boolean;
+  is_paused?: boolean;
+  paused_at?: string | null;
 };
 
 const emptySummary = {
@@ -89,10 +92,10 @@ export async function GET(request: Request) {
     const activeService = services?.[0] ?? null;
     let query = supabase
       .from("ticket_turns")
-      .select("id, service_id, user_id, student_code, student_email, student_name, turn_code, status, sequence_number, assigned_at, is_special")
+      .select("id, service_id, user_id, turn_date, student_code, student_email, student_name, turn_code, status, sequence_number, assigned_at, is_special, is_paused, paused_at")
       .eq("turn_date", date)
       .order("sequence_number", { ascending: true })
-      .limit(240);
+      .limit(1000);
 
     if (serviceIds.length > 0 && !monitorRoles.some(role => role.service_id === null)) {
       query = query.in("service_id", serviceIds);
@@ -304,13 +307,44 @@ export async function PATCH(request: Request) {
       return NextResponse.json({ ok: true });
     }
 
+    if (action === "pause_turn" || action === "resume_turn") {
+      if (!turnId) {
+        return NextResponse.json({ error: "Accion invalida" }, { status: 400 });
+      }
+
+      const isPaused = action === "pause_turn";
+      const { error } = await supabase
+        .from("ticket_turns")
+        .update({
+          status: isPaused ? "en_fila" : status || "en_fila",
+          is_paused: isPaused,
+          paused_at: isPaused ? new Date().toISOString() : null
+        })
+        .eq("id", turnId);
+
+      if (error) {
+        return NextResponse.json({ error: "No se pudo actualizar el turno" }, { status: 500 });
+      }
+
+      return NextResponse.json({ ok: true });
+    }
+
     if (!turnId || !["activo", "atendido", "expirado", "en_fila"].includes(status)) {
       return NextResponse.json({ error: "Accion invalida" }, { status: 400 });
     }
 
-    const updates: { status: TurnRow["status"]; attended_at?: string | null } = { status };
+    const updates: { status: TurnRow["status"]; attended_at?: string | null; is_paused?: boolean; paused_at?: string | null } = { status };
     if (status === "atendido") {
       updates.attended_at = new Date().toISOString();
+      updates.is_paused = false;
+      updates.paused_at = null;
+    } else {
+      updates.attended_at = null;
+    }
+
+    if (status === "expirado" || status === "activo") {
+      updates.is_paused = false;
+      updates.paused_at = null;
     }
 
     const { error } = await supabase.from("ticket_turns").update(updates).eq("id", turnId);

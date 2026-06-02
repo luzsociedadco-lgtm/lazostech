@@ -57,6 +57,9 @@ type MonitorTurnStatus = "activo" | "en_fila" | "atendido" | "expirado";
 
 type MonitorTurn = {
   id: string;
+  service_id?: string;
+  user_id?: string;
+  turn_date?: string;
   student_code: string;
   student_email: string;
   student_name: string;
@@ -65,6 +68,8 @@ type MonitorTurn = {
   sequence_number: number;
   assigned_at: string;
   is_special?: boolean;
+  is_paused?: boolean;
+  paused_at?: string | null;
 };
 
 type MonitorState = {
@@ -97,6 +102,42 @@ function formatMonitorDate(date: Date) {
   return date.toISOString().slice(0, 10);
 }
 
+function sortMonitorTurns(turns: MonitorTurn[]) {
+  return [...turns].sort((left, right) => left.sequence_number - right.sequence_number);
+}
+
+function summarizeMonitorTurns(turns: MonitorTurn[]) {
+  return turns.reduce(
+    (acc, turnItem) => ({
+      ...acc,
+      [turnItem.status]: acc[turnItem.status] + 1,
+    }),
+    { ...emptyMonitorState.summary }
+  );
+}
+
+function normalizeRealtimeTurn(value: unknown): MonitorTurn | null {
+  const row = value as Partial<MonitorTurn> | null;
+  if (!row?.id || !row.turn_code || !row.status) return null;
+
+  return {
+    id: String(row.id),
+    service_id: row.service_id ? String(row.service_id) : undefined,
+    user_id: row.user_id ? String(row.user_id) : undefined,
+    turn_date: row.turn_date ? String(row.turn_date) : undefined,
+    student_code: String(row.student_code || ""),
+    student_email: String(row.student_email || ""),
+    student_name: String(row.student_name || ""),
+    turn_code: String(row.turn_code),
+    status: row.status as MonitorTurnStatus,
+    sequence_number: Number(row.sequence_number ?? 0),
+    assigned_at: String(row.assigned_at || new Date().toISOString()),
+    is_special: Boolean(row.is_special),
+    is_paused: Boolean(row.is_paused),
+    paused_at: row.paused_at ? String(row.paused_at) : null,
+  };
+}
+
 export default function TicketsPage() {
   const { user } = useAuth();
   const [quantity, setQuantity] = useState(3);
@@ -119,7 +160,8 @@ export default function TicketsPage() {
   const [cameraPopupOpen, setCameraPopupOpen] = useState(false);
   const [scanMessage, setScanMessage] = useState("");
   const [scannerActive, setScannerActive] = useState(false);
-  const [pendingMonitorAssignments, setPendingMonitorAssignments] = useState(0);
+  const [turnOptionsOpen, setTurnOptionsOpen] = useState(false);
+  const [turnOptionsTarget, setTurnOptionsTarget] = useState<MonitorTurn | null>(null);
   const [specialStudentCode, setSpecialStudentCode] = useState("");
   const [specialStudentPreview, setSpecialStudentPreview] = useState<{
     student_code: string;
@@ -133,6 +175,7 @@ export default function TicketsPage() {
   const [historyQuery, setHistoryQuery] = useState("");
   const [isMonitorActionLoading, setIsMonitorActionLoading] = useState(false);
   const menuSwipeStart = useRef<number | null>(null);
+  const turnHoldTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const galleryInputRef = useRef<HTMLInputElement | null>(null);
   const scannerVideoRef = useRef<HTMLVideoElement | null>(null);
   const scannerStreamRef = useRef<MediaStream | null>(null);
@@ -222,7 +265,7 @@ export default function TicketsPage() {
         setMonitorState({
           isRestaurantMonitor: Boolean(json.isRestaurantMonitor),
           isQueuePaused: Boolean(json.isQueuePaused),
-          turns: Array.isArray(json.turns) ? json.turns : [],
+          turns: Array.isArray(json.turns) ? sortMonitorTurns(json.turns) : [],
           summary: json.summary ?? emptyMonitorState.summary,
         });
       })
@@ -242,31 +285,63 @@ export default function TicketsPage() {
     setMonitorState({
       isRestaurantMonitor: Boolean(json.isRestaurantMonitor),
       isQueuePaused: Boolean(json.isQueuePaused),
-      turns: Array.isArray(json.turns) ? json.turns : [],
+      turns: Array.isArray(json.turns) ? sortMonitorTurns(json.turns) : [],
       summary: json.summary ?? emptyMonitorState.summary,
     });
-    setPendingMonitorAssignments(0);
   }, [user]);
 
   useEffect(() => {
     if (!user || !monitorState.isRestaurantMonitor) return;
 
+    const today = formatMonitorDate(new Date());
     const supabase = createSupabaseBrowserClient();
     const channel = supabase
-      .channel("ticket-turn-monitor-inserts")
+      .channel("ticket-turn-monitor-live")
       .on(
         "postgres_changes",
-        { event: "INSERT", schema: "public", table: "ticket_turns" },
-        () => {
-          setPendingMonitorAssignments(previous => {
-            const next = previous + 1;
-            if (next >= 50) {
-              void refreshMonitorTools();
-              return 0;
-            }
+        { event: "*", schema: "public", table: "ticket_turns" },
+        payload => {
+          const eventType = payload.eventType;
+          const nextTurn = normalizeRealtimeTurn(payload.new);
+          const oldTurn = normalizeRealtimeTurn(payload.old);
+          const targetTurn = nextTurn ?? oldTurn;
+          const targetTurnId =
+            targetTurn?.id || String(((payload.old ?? payload.new) as { id?: string } | null)?.id || "");
 
-            return next;
+          if (targetTurn?.turn_date && targetTurn.turn_date !== today) {
+            return;
+          }
+
+          setMonitorState(previous => {
+            if (!previous.isRestaurantMonitor) return previous;
+
+            const currentTurns =
+              eventType === "DELETE"
+                ? previous.turns.filter(item => item.id !== targetTurnId)
+                : nextTurn
+                  ? sortMonitorTurns([
+                      ...previous.turns.filter(item => item.id !== nextTurn.id),
+                      nextTurn,
+                    ])
+                  : previous.turns;
+
+            return {
+              ...previous,
+              turns: currentTurns,
+              summary: summarizeMonitorTurns(currentTurns),
+            };
           });
+        }
+      )
+      .on(
+        "postgres_changes",
+        { event: "UPDATE", schema: "public", table: "ticket_turn_services" },
+        payload => {
+          const row = payload.new as { queue_paused?: boolean } | null;
+          setMonitorState(previous => ({
+            ...previous,
+            isQueuePaused: Boolean(row?.queue_paused),
+          }));
         }
       )
       .subscribe();
@@ -312,6 +387,42 @@ export default function TicketsPage() {
       turnId: turn.id,
       status: turn.status === "atendido" ? "en_fila" : "atendido"
     });
+  };
+
+  const expireTurn = async (turn: MonitorTurn) => {
+    await submitMonitorAction({ turnId: turn.id, status: "expirado" });
+    setTurnOptionsOpen(false);
+    setTurnOptionsTarget(null);
+  };
+
+  const toggleTurnPause = async (turn: MonitorTurn) => {
+    await submitMonitorAction({
+      action: turn.is_paused ? "resume_turn" : "pause_turn",
+      turnId: turn.id,
+      status: "en_fila"
+    });
+    setTurnOptionsOpen(false);
+    setTurnOptionsTarget(null);
+  };
+
+  const openTurnOptions = (turnItem: MonitorTurn) => {
+    setTurnOptionsTarget(turnItem);
+    setTurnOptionsOpen(true);
+  };
+
+  const startTurnHold = (turnItem: MonitorTurn) => {
+    if (turnHoldTimerRef.current) clearTimeout(turnHoldTimerRef.current);
+    turnHoldTimerRef.current = setTimeout(() => {
+      openTurnOptions(turnItem);
+      turnHoldTimerRef.current = null;
+    }, 650);
+  };
+
+  const cancelTurnHold = () => {
+    if (turnHoldTimerRef.current) {
+      clearTimeout(turnHoldTimerRef.current);
+      turnHoldTimerRef.current = null;
+    }
   };
 
   const assignSpecialTurn = async () => {
@@ -505,6 +616,8 @@ export default function TicketsPage() {
 
     return () => stopQrScanner();
   }, [studentScanOpen, stopQrScanner]);
+
+  useEffect(() => () => cancelTurnHold(), []);
 
   const readQrFromImage = async (file: File) => {
     setScanMessage("Leyendo imagen...");
@@ -750,6 +863,7 @@ export default function TicketsPage() {
           monitorQrOpen ||
           studentScanOpen ||
           cameraPopupOpen ||
+          turnOptionsOpen ||
           historyPopupDate
             ? "is-open"
             : ""
@@ -762,6 +876,7 @@ export default function TicketsPage() {
           setMonitorQrOpen(false);
           setStudentScanOpen(false);
           setCameraPopupOpen(false);
+          setTurnOptionsOpen(false);
           setHistoryPopupDate(null);
         }}
       />
@@ -800,7 +915,6 @@ export default function TicketsPage() {
           <button type="button" className="tickets-monitor-list-button" onClick={() => setQueuePopupOpen(true)}>
             <ListChecks size={18} />
             Ver lista en curso
-            {pendingMonitorAssignments > 0 ? <small>{pendingMonitorAssignments}/50 nuevos</small> : null}
           </button>
 
           <section className="tickets-monitor-tools">
@@ -904,11 +1018,22 @@ export default function TicketsPage() {
               filteredMonitorTurns.map(item => {
                 const isChecked = item.status === "atendido";
                 return (
-                  <article key={item.id} className={`tickets-monitor-row ${isChecked ? "is-checked" : ""}`}>
+                  <article
+                    key={item.id}
+                    className={`tickets-monitor-row ${isChecked ? "is-checked" : ""} ${item.is_paused ? "is-paused" : ""}`}
+                    onPointerDown={() => startTurnHold(item)}
+                    onPointerUp={cancelTurnHold}
+                    onPointerLeave={cancelTurnHold}
+                    onPointerCancel={cancelTurnHold}
+                  >
                     <button
                       type="button"
                       className="tickets-monitor-check"
-                      onClick={() => toggleTurnPassed(item)}
+                      onPointerDown={event => event.stopPropagation()}
+                      onClick={event => {
+                        event.stopPropagation();
+                        void toggleTurnPassed(item);
+                      }}
                       aria-label={isChecked ? "Desmarcar turno atendido" : "Marcar turno como atendido"}
                     >
                       <Check size={16} />
@@ -917,6 +1042,7 @@ export default function TicketsPage() {
                       <strong>
                         {item.turn_code}
                         {item.is_special ? <small>Especial</small> : null}
+                        {item.is_paused ? <small>Pausado</small> : null}
                       </strong>
                       <span>{monitorStatusLabels[item.status]}</span>
                     </div>
@@ -933,6 +1059,48 @@ export default function TicketsPage() {
                 <span>Cuando los estudiantes escaneen el QR apareceran aqui.</span>
               </div>
             )}
+          </div>
+        </section>
+      ) : null}
+
+      {turnOptionsOpen && turnOptionsTarget ? (
+        <section className="tickets-monitor-modal is-compact" role="dialog" aria-modal="true">
+          <header>
+            <h2>{turnOptionsTarget.turn_code}</h2>
+            <button
+              type="button"
+              onClick={() => {
+                setTurnOptionsOpen(false);
+                setTurnOptionsTarget(null);
+              }}
+              aria-label="Cerrar opciones de turno"
+            >
+              <X size={18} />
+            </button>
+          </header>
+          <div className="tickets-turn-options">
+            <div>
+              <strong>{turnOptionsTarget.student_name}</strong>
+              <small>{turnOptionsTarget.student_code} - {turnOptionsTarget.student_email}</small>
+            </div>
+            <button
+              type="button"
+              className={turnOptionsTarget.is_paused ? "is-resume" : "is-pause"}
+              disabled={isMonitorActionLoading || turnOptionsTarget.status === "atendido" || turnOptionsTarget.status === "expirado"}
+              onClick={() => toggleTurnPause(turnOptionsTarget)}
+            >
+              {turnOptionsTarget.is_paused ? <Play size={16} /> : <Pause size={16} />}
+              {turnOptionsTarget.is_paused ? "Reanudar turno" : "Pausar turno"}
+            </button>
+            <button
+              type="button"
+              className="is-expire"
+              disabled={isMonitorActionLoading || turnOptionsTarget.status === "expirado"}
+              onClick={() => expireTurn(turnOptionsTarget)}
+            >
+              <X size={16} />
+              Expirar turno
+            </button>
           </div>
         </section>
       ) : null}

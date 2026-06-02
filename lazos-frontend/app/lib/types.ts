@@ -86,6 +86,7 @@ export type TicketTurnSnapshot = TicketTurn & {
   estimatedMinutes: number;
   estimatedTimeLabel: string;
   queuePaused?: boolean;
+  turnPaused?: boolean;
   reactivationsAvailable: number;
   monthlyReactivationsUsed: number;
   monthlyReactivationsLimit: number;

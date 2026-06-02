@@ -424,9 +424,9 @@ a {
 }
 
 .profile-avatar-ring svg {
-  width: 88%;
-  height: 88%;
-  stroke-width: 1.65;
+  width: 108%;
+  height: 108%;
+  stroke-width: 1.7;
 }
 
 .profile-head-metrics {
@@ -2163,6 +2163,10 @@ a {
   opacity: 0.72;
 }
 
+.tickets-monitor-row.is-paused {
+  box-shadow: inset 0 0 0 2px #c28115;
+}
+
 .tickets-monitor-check {
   width: 28px;
   height: 28px;
@@ -2183,6 +2187,57 @@ a {
 .tickets-monitor-row strong small {
   color: #c28115;
   font-size: 0.58rem;
+}
+
+.tickets-turn-options {
+  display: grid;
+  gap: 10px;
+}
+
+.tickets-turn-options div {
+  display: grid;
+  gap: 3px;
+  background: #eef1f4;
+  color: #1b2023;
+  border-radius: 8px;
+  padding: 10px;
+}
+
+.tickets-turn-options strong,
+.tickets-turn-options small {
+  display: block;
+}
+
+.tickets-turn-options small {
+  color: #5c646b;
+  font-size: 0.72rem;
+  font-weight: 750;
+}
+
+.tickets-turn-options button {
+  min-height: 42px;
+  border: 0;
+  border-radius: 8px;
+  color: #ffffff;
+  font-weight: 850;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+}
+
+.tickets-turn-options button.is-pause,
+.tickets-turn-options button.is-expire {
+  background: #b12a2a;
+}
+
+.tickets-turn-options button.is-resume {
+  background: #2b7f43;
+}
+
+.tickets-turn-options button:disabled {
+  opacity: 0.56;
+  cursor: not-allowed;
 }
 
 .tickets-special-form {
