@@ -4,7 +4,7 @@
     "solc": "^0.8.31"
   },
   "devDependencies": {
-    "@nomicfoundation/hardhat-toolbox": "^6.1.0",
+    "@nomicfoundation/hardhat-toolbox": "^7.0.0",
     "@types/node": "^22.19.1",
     "supabase": "^2.101.0",
     "typescript": "~5.8.0"
