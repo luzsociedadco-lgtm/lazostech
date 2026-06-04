@@ -25,6 +25,11 @@ Thumbs.db
 # ===== Typescript =====
 *.tsbuildinfo
 
+# ===== Local service state =====
+supabase/.temp/
+lazos-frontend/.vercel/
+lazos-frontend/*.log
+
 # ===== IDE =====
 .vscode/
 .idea/
