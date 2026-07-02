@@ -4,6 +4,7 @@ import FooterNav from "./components/FooterNav";
 import { AuthProvider } from "./providers/AuthProvider";
 import { WagmiWrapper } from "./providers/WagmiWrapper";
 import Script from "next/script";
+import { Analytics } from "@vercel/analytics/next";
 
 export const metadata = {
   title: "LazosTech",
@@ -50,6 +51,7 @@ export default function RootLayout({
             </div>
           </AuthProvider>
         </WagmiWrapper>
+        <Analytics />
       </body>
     </html>
   );
