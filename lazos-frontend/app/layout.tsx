@@ -2,8 +2,7 @@ import "./globals.css";
 import AppAuthGate from "./components/AppAuthGate";
 import FooterNav from "./components/FooterNav";
 import { AuthProvider } from "./providers/AuthProvider";
-import { WagmiWrapper } from "./providers/WagmiWrapper";
-import Script from "next/script";
+import { ClientProviders } from "./providers/ClientProviders";
 import { Analytics } from "@vercel/analytics/next";
 
 export const metadata = {
@@ -23,25 +22,8 @@ export default function RootLayout({
 }) {
   return (
     <html lang="es">
-      <head>
-        <Script
-          src="https://www.googletagmanager.com/gtag/js?id=G-YPK16TKDZW"
-          strategy="afterInteractive"
-        />
-
-        <Script id="google-analytics" strategy="afterInteractive">
-          {`
-            window.dataLayer = window.dataLayer || [];
-            function gtag(){dataLayer.push(arguments);}
-            gtag('js', new Date());
-
-            gtag('config', 'G-YPK16TKDZW');
-          `}
-        </Script>
-      </head>
-
       <body>
-        <WagmiWrapper>
+        <ClientProviders>
           <AuthProvider>
             <div className="app-frame">
               <AppAuthGate>
@@ -50,7 +32,7 @@ export default function RootLayout({
               </AppAuthGate>
             </div>
           </AuthProvider>
-        </WagmiWrapper>
+        </ClientProviders>
         <Analytics />
       </body>
     </html>

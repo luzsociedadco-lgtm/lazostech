@@ -39,7 +39,6 @@ jobs:
       NEXT_PUBLIC_SUPABASE_URL: https://example.supabase.co
       NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY: sb_publishable_ci_placeholder
       NEXT_PUBLIC_RPC_URL: https://sepolia.base.org
-      NEXT_PUBLIC_WALLET_CONNECT_PROJECT_ID: ci-placeholder
       NEXT_PUBLIC_WALLETCONNECT_ID: ci-placeholder
 
     steps:
@@ -58,6 +57,9 @@ jobs:
 
       - name: Audit production dependencies
         run: npm audit --omit=dev --audit-level=moderate
+
+      - name: Typecheck
+        run: npm run check-types
 
       - name: Build
         run: npm run build

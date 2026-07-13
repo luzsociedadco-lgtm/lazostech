@@ -11,7 +11,12 @@ import { http } from "viem";
 
 const rpcUrl = process.env.NEXT_PUBLIC_RPC_URL || "https://sepolia.base.org";
 const walletConnectProjectId =
-  process.env.NEXT_PUBLIC_WALLETCONNECT_ID || "1d7f6b2a8e9f4a72b31f8e909f4f0d1c";
+  process.env.NEXT_PUBLIC_WALLETCONNECT_ID ||
+  process.env.NEXT_PUBLIC_WALLET_CONNECT_PROJECT_ID;
+
+if (!walletConnectProjectId) {
+  throw new Error("NEXT_PUBLIC_WALLETCONNECT_ID is required");
+}
 
 export const config = getDefaultConfig({
   appName: "$NUDOS",
@@ -20,7 +25,7 @@ export const config = getDefaultConfig({
   transports: {
     [baseSepolia.id]: http(rpcUrl),
   },
-  ssr: false,
+  ssr: true,
 });
 
 export function WagmiWrapper({ children }: { children: React.ReactNode }) {

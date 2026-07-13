@@ -2,137 +2,49 @@ import { NextResponse } from "next/server";
 
 import {
   buildEmptyProfile,
-  hasUnivalleEmailDomain,
-  isProfileComplete,
-  getOrCreateUserFromAuth,
-  getUserByEmail,
-  getUserById,
-  toUserSnapshot
+  computeAccess,
+  isProfileComplete
 } from "@/app/lib/db.server";
 import { createClient } from "@/app/lib/supabase/server";
-import type { UserSnapshot } from "@/app/lib/types";
+import type {
+  ProfileRecord,
+  UserNotification,
+  UserNotificationType,
+  UserSnapshot
+} from "@/app/lib/types";
 
-function buildAuthUserSnapshot(input: {
-  id: string;
-  email: string;
-  authProvider: UserSnapshot["authProvider"];
-}): UserSnapshot {
-  const now = new Date().toISOString();
+function profileFromRow(email: string, row: Record<string, unknown> | null): ProfileRecord {
+  const defaults = buildEmptyProfile(email);
 
-  return {
-    id: input.id,
-    email: input.email,
-    authProvider: input.authProvider,
-    createdAt: now,
-    updatedAt: now,
-    profile: {
-      firstName: "",
-      lastName: "",
-      phone: "",
-      nationalId: "",
-      studentCode: "",
-      universityId: 0,
-      campusId: 1,
-      programId: 0,
-      studentType: "Pregrado",
-      benefitLabel: "Almuerzo Regular"
-    },
-    linkedWallet: null,
-    universityValidated: false,
-    syncState: {
-      directoryMatched: false,
-      profileComplete: false,
-      walletLinked: false,
-      onchainProfileRegistered: false,
-      onchainAffiliationSynced: false
-    },
-    tickets: {
-      available: 0,
-      source: "ticket_system"
-    },
-    notifications: [],
-    access: {
-      perfil: true,
-      tickets: hasUnivalleEmailDomain(input.email),
-      reciclaje: false,
-      marketplace: false,
-      dao: false
-    },
-    completion: {
-      profileComplete: false,
-      walletLinked: false
-    }
-  };
-}
-
-function buildSnapshotWithComputedState(snapshot: UserSnapshot): UserSnapshot {
-  const profileComplete = isProfileComplete(snapshot.profile);
-  const walletLinked = Boolean(snapshot.linkedWallet?.address);
+  if (!row) return defaults;
 
   return {
-    ...snapshot,
-    syncState: {
-      ...snapshot.syncState,
-      directoryMatched: snapshot.universityValidated,
-      profileComplete,
-      walletLinked
-    },
-    access: {
-      ...snapshot.access,
-      perfil: true,
-      tickets: snapshot.universityValidated || profileComplete || hasUnivalleEmailDomain(snapshot.email),
-      reciclaje: walletLinked,
-      marketplace: walletLinked,
-      dao: walletLinked
-    },
-    completion: {
-      profileComplete,
-      walletLinked
-    }
+    firstName: String(row.first_name || ""),
+    lastName: String(row.last_name || ""),
+    phone: String(row.phone || ""),
+    nationalId: String(row.national_id || ""),
+    studentCode: String(row.student_code || ""),
+    universityId: Number(row.university_id ?? defaults.universityId),
+    campusId: Number(row.campus_id ?? defaults.campusId),
+    programId: Number(row.program_id || 0),
+    studentType: String(row.student_type || defaults.studentType),
+    benefitLabel: String(row.benefit_label || defaults.benefitLabel)
   };
 }
 
-async function mergeSupabaseProfile(
-  supabase: Awaited<ReturnType<typeof createClient>>,
-  snapshot: UserSnapshot,
-  authUserId: string,
-  _authAvatarUrl: string
-) {
-  const { data: profileRow } = await supabase
-    .from("user_profiles")
-    .select("first_name, last_name, phone, national_id, student_code, university_id, campus_id, program_id, student_type, benefit_label, university_validated")
-    .eq("user_id", authUserId)
-    .maybeSingle();
-
-  const institutionalDefaults = buildEmptyProfile(snapshot.email);
-  const mergedProfile = {
-    ...institutionalDefaults,
-    ...snapshot.profile,
-    ...(profileRow
-      ? {
-          firstName: String(profileRow.first_name || ""),
-          lastName: String(profileRow.last_name || ""),
-          phone: String(profileRow.phone || ""),
-          nationalId: String(profileRow.national_id || ""),
-          studentCode: String(profileRow.student_code || ""),
-          universityId: Number(profileRow.university_id || 0),
-          campusId: Number(profileRow.campus_id || 1),
-          programId: Number(profileRow.program_id || 0),
-          studentType: String(profileRow.student_type || ""),
-          benefitLabel: String(profileRow.benefit_label || "")
-        }
-      : {})
-  };
-
-  return buildSnapshotWithComputedState({
-    ...snapshot,
-    profile: mergedProfile,
-    universityValidated: Boolean(profileRow?.university_validated ?? snapshot.universityValidated),
-    updatedAt: new Date().toISOString()
-  });
+function notificationsFromRows(rows: Array<Record<string, unknown>> | null): UserNotification[] {
+  return (rows ?? []).map(row => ({
+    id: String(row.id),
+    type: String(row.type) as UserNotificationType,
+    title: String(row.title),
+    body: String(row.body),
+    href: row.href ? String(row.href) : null,
+    isRead: Boolean(row.is_read),
+    createdAt: String(row.created_at)
+  }));
 }
 
-export async function getSessionUser() {
+export async function getSessionUser(): Promise<UserSnapshot | null> {
   try {
     const supabase = await createClient();
     const {
@@ -140,46 +52,71 @@ export async function getSessionUser() {
       error
     } = await supabase.auth.getUser();
 
-    if (error || !authUser?.id) return null;
+    if (error || !authUser?.id || !authUser.email) return null;
 
-    const authUserId = String(authUser.id);
-    const email = authUser.email ?? "";
-    const authProvider = authUser.app_metadata?.provider === "google" ? "google" : "email";
+    const [profileResult, notificationsResult] = await Promise.all([
+      supabase
+        .from("user_profiles")
+        .select(
+          "first_name, last_name, phone, national_id, student_code, university_id, campus_id, program_id, student_type, benefit_label, university_validated, linked_wallet, wallet_linked_at, onchain_profile_registered, onchain_affiliation_synced, created_at, updated_at"
+        )
+        .eq("user_id", authUser.id)
+        .maybeSingle(),
+      supabase
+        .from("user_notifications")
+        .select("id, type, title, body, href, is_read, created_at")
+        .eq("user_id", authUser.id)
+        .order("created_at", { ascending: false })
+        .limit(50)
+    ]);
 
-    try {
-      const user =
-        (await getUserById(authUserId)) ||
-        (email ? await getUserByEmail(email) : null) ||
-        (email
-          ? await getOrCreateUserFromAuth({
-              id: authUserId,
-              email,
-              authProvider
-            })
-          : null);
+    const profileRow = profileResult.data as Record<string, unknown> | null;
+    const profile = profileFromRow(authUser.email, profileRow);
+    const linkedWalletAddress = profileRow?.linked_wallet
+      ? String(profileRow.linked_wallet)
+      : null;
+    const walletLinked = Boolean(linkedWalletAddress);
+    const universityValidated = Boolean(profileRow?.university_validated);
 
-      if (!user) return null;
-
-      return mergeSupabaseProfile(
-        supabase,
-        toUserSnapshot(user),
-        authUserId,
-        ""
-      );
-    } catch {
-      return email
-        ? mergeSupabaseProfile(
-            supabase,
-            buildAuthUserSnapshot({
-              id: authUserId,
-              email,
-              authProvider
-            }),
-            authUserId,
-            ""
-          )
-        : null;
-    }
+    return {
+      id: authUser.id,
+      email: authUser.email,
+      authProvider: authUser.app_metadata?.provider === "google" ? "google" : "email",
+      createdAt: String(profileRow?.created_at || authUser.created_at),
+      updatedAt: String(profileRow?.updated_at || authUser.updated_at || authUser.created_at),
+      profile,
+      linkedWallet: linkedWalletAddress
+        ? {
+            address: linkedWalletAddress,
+            linkedAt: String(profileRow?.wallet_linked_at || profileRow?.updated_at || authUser.created_at)
+          }
+        : null,
+      universityValidated,
+      syncState: {
+        directoryMatched: universityValidated,
+        profileComplete: isProfileComplete(profile),
+        walletLinked,
+        onchainProfileRegistered: Boolean(profileRow?.onchain_profile_registered),
+        onchainAffiliationSynced: Boolean(profileRow?.onchain_affiliation_synced)
+      },
+      tickets: {
+        available: 0,
+        source: "ticket_system"
+      },
+      notifications: notificationsFromRows(
+        notificationsResult.data as Array<Record<string, unknown>> | null
+      ),
+      access: computeAccess({
+        email: authUser.email,
+        profile,
+        universityValidated,
+        walletLinked
+      }),
+      completion: {
+        profileComplete: isProfileComplete(profile),
+        walletLinked
+      }
+    };
   } catch {
     return null;
   }

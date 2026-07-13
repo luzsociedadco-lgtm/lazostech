@@ -1,9 +1,6 @@
 import { NextResponse } from "next/server";
 
-import {
-  hasUnivalleEmailDomain,
-  updateUserProfile
-} from "@/app/lib/db.server";
+import { hasUnivalleEmailDomain } from "@/app/lib/db.server";
 import { getSessionUser, unauthorizedResponse } from "@/app/lib/session.server";
 import { createClient } from "@/app/lib/supabase/server";
 
@@ -17,17 +14,15 @@ export async function PATCH(request: Request) {
 
   try {
     const profileUpdates = {
-      firstName: String(body.firstName || ""),
-      lastName: String(body.lastName || ""),
-      phone: String(body.phone || ""),
-      nationalId: String(body.nationalId || ""),
-      studentCode: String(body.studentCode || ""),
+      firstName: String(body.firstName || "").trim().slice(0, 100),
+      lastName: String(body.lastName || "").trim().slice(0, 100),
+      phone: String(body.phone || "").trim().slice(0, 30),
+      nationalId: String(body.nationalId || "").trim().slice(0, 50),
+      studentCode: String(body.studentCode || "").trim().slice(0, 50),
       universityId: Number(body.universityId || 0),
       campusId: Number(body.campusId || 1),
       programId: Number(body.programId || 0)
     };
-
-    await updateUserProfile(sessionUser.id, profileUpdates).catch(() => null);
 
     const supabase = await createClient();
     const {
