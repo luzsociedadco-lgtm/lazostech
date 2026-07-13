@@ -19,20 +19,22 @@ const securityHeaders = [
       `script-src ${scriptSources.join(" ")}`,
       "style-src 'self' 'unsafe-inline'",
       "img-src 'self' data: blob: https:",
-      "font-src 'self' data:",
+      "font-src 'self' data: https://fonts.reown.com",
       [
         "connect-src 'self'",
         "https://*.supabase.co",
         "wss://*.supabase.co",
         "https://*.walletconnect.com",
         "wss://*.walletconnect.com",
-        "https://rpc.walletconnect.org",
+        "https://*.walletconnect.org",
+        "wss://*.walletconnect.org",
+        "https://api.web3modal.org",
         "https://*.g.alchemy.com",
         "https://*.alchemy.com",
         "https://sepolia.base.org",
         "https://mainnet.base.org"
       ].join(" "),
-      "frame-src 'self' https://verify.walletconnect.com"
+      "frame-src 'self' https://verify.walletconnect.com https://verify.walletconnect.org"
     ].join("; ")
   },
   {
