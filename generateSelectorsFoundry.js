@@ -1,7 +1,7 @@
 // generateSelectorsFoundry.js
 import fs from "fs";
 import path from "path";
-import { execSync } from "child_process";
+import { execFileSync } from "node:child_process";
 
 const FACETS_DIR = path.join(process.cwd(), "src/facets");
 const OUT_FILE = path.join(process.cwd(), "selectors_output.sol");
@@ -25,7 +25,9 @@ for (const file of facetFiles) {
     // Ejecutamos forge inspect con --json
     let abiJson;
     try {
-        const abiRaw = execSync(`forge inspect ${filePath} abi --json`, { encoding: "utf-8" });
+        const abiRaw = execFileSync("forge", ["inspect", filePath, "abi", "--json"], {
+            encoding: "utf-8",
+        });
         abiJson = JSON.parse(abiRaw);
     } catch (err) {
         console.warn(`⚠️  No se pudo inspeccionar ${contractName}: ${err.message}`);
@@ -48,4 +50,3 @@ for (const file of facetFiles) {
 
 fs.writeFileSync(OUT_FILE, output);
 console.log(`✅ Selectors generados en ${OUT_FILE}`);
-

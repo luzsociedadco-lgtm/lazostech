@@ -298,23 +298,48 @@ async function connect(role) {
             const val = document.getElementById('propInput').value;
             if(!val) return;
             props.push({text: val, vote: null});
-            document.getElementById('propList').innerHTML += `<div class="bg-white/5 p-4 rounded-xl border border-white/5 text-sm italic tracking-wide">▪ ${val}</div>`;
+            const proposal = document.createElement('div');
+            proposal.className = 'bg-white/5 p-4 rounded-xl border border-white/5 text-sm italic tracking-wide';
+            proposal.textContent = `▪ ${val}`;
+            document.getElementById('propList').appendChild(proposal);
             document.getElementById('propInput').value = "";
             document.getElementById('startVotingBtn').classList.remove('hidden');
         }
 
         function renderVotingGrid() {
             const grid = document.getElementById('votingGrid');
-            grid.innerHTML = props.map((p, i) => `
-                <div class="lazos-card p-6 border-white/5">
-                    <h4 class="font-bold text-xl mb-6 h-12 leading-tight">${p.text}</h4>
-                    <div id="vote-actions-${i}" class="flex gap-4">
-                        <button onclick="vote(${i}, 'Approved')" class="flex-grow btn-gold py-4 rounded-xl text-[10px] uppercase">APPROVE</button>
-                        <button onclick="vote(${i}, 'Rejected')" class="flex-grow bg-red-500/10 border border-red-500/20 py-4 rounded-xl text-[10px] font-bold text-red-400 hover:bg-red-500/20 uppercase transition-all">REJECT</button>
-                    </div>
-                    <div id="vote-done-${i}" class="hidden py-4 font-bold text-center rounded-xl text-[10px] uppercase tracking-widest"></div>
-                </div>
-            `).join('');
+            grid.replaceChildren();
+
+            props.forEach((proposal, index) => {
+                const card = document.createElement('div');
+                card.className = 'lazos-card p-6 border-white/5';
+
+                const heading = document.createElement('h4');
+                heading.className = 'font-bold text-xl mb-6 h-12 leading-tight';
+                heading.textContent = proposal.text;
+
+                const actions = document.createElement('div');
+                actions.id = `vote-actions-${index}`;
+                actions.className = 'flex gap-4';
+
+                const approveButton = document.createElement('button');
+                approveButton.className = 'flex-grow btn-gold py-4 rounded-xl text-[10px] uppercase';
+                approveButton.textContent = 'APPROVE';
+                approveButton.addEventListener('click', () => vote(index, 'Approved'));
+
+                const rejectButton = document.createElement('button');
+                rejectButton.className = 'flex-grow bg-red-500/10 border border-red-500/20 py-4 rounded-xl text-[10px] font-bold text-red-400 hover:bg-red-500/20 uppercase transition-all';
+                rejectButton.textContent = 'REJECT';
+                rejectButton.addEventListener('click', () => vote(index, 'Rejected'));
+
+                const result = document.createElement('div');
+                result.id = `vote-done-${index}`;
+                result.className = 'hidden py-4 font-bold text-center rounded-xl text-[10px] uppercase tracking-widest';
+
+                actions.append(approveButton, rejectButton);
+                card.append(heading, actions, result);
+                grid.appendChild(card);
+            });
         }
 
         function goToVoting() {
@@ -335,8 +360,7 @@ async function connect(role) {
 
         function showResults() {
             const content = document.getElementById('resultsContent');
-            
-            let html = `
+            content.innerHTML = `
                 <div class="flex justify-between items-start mb-8 border-b border-white/10 pb-6">
                     <div class="text-left">
                         <p class="text-[10px] text-gray-500 font-bold uppercase tracking-widest mb-1">Active Session</p>
@@ -348,47 +372,80 @@ async function connect(role) {
                         <p class="text-[9px] text-gray-500 uppercase font-bold tracking-widest">Board Members Voted</p>
                     </div>
                 </div>
-                <div class="grid md:grid-cols-2 gap-6">
+                <div id="resultsGrid" class="grid md:grid-cols-2 gap-6"></div>
             `;
 
-            html += props.map((p, i) => {
-                const isApproved = p.vote === 'Approved';
+            const resultsGrid = document.getElementById('resultsGrid');
+
+            props.forEach((proposal, index) => {
+                const isApproved = proposal.vote === 'Approved';
                 // Si Aprueba: 4 de 4 (100% verde). Si Rechaza: 3 de 4 (75% verde, 25% rojo).
                 const label = isApproved ? 'Passed' : 'Rejected';
                 const labelClass = isApproved ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20' : 'bg-red-500/10 text-red-400 border-red-500/20';
                 const yesVal = isApproved ? '100%' : '75%';
                 const noVal = isApproved ? '0%' : '25%';
 
-                return `
-                <div class="lazos-card p-5 border-white/5 relative overflow-hidden">
-                    <div class="flex justify-between items-start mb-4">
-                        <span class="text-[10px] font-mono text-gray-600 uppercase">RES-0${i+1}</span>
-                        <span class="text-[9px] font-bold px-2 py-0.5 rounded ${labelClass} border uppercase tracking-widest">${label}</span>
-                    </div>
-                    <h4 class="font-bold text-white text-lg mb-6 leading-tight h-12">${p.text}</h4>
-                    
-                    <div class="w-full bg-red-500 h-1.5 rounded-full mb-3 overflow-hidden flex">
-                        <div class="bg-emerald-500 h-full transition-all duration-1000" style="width: ${yesVal}"></div>
-                    </div>
+                const card = document.createElement('div');
+                card.className = 'lazos-card p-5 border-white/5 relative overflow-hidden';
 
-                    <div class="flex justify-between items-center text-[10px] font-bold uppercase tracking-widest">
-                        <div class="flex gap-4">
-                            <span class="text-emerald-400">Yes: ${yesVal}</span>
-                            <span class="${isApproved ? 'text-gray-600' : 'text-red-400'}">No: ${noVal}</span>
-                        </div>
-                        <a href="https://sepolia.basescan.org/address/0xd225CBF92DC4a0A9512094B215b7b4Df2870DeE8" target="_blank" class="text-[#f2a93b] hover:underline">View on BaseScan ↗</a>
-                    </div>
-                </div>`;
-            }).join('');
+                const cardHeader = document.createElement('div');
+                cardHeader.className = 'flex justify-between items-start mb-4';
 
-            html += `
-                </div>
-                <div class="mt-8 p-4 border border-dashed border-white/10 rounded-xl text-center bg-white/[0.01]">
-                    <p class="text-[11px] font-mono text-gray-500">Assambley Proxy Contract: <span class="text-[#f2a93b]">0xd225CBF92DC4a0A9512094B215b7b4Df2870DeE8</span></p>
-                </div>
-            `;
+                const resolutionId = document.createElement('span');
+                resolutionId.className = 'text-[10px] font-mono text-gray-600 uppercase';
+                resolutionId.textContent = `RES-0${index + 1}`;
 
-            content.innerHTML = html;
+                const status = document.createElement('span');
+                status.className = `text-[9px] font-bold px-2 py-0.5 rounded ${labelClass} border uppercase tracking-widest`;
+                status.textContent = label;
+                cardHeader.append(resolutionId, status);
+
+                const heading = document.createElement('h4');
+                heading.className = 'font-bold text-white text-lg mb-6 leading-tight h-12';
+                heading.textContent = proposal.text;
+
+                const progress = document.createElement('div');
+                progress.className = 'w-full bg-red-500 h-1.5 rounded-full mb-3 overflow-hidden flex';
+                const approval = document.createElement('div');
+                approval.className = 'bg-emerald-500 h-full transition-all duration-1000';
+                approval.style.width = yesVal;
+                progress.appendChild(approval);
+
+                const metadata = document.createElement('div');
+                metadata.className = 'flex justify-between items-center text-[10px] font-bold uppercase tracking-widest';
+                const totals = document.createElement('div');
+                totals.className = 'flex gap-4';
+                const yes = document.createElement('span');
+                yes.className = 'text-emerald-400';
+                yes.textContent = `Yes: ${yesVal}`;
+                const no = document.createElement('span');
+                no.className = isApproved ? 'text-gray-600' : 'text-red-400';
+                no.textContent = `No: ${noVal}`;
+                totals.append(yes, no);
+
+                const explorer = document.createElement('a');
+                explorer.href = 'https://sepolia.basescan.org/address/0xd225CBF92DC4a0A9512094B215b7b4Df2870DeE8';
+                explorer.target = '_blank';
+                explorer.rel = 'noopener noreferrer';
+                explorer.className = 'text-[#f2a93b] hover:underline';
+                explorer.textContent = 'View on BaseScan ↗';
+                metadata.append(totals, explorer);
+
+                card.append(cardHeader, heading, progress, metadata);
+                resultsGrid.appendChild(card);
+            });
+
+            const contract = document.createElement('div');
+            contract.className = 'mt-8 p-4 border border-dashed border-white/10 rounded-xl text-center bg-white/[0.01]';
+            const contractText = document.createElement('p');
+            contractText.className = 'text-[11px] font-mono text-gray-500';
+            contractText.append('Assambley Proxy Contract: ');
+            const contractAddress = document.createElement('span');
+            contractAddress.className = 'text-[#f2a93b]';
+            contractAddress.textContent = '0xd225CBF92DC4a0A9512094B215b7b4Df2870DeE8';
+            contractText.appendChild(contractAddress);
+            contract.appendChild(contractText);
+            content.appendChild(contract);
             transition('step4', 'step5');
         }
     </script>
