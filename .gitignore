@@ -32,6 +32,10 @@ lazos-frontend/*.log
 lazos-frontend/app/data/app-db.json
 lazos-frontend/app/data/university-directory.json
 
+# ===== Retired prototypes =====
+packages/playground/
+lazos-frontend/packages/
+
 # ===== IDE =====
 .vscode/
 .idea/
