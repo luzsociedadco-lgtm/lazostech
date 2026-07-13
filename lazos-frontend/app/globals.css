@@ -4975,7 +4975,99 @@ a {
 
 .wallet-connect {
   display: flex;
+  gap: 8px;
   justify-content: flex-start;
+}
+
+.wallet-connect--connected {
+  align-items: center;
+}
+
+.wallet-connect__button,
+.wallet-connect__account,
+.wallet-connect__option {
+  align-items: center;
+  display: inline-flex;
+  gap: 8px;
+}
+
+.wallet-connect__button,
+.wallet-connect__option {
+  border: 1px solid #1f6feb;
+  background: #1f6feb;
+  color: #fff;
+  cursor: pointer;
+  font: inherit;
+  font-weight: 700;
+  padding: 10px 14px;
+}
+
+.wallet-connect__button:disabled,
+.wallet-connect__option:disabled {
+  cursor: wait;
+  opacity: 0.65;
+}
+
+.wallet-connect__button--warning {
+  border-color: #b45309;
+  background: #b45309;
+}
+
+.wallet-connect__account {
+  border: 1px solid var(--line);
+  background: var(--paper);
+  padding: 9px 12px;
+  font-size: 0.9rem;
+  font-weight: 700;
+}
+
+.wallet-connect__icon {
+  align-items: center;
+  border: 1px solid var(--line);
+  background: var(--paper);
+  color: inherit;
+  cursor: pointer;
+  display: inline-flex;
+  height: 36px;
+  justify-content: center;
+  padding: 0;
+  width: 36px;
+}
+
+.wallet-connect__dialog {
+  border: 1px solid var(--line);
+  background: var(--paper);
+  color: inherit;
+  max-width: min(360px, calc(100vw - 32px));
+  padding: 18px;
+  width: 100%;
+}
+
+.wallet-connect__dialog::backdrop {
+  background: rgb(15 23 42 / 55%);
+}
+
+.wallet-connect__dialog-header {
+  align-items: center;
+  display: flex;
+  justify-content: space-between;
+}
+
+.wallet-connect__options {
+  display: grid;
+  gap: 10px;
+  margin-top: 18px;
+}
+
+.wallet-connect__option {
+  justify-content: flex-start;
+  width: 100%;
+}
+
+.wallet-connect__error {
+  color: #b91c1c;
+  font-size: 0.875rem;
+  margin: 12px 0 0;
 }
 
 .empty-panel,

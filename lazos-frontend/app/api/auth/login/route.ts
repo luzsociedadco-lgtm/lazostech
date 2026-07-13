@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 
-import { getOrCreateUserFromAuth, toUserSnapshot } from "@/app/lib/db.server";
+import { getSessionUser } from "@/app/lib/session.server";
 import { createClient } from "@/app/lib/supabase/server";
 
 export async function POST(request: Request) {
@@ -20,13 +20,7 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: "Credenciales invalidas" }, { status: 401 });
     }
 
-    const user = await getOrCreateUserFromAuth({
-      id: data.user.id,
-      email: data.user.email,
-      authProvider: "email"
-    });
-
-    return NextResponse.json({ user: toUserSnapshot(user) });
+    return NextResponse.json({ user: await getSessionUser() });
   } catch (error) {
     const message =
       error instanceof Error && error.message === "SUPABASE_ENV_MISSING"

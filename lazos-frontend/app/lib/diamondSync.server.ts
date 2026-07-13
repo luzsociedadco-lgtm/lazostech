@@ -56,6 +56,14 @@ function parseEnv(raw: string) {
 }
 
 async function loadRootEnv() {
+  if (process.env.RPC_URL && process.env.PRIVATE_KEY) {
+    return {
+      RPC_URL: process.env.RPC_URL,
+      PRIVATE_KEY: process.env.PRIVATE_KEY,
+      DIAMOND: process.env.DIAMOND || NUDOS_DIAMOND_ADDRESS
+    } satisfies EnvShape;
+  }
+
   const candidates = [
     path.join(process.cwd(), ".env"),
     path.join(process.cwd(), "..", ".env"),

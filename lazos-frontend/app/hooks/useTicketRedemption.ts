@@ -2,11 +2,10 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { formatUnits } from "viem";
-import { useAccount, usePublicClient, useWriteContract } from "wagmi";
+import { useAccount, useConfig, usePublicClient, useWriteContract } from "wagmi";
 import { waitForTransactionReceipt } from "wagmi/actions";
 
 import { ticketsFacetAbi, NUDOS_DIAMOND_ADDRESS, erc20Abi } from "@/app/lib/diamondContracts";
-import { config as wagmiConfig } from "@/app/providers/WagmiWrapper";
 import { NUDOS_CONTRACT } from "@/src/config/contracts";
 
 type RedemptionState = {
@@ -24,6 +23,7 @@ type RedemptionState = {
 
 export function useTicketRedemption(quantity: number): RedemptionState {
   const { address, isConnected } = useAccount();
+  const wagmiConfig = useConfig();
   const publicClient = usePublicClient();
   const { writeContractAsync } = useWriteContract();
   const [quoteWei, setQuoteWei] = useState<bigint | null>(null);

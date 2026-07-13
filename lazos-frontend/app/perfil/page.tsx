@@ -20,14 +20,13 @@ import {
 import type { LucideIcon } from "lucide-react";
 import { useEffect, useMemo, useRef, useState } from "react";
 import type { CSSProperties } from "react";
-import { useAccount, usePublicClient, useWriteContract } from "wagmi";
+import { useAccount, useConfig, usePublicClient, useWriteContract } from "wagmi";
 import { waitForTransactionReceipt } from "wagmi/actions";
 
 import { useNudosErc20Balance } from "@/app/hooks/useNudosErc20Balance";
 import { WalletConnect } from "@/app/components/WalletConnect";
 import { NUDOS_DIAMOND_ADDRESS, profileFacetAbi } from "@/app/lib/diamondContracts";
 import { useAuth } from "@/app/providers/AuthProvider";
-import { config as wagmiConfig } from "@/app/providers/WagmiWrapper";
 
 const universityLogoById: Record<number, string> = {
   1000: "/images/logo-G.png"
@@ -113,6 +112,7 @@ function DrawerRow({
 export default function PerfilPage() {
   const router = useRouter();
   const { address } = useAccount();
+  const wagmiConfig = useConfig();
   const publicClient = usePublicClient();
   const { writeContractAsync } = useWriteContract();
   const { user, catalog, logout, updateProfile, linkWallet, unlinkWallet, refresh } = useAuth();
