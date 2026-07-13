@@ -1,8 +1,8 @@
 'use client';
 
-import { ConnectButton } from '@rainbow-me/rainbowkit';
 import NudosBalance from './NudosBalance';
 import Image from 'next/image';
+import { WalletConnect } from './WalletConnect';
 
 export default function WalletDashboard() {
   return (
@@ -20,7 +20,7 @@ export default function WalletDashboard() {
       </header>
 
       <div className="bg-white shadow-lg rounded-2xl p-8 w-full max-w-md text-center">
-        <ConnectButton />
+        <WalletConnect />
         <div className="mt-6">
           <NudosBalance />
         </div>
