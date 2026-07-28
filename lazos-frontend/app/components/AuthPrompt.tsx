@@ -1,6 +1,7 @@
 "use client";
 
 import Image from "next/image";
+import Link from "next/link";
 import { Eye, EyeOff } from "lucide-react";
 import { useMemo, useState } from "react";
 
@@ -76,6 +77,9 @@ export default function AuthPrompt({ nextPath = "/perfil" }: { nextPath?: string
 
   return (
     <main className="auth-screen">
+      <Link href="/we" className="auth-about-pill">
+        Sobre Nosotros
+      </Link>
       <section className="auth-phone">
         <div className="auth-brand">
           <Image src="/lazosGO.png" alt="LazosTech" width={82} height={82} className="auth-brand__mark" priority />

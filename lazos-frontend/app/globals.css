@@ -53,17 +53,51 @@ a {
   padding: 0;
 }
 
+.app-frame:has(.we-page) {
+  width: 100%;
+  max-width: none;
+  padding: 0;
+}
+
 .screen-shell {
   animation: rise-in 320ms ease-out;
 }
 
 .auth-screen {
+  position: relative;
   height: 100dvh;
   display: grid;
   place-items: center;
   padding: 0;
   overflow: hidden;
   background: #000000;
+}
+
+.auth-about-pill {
+  position: absolute;
+  top: max(18px, env(safe-area-inset-top));
+  left: max(18px, env(safe-area-inset-left));
+  z-index: 3;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 29px;
+  padding: 0 12px;
+  border: 1px solid #f2a72f;
+  border-radius: 999px;
+  color: #f2a72f;
+  background: rgba(0, 0, 0, 0.12);
+  font-size: 0.585rem;
+  font-weight: 400;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  transition: background 180ms ease, color 180ms ease, transform 180ms ease;
+}
+
+.auth-about-pill:hover {
+  color: #0b0905;
+  background: #f2a72f;
+  transform: translateY(-1px);
 }
 
 .auth-phone {

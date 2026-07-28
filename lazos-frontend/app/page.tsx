@@ -1,6 +1,7 @@
 "use client";
 
 import Image from "next/image";
+import Link from "next/link";
 import { Eye, EyeOff } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
@@ -92,6 +93,9 @@ export default function Home() {
 
   return (
     <main className="auth-screen">
+      <Link href="/we" className="auth-about-pill">
+        Sobre Nosotros
+      </Link>
       <section className="auth-phone">
         <div className="auth-brand">
           <Image
