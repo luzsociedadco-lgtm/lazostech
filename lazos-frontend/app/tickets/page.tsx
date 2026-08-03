@@ -314,6 +314,11 @@ export default function TicketsPage() {
           const targetTurnId =
             targetTurn?.id || String(((payload.old ?? payload.new) as { id?: string } | null)?.id || "");
 
+          if (!targetTurn) {
+            void refreshMonitorTools();
+            return;
+          }
+
           if (targetTurn?.turn_date && targetTurn.turn_date !== today) {
             return;
           }
@@ -355,6 +360,18 @@ export default function TicketsPage() {
     return () => {
       void supabase.removeChannel(channel);
     };
+  }, [monitorState.isRestaurantMonitor, refreshMonitorTools, user]);
+
+  useEffect(() => {
+    if (!user || !monitorState.isRestaurantMonitor) return;
+
+    const intervalId = window.setInterval(() => {
+      if (document.visibilityState === "visible") {
+        void refreshMonitorTools();
+      }
+    }, 5000);
+
+    return () => window.clearInterval(intervalId);
   }, [monitorState.isRestaurantMonitor, refreshMonitorTools, user]);
 
   const submitMonitorAction = async (payload: {
