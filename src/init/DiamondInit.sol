@@ -3,6 +3,7 @@ pragma solidity ^0.8.30;
 
 import {AppStorage} from "src/libraries/AppStorage.sol";
 import {LibEntityRules} from "src/libraries/LibEntityRules.sol";
+import {LibDiamond} from "src/libraries/LibDiamond.sol";
 
 contract DiamondInit {
     function init() external {
@@ -11,7 +12,9 @@ contract DiamondInit {
         // =============================================================
         // 🔐 PROTOCOL OWNER
         // =============================================================
-        s.owner = msg.sender;
+        address protocolOwner = LibDiamond.contractOwner();
+        require(protocolOwner != address(0), "DiamondInit: owner not set");
+        s.owner = protocolOwner;
 
         // =============================================================
         // 🎟️ TICKETS ECONOMY
@@ -49,7 +52,7 @@ contract DiamondInit {
         _seedPilotPrograms(s);
 
         // Owner starts as the first system operator for setup / cleanup tasks.
-        s.isSystemAdmin[msg.sender] = true;
+        s.isSystemAdmin[protocolOwner] = true;
     }
 
     function _seedPilotUniversities(AppStorage.Layout storage s) internal {

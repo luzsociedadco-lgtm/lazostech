@@ -1,6 +1,13 @@
 import { erc20Abi } from "viem";
+import { resolveContractAddress } from "@/src/config/network";
 
-export const NUDOS_DIAMOND_ADDRESS = "0xa6181f4564d5e4318e3fab7904e9624ed0101c46" as `0x${string}`;
+const SEPOLIA_DIAMOND_ADDRESS = "0xa6181f4564d5e4318e3fab7904e9624ed0101c46" as const;
+
+export const NUDOS_DIAMOND_ADDRESS = resolveContractAddress(
+  process.env.NEXT_PUBLIC_NUDOS_DIAMOND_ADDRESS,
+  SEPOLIA_DIAMOND_ADDRESS,
+  "NEXT_PUBLIC_NUDOS_DIAMOND_ADDRESS",
+);
 
 export const ticketsFacetAbi = [
   {

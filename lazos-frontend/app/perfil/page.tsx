@@ -27,13 +27,14 @@ import { useNudosErc20Balance } from "@/app/hooks/useNudosErc20Balance";
 import { WalletConnect } from "@/app/components/WalletConnect";
 import { NUDOS_DIAMOND_ADDRESS, profileFacetAbi } from "@/app/lib/diamondContracts";
 import { useAuth } from "@/app/providers/AuthProvider";
+import { appChain } from "@/src/config/network";
 
 const universityLogoById: Record<number, string> = {
   1000: "/images/logo-G.png"
 };
 
 const accountItems = [
-  { key: "wallet", label: "Wallet Network", detail: "Base Sepolia / Wallet vinculada", icon: Wallet },
+  { key: "wallet", label: "Wallet Network", detail: `${appChain.name} / Wallet vinculada`, icon: Wallet },
   { key: "notifications", label: "Notificaciones", detail: "Historial del sistema", icon: Bell },
   { key: "edit", label: "Editar perfil", detail: "Completa tu informacion", icon: UserCircle2 },
   { key: "payment", label: "Payment Options", detail: "Tarjetas y pagos", icon: CreditCard }

@@ -1,14 +1,17 @@
-import { createConfig, http } from 'wagmi'
-import { getDefaultConfig } from '@rainbow-me/rainbowkit'
-import { baseSepolia } from 'wagmi/chains'
+import { createConfig, http } from "wagmi";
+import { base, baseSepolia } from "wagmi/chains";
+import { injected } from "wagmi/connectors";
+import { appChain, appRpcUrl } from "./network";
 
-const rpcUrl = process.env.NEXT_PUBLIC_RPC_URL || 'https://sepolia.base.org'
-
-export const config = getDefaultConfig({
-  appName: 'Lazos.go',
-  projectId: process.env.NEXT_PUBLIC_WALLETCONNECT_ID || 'default', // tu ID de WalletConnect si lo tienes
-  chains: [baseSepolia],
-  transports: {
-    [baseSepolia.id]: http(rpcUrl),
-  },
-})
+export const config =
+  appChain.id === base.id
+    ? createConfig({
+        chains: [base],
+        transports: { [base.id]: http(appRpcUrl) },
+        connectors: [injected()],
+      })
+    : createConfig({
+        chains: [baseSepolia],
+        transports: { [baseSepolia.id]: http(appRpcUrl) },
+        connectors: [injected()],
+      });

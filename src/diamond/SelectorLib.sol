@@ -226,15 +226,16 @@ library SelectorLib {
     }
 
     function getUniversityGovernanceViewFacetSelectors() internal pure returns (bytes4[] memory selectors) {
-        selectors = new bytes4[](7);
+        selectors = new bytes4[](6);
 
         selectors[0] = UniversityGovernanceViewFacet.getExecutorInfo.selector;
         selectors[1] = UniversityGovernanceViewFacet.getResolution.selector;
-        selectors[2] = UniversityGovernanceViewFacet.isMember.selector;
-        selectors[3] = UniversityGovernanceViewFacet.getResolutionCount.selector;
-        selectors[4] = UniversityGovernanceViewFacet.isActiveMember.selector;
-        selectors[5] = UniversityGovernanceViewFacet.getSessionState.selector;
-        selectors[6] = UniversityGovernanceViewFacet.getExecutionTask.selector;
+        // isMember(address) collides with GovernanceRolesViewFacet.isMember(address).
+        // University membership remains available through isUniversityMember(address).
+        selectors[2] = UniversityGovernanceViewFacet.getResolutionCount.selector;
+        selectors[3] = UniversityGovernanceViewFacet.isActiveMember.selector;
+        selectors[4] = UniversityGovernanceViewFacet.getSessionState.selector;
+        selectors[5] = UniversityGovernanceViewFacet.getExecutionTask.selector;
     }
 
     function getImpactLeaderboardFacetSelectors() internal pure returns (bytes4[] memory selectors) {

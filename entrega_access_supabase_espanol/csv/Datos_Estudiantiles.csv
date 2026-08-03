@@ -1,0 +1,3 @@
+Id_Estudiante,Correo_Electronico,Nombres,Apellidos,Telefono,Documento_Identidad,Codigo_Estudiante,Id_Universidad,Id_Sede,Id_Programa,Tipo_Estudiante,Beneficio,Validado_Universidad,Fecha_Creacion,Fecha_Actualizacion,Billetera_Vinculada,Fecha_Vinculacion_Billetera,Perfil_Registrado_Blockchain,Afiliacion_Sincronizada_Blockchain
+bfa77e9c-3ca0-4312-ad90-62caba9259a2,alehandre10@hotmail.com,alejandro,Realpe Rivera,,,,0,1,0,,,False,2026-05-31 20:16:56.058263,2026-06-02 00:45:58.244963,,,False,False
+d51f3e4e-ab78-4512-858d-c311b6f5732e,daniel.realpe@correounivalle.edu.co,ALEJANDRO,REALPE,3153791887,1107512243,202323560,1000,1001,1001107,Pregrado,Almuerzo Regular,True,2026-06-01 20:20:53.867089,2026-06-01 22:47:51.561148,,,False,False

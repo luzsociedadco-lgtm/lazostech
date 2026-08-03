@@ -2,6 +2,7 @@
 pragma solidity ^0.8.30;
 
 import {AppStorage} from "src/libraries/AppStorage.sol";
+import {LibDiamond} from "src/libraries/LibDiamond.sol";
 
 contract OwnershipFacet {
     event OwnershipTransferred(address indexed previousOwner, address indexed newOwner);
@@ -11,7 +12,7 @@ contract OwnershipFacet {
     //////////////////////////////////////////////////////////////*/
 
     function owner() external view returns (address) {
-        return AppStorage.layout().owner;
+        return LibDiamond.contractOwner();
     }
 
     /*//////////////////////////////////////////////////////////////
@@ -19,7 +20,7 @@ contract OwnershipFacet {
     //////////////////////////////////////////////////////////////*/
 
     modifier onlyOwner() {
-        require(msg.sender == AppStorage.layout().owner, "Not owner");
+        LibDiamond.enforceIsContractOwner();
         _;
     }
 
@@ -28,8 +29,9 @@ contract OwnershipFacet {
 
         AppStorage.Layout storage s = AppStorage.layout();
 
-        address previousOwner = s.owner;
+        address previousOwner = LibDiamond.contractOwner();
         s.owner = newOwner;
+        LibDiamond.setContractOwner(newOwner);
 
         emit OwnershipTransferred(previousOwner, newOwner);
     }

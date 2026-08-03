@@ -1,6 +1,14 @@
+import { resolveContractAddress } from "./network";
+
+const SEPOLIA_NUDOS_TOKEN_ADDRESS = "0xE15a1c28C4185F9d98C1d2E17c2e8497BfeFa23C" as const;
+
 export const NUDOS_CONTRACT = {
-  address: '0xE15a1c28C4185F9d98C1d2E17c2e8497BfeFa23C' as `0x${string}`,
-  symbol: 'NUDOS',
+  address: resolveContractAddress(
+    process.env.NEXT_PUBLIC_NUDOS_TOKEN_ADDRESS,
+    SEPOLIA_NUDOS_TOKEN_ADDRESS,
+    "NEXT_PUBLIC_NUDOS_TOKEN_ADDRESS",
+  ),
+  symbol: "NUDOS",
   abi: [
     {
       inputs: [{ internalType: 'address', name: 'account', type: 'address' }],

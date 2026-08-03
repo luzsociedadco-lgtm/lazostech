@@ -4,7 +4,7 @@ import process from "node:process";
 import { fileURLToPath } from "node:url";
 
 import { createPublicClient, formatUnits, http } from "viem";
-import { baseSepolia } from "viem/chains";
+import { base, baseSepolia } from "viem/chains";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const appRoot = path.resolve(__dirname, "..");
@@ -22,16 +22,6 @@ function readAddress(sourceText, constantName) {
   const match = sourceText.match(new RegExp(`${constantName}\\s*=\\s*["'](0x[a-fA-F0-9]{40})["']`));
   if (!match) {
     throw new Error(`No se encontro ${constantName} en el frontend.`);
-  }
-  return match[1];
-}
-
-function readContractAddress(sourceText, exportName) {
-  const blockMatch = sourceText.match(new RegExp(`export\\s+const\\s+${exportName}\\s*=\\s*{([\\s\\S]*?)}`, "m"));
-  const block = blockMatch?.[1] ?? sourceText;
-  const match = block.match(/address:\s*['"](0x[a-fA-F0-9]{40})['"]/);
-  if (!match) {
-    throw new Error(`No se encontro ${exportName}.address en el frontend.`);
   }
   return match[1];
 }
@@ -90,12 +80,34 @@ async function main() {
     process.env.NEXT_PUBLIC_RPC_URL ||
     readEnvValue(envText, "NEXT_PUBLIC_RPC_URL") ||
     "https://sepolia.base.org";
-  const diamondAddress = readAddress(diamondText, "NUDOS_DIAMOND_ADDRESS");
-  const tokenAddress = readContractAddress(tokenText, "NUDOS_CONTRACT");
+  const expectedChainId = Number(
+    process.env.NEXT_PUBLIC_CHAIN_ID ||
+      readEnvValue(envText, "NEXT_PUBLIC_CHAIN_ID") ||
+      baseSepolia.id,
+  );
+  const chain = expectedChainId === base.id ? base : expectedChainId === baseSepolia.id ? baseSepolia : null;
+
+  assert(chain, `NEXT_PUBLIC_CHAIN_ID no soportado: ${expectedChainId}.`);
+  assert(
+    chain.id !== base.id || (rpcUrl && rpcUrl !== "https://mainnet.base.org"),
+    "Base Mainnet requiere un proveedor RPC dedicado.",
+  );
+
+  const diamondAddress =
+    process.env.NEXT_PUBLIC_NUDOS_DIAMOND_ADDRESS ||
+    readEnvValue(envText, "NEXT_PUBLIC_NUDOS_DIAMOND_ADDRESS") ||
+    (chain.id === baseSepolia.id ? readAddress(diamondText, "SEPOLIA_DIAMOND_ADDRESS") : null);
+  const tokenAddress =
+    process.env.NEXT_PUBLIC_NUDOS_TOKEN_ADDRESS ||
+    readEnvValue(envText, "NEXT_PUBLIC_NUDOS_TOKEN_ADDRESS") ||
+    (chain.id === baseSepolia.id ? readAddress(tokenText, "SEPOLIA_NUDOS_TOKEN_ADDRESS") : null);
+
+  assert(diamondAddress, "Falta NEXT_PUBLIC_NUDOS_DIAMOND_ADDRESS para la red seleccionada.");
+  assert(tokenAddress, "Falta NEXT_PUBLIC_NUDOS_TOKEN_ADDRESS para la red seleccionada.");
   const walletAddress = process.env.NUDOS_E2E_WALLET;
 
   const client = createPublicClient({
-    chain: baseSepolia,
+    chain,
     transport: http(rpcUrl),
   });
 
@@ -120,7 +132,7 @@ async function main() {
     client.readContract({ address: tokenAddress, abi: erc20Abi, functionName: "decimals" }),
   ]);
 
-  assert(chainId === baseSepolia.id, `RPC conectado a chainId ${chainId}, se esperaba Base Sepolia ${baseSepolia.id}.`);
+  assert(chainId === chain.id, `RPC conectado a chainId ${chainId}, se esperaba ${chain.name} ${chain.id}.`);
   assert(Boolean(diamondCode) && diamondCode !== "0x", "El Diamond configurado en frontend no tiene bytecode.");
   assert(Boolean(tokenCode) && tokenCode !== "0x", "El token NUDOS configurado en frontend no tiene bytecode.");
   assert(quoteOne > 0n, "quoteTicketRedemption(1) debe devolver un precio positivo.");
@@ -130,6 +142,7 @@ async function main() {
 
   const result = {
     ok: true,
+    network: chain.name,
     chainId,
     blockNumber: blockNumber.toString(),
     frontendConfig: {

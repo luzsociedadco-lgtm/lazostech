@@ -7,7 +7,12 @@ import AuthPrompt from "@/app/components/AuthPrompt";
 import { useAuth } from "@/app/providers/AuthProvider";
 
 function isPublicPath(pathname: string) {
-  return pathname === "/" || pathname === "/we" || pathname.startsWith("/auth/callback");
+  return (
+    pathname === "/" ||
+    pathname === "/we" ||
+    pathname === "/luzsociedad" ||
+    pathname.startsWith("/auth/callback")
+  );
 }
 
 export default function AppAuthGate({ children }: { children: React.ReactNode }) {

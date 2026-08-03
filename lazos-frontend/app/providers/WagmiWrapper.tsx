@@ -5,9 +5,9 @@ import { injected } from "@wagmi/connectors/injected";
 import { walletConnect } from "@wagmi/connectors/walletConnect";
 import { useState } from "react";
 import { createConfig, http, WagmiProvider } from "wagmi";
-import { baseSepolia } from "wagmi/chains";
+import { base, baseSepolia } from "wagmi/chains";
+import { appChain, appRpcUrl } from "@/src/config/network";
 
-const rpcUrl = process.env.NEXT_PUBLIC_RPC_URL || "https://sepolia.base.org";
 const appUrl = typeof window === "undefined" ? "https://lazostech.com" : window.location.origin;
 const walletConnectProjectId =
   process.env.NEXT_PUBLIC_WALLETCONNECT_ID ||
@@ -17,26 +17,34 @@ if (!walletConnectProjectId) {
   throw new Error("NEXT_PUBLIC_WALLETCONNECT_ID is required");
 }
 
-export const config = createConfig({
-  chains: [baseSepolia],
-  connectors: [
-    injected(),
-    walletConnect({
-      projectId: walletConnectProjectId,
-      showQrModal: true,
-      metadata: {
-        name: "LazosTech",
-        description: "Plataforma universitaria LazosTech",
-        url: appUrl,
-        icons: [`${appUrl}/logo.svg`]
-      }
-    })
-  ],
-  transports: {
-    [baseSepolia.id]: http(rpcUrl),
-  },
-  ssr: true,
-});
+const connectors = [
+  injected(),
+  walletConnect({
+    projectId: walletConnectProjectId,
+    showQrModal: true,
+    metadata: {
+      name: "LazosTech",
+      description: "Plataforma universitaria LazosTech",
+      url: appUrl,
+      icons: [`${appUrl}/logo.svg`]
+    }
+  })
+];
+
+export const config =
+  appChain.id === base.id
+    ? createConfig({
+        chains: [base],
+        connectors,
+        transports: { [base.id]: http(appRpcUrl) },
+        ssr: true
+      })
+    : createConfig({
+        chains: [baseSepolia],
+        connectors,
+        transports: { [baseSepolia.id]: http(appRpcUrl) },
+        ssr: true
+      });
 
 export function WagmiWrapper({ children }: { children: React.ReactNode }) {
   const [queryClient] = useState(() => new QueryClient());

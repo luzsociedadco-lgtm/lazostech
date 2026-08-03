@@ -1,0 +1,60 @@
+{
+  "safe": {
+    "address": "",
+    "owners": 0,
+    "threshold": 0,
+    "recoveryTested": false
+  },
+  "rpc": {
+    "provider": "",
+    "dedicatedEndpointConfigured": false,
+    "failoverTested": false
+  },
+  "token": {
+    "policyApproved": false,
+    "sourceActivated": false,
+    "supplyAndDistributionDocumented": false,
+    "treasuryFundingPlanApproved": false
+  },
+  "audit": {
+    "status": "pending",
+    "reportPath": "",
+    "criticalFindingsOpen": 0,
+    "highFindingsOpen": 0
+  },
+  "testing": {
+    "coverageReportPath": "",
+    "lastMeasuredAt": "2026-07-22",
+    "lineCoveragePercent": 17.18,
+    "statementCoveragePercent": 14.58,
+    "branchCoveragePercent": 0.65,
+    "functionCoveragePercent": 18.27,
+    "criticalFlowsCovered": false,
+    "invariantSuiteApproved": false
+  },
+  "operations": {
+    "monitoringConfigured": false,
+    "alertsTested": false,
+    "emergencyControlPolicyApproved": false,
+    "operatorCustodyApproved": false,
+    "operatorRotationTested": false,
+    "incidentRunbookApproved": false,
+    "rollbackRehearsed": false
+  },
+  "supabase": {
+    "migrationHistoryVerified": false,
+    "securityAdvisorsReviewed": false,
+    "backupRestoreTested": false
+  },
+  "legal": {
+    "tokenAndPrivacyReviewApproved": false,
+    "termsAndPrivacyPublished": false
+  },
+  "deployment": {
+    "diamondAddress": "",
+    "tokenAddress": "",
+    "transactionHash": "",
+    "contractsVerified": false,
+    "mainnetE2EPassed": false
+  }
+}

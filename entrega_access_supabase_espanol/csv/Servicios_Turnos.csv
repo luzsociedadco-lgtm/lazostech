@@ -1,0 +1,2 @@
+Id_Servicio,Codigo,Nombre,Token_QR,Hora_Inicio_Operacion,Limite_Reactivaciones_Mensuales,Esta_Activo,Fecha_Creacion,Fecha_Actualizacion,Fila_Pausada,Fecha_Pausa_Fila
+5e71c48f-f646-4cb3-854a-f1795256ddcb,univalle-lunch-main,Fila de almuerzos Univalle,lazos-lunch-turns-v1,12:00:00,10,True,2026-05-29 01:44:03.813126,2026-06-16 16:35:56.174796,False,

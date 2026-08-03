@@ -1,0 +1,5 @@
+id,user_id,service_id,role,is_active,created_at
+398e257c-f14f-4192-b94e-1afabc5cbb9a,83b0d947-b200-699f-25bf-598a8d34e2fc,5e71c48f-f646-4cb3-854a-f1795256ddcb,restaurant_monitor,True,2026-05-29 01:44:03.813126
+3740d033-2ac1-4807-beee-5386fc421d0e,5364b7f7-e2fc-33dc-9f48-67935cd6fbaf,5e71c48f-f646-4cb3-854a-f1795256ddcb,restaurant_monitor,True,2026-06-02 16:45:14.933195
+62dc1009-607b-47bc-8610-32dedb7cb18d,1bc2069a-a1a4-7eff-81f4-91b89cdd91e8,5e71c48f-f646-4cb3-854a-f1795256ddcb,restaurant_monitor,True,2026-06-02 16:45:14.933195
+e5e0dd17-b38b-4644-b78b-f3d509c76d10,1f928f9f-1f29-f959-faeb-e7ba85887a95,5e71c48f-f646-4cb3-854a-f1795256ddcb,restaurant_monitor,True,2026-06-02 16:45:14.933195

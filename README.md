@@ -216,7 +216,7 @@ forge test
 
 Current stage:
 
-**MVP Prototype**
+**Base Sepolia pilot / Base Mainnet pre-deployment hardening**
 
 Completed components
 
@@ -225,13 +225,19 @@ Completed components
 • recycling workflow tracking
 • reward token integration
 • deployment on Base Sepolia
+• CI-enforced Solidity deployment and ownership tests
+• environment-driven Base Sepolia/Mainnet frontend configuration
 
 Next steps
 
-• security review
+• approve the NUDOS token supply/distribution policy and activate its canonical source
+• independent smart-contract audit and remediation
+• production Safe, dedicated RPC, monitoring, incident response, and legal approval
 • institutional pilots
 • verification layer improvements
 • impact analytics
+
+Base Mainnet is explicitly `NO-GO` until `npm run readiness:predeploy` reports `READY`. See `docs/runbooks/mainnet-cutover.md`.
 
 ---
 

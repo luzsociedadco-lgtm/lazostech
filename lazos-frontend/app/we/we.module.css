@@ -297,10 +297,14 @@
 }
 
 .intro {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
   padding: 56px 0 42px;
 }
 
 .aboutIntro {
+  grid-column: 1 / -1;
   max-width: 920px;
   margin-bottom: 48px;
 }
@@ -314,11 +318,9 @@
 }
 
 .storyRow {
-  display: grid;
-  grid-template-columns: 1.05fr 0.95fr;
-  align-items: stretch;
-  min-height: 580px;
-  margin-bottom: 64px;
+  display: block;
+  min-height: auto;
+  margin: 0;
 }
 
 .storyRowReverse .storyImage {
@@ -330,9 +332,7 @@
 }
 
 .storyImage {
-  position: relative;
-  min-height: 540px;
-  overflow: hidden;
+  display: none;
 }
 
 .storyImage::after {
@@ -358,10 +358,19 @@
 .storyCopy {
   display: flex;
   flex-direction: column;
-  justify-content: center;
-  padding: clamp(42px, 7vw, 96px);
-  border: 1px solid rgba(255, 255, 255, 0.14);
-  background: var(--panel);
+  min-height: 300px;
+  justify-content: flex-start;
+  padding: clamp(20px, 2vw, 32px);
+  border: 0;
+  background: #18191b;
+}
+
+.storyRow:first-of-type .storyCopy {
+  background: #0d1d0b;
+}
+
+.storyRow:last-of-type .storyCopy {
+  background: #4a3103;
 }
 
 .storyCopy > span {
@@ -384,8 +393,8 @@
 .teamHeading h2,
 .videoContent h2 {
   margin: 28px 0 22px;
-  font-size: clamp(2.4rem, 4.5vw, 4.9rem);
-  line-height: 0.98;
+  font-size: clamp(1.1rem, 1.5vw, 1.55rem);
+  line-height: 1.12;
   letter-spacing: -0.052em;
   font-weight: 500;
 }
@@ -396,6 +405,7 @@
 .videoContent > p:not(.sectionLabel) {
   margin: 0;
   color: var(--muted);
+  font-size: clamp(0.72rem, 0.9vw, 0.9rem);
   line-height: 1.75;
 }
 

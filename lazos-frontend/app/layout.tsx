@@ -7,7 +7,7 @@ import { Analytics } from "@vercel/analytics/next";
 
 export const metadata = {
   title: "LazosTech",
-  description: "Frontend de la dapp LazosTech sobre Base Sepolia",
+  description: "Frontend de la dapp LazosTech sobre Base",
   icons: {
     icon: "/favicon-lazostech.png",
     shortcut: "/favicon-lazostech.png",

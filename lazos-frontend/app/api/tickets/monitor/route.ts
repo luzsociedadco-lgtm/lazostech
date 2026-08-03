@@ -228,92 +228,29 @@ export async function PATCH(request: Request) {
     }
 
     if (action === "special_turn") {
-      if (!serviceId) {
-        return NextResponse.json({ error: "Servicio no disponible" }, { status: 404 });
-      }
-
       const studentCode = String(body.studentCode || "").trim();
       if (!studentCode) {
         return NextResponse.json({ error: "Codigo requerido" }, { status: 400 });
       }
 
-      const { data: studentTurns } = await supabase
-        .from("ticket_turns")
-        .select("user_id, student_code, student_email, student_name")
-        .eq("student_code", studentCode)
-        .order("assigned_at", { ascending: false })
-        .limit(1);
+      const { data, error } = await supabase.rpc("assign_special_lunch_turn", {
+        target_student_code: studentCode
+      });
 
-      const student = studentTurns?.[0];
-      if (!student?.user_id) {
-        return NextResponse.json({ error: "No encontramos ese codigo en la fila" }, { status: 404 });
-      }
-
-      const today = getBogotaDate();
-      const { data: latestTurns } = await supabase
-        .from("ticket_turns")
-        .select("sequence_number, turn_code")
-        .eq("service_id", serviceId)
-        .eq("turn_date", today)
-        .order("sequence_number", { ascending: false })
-        .limit(1);
-
-      const latest = latestTurns?.[0];
-      const nextSequence = latest ? Number(latest.sequence_number) + 1 : 0;
-      const baseCode = latest?.turn_code ? latest.turn_code.replace(/E$/u, "") : "A-00";
-      const specialCode = `${baseCode}E`;
-
-      const { error: insertError } = await supabase
-        .from("ticket_turns")
-        .insert({
-          service_id: serviceId,
-          user_id: student.user_id,
-          student_code: student.student_code,
-          student_email: student.student_email,
-          student_name: student.student_name,
-          turn_date: today,
-          sequence_number: nextSequence,
-          turn_code: specialCode,
-          status: "activo",
-          is_special: true,
-          assigned_at: new Date().toISOString()
-        });
-
-      if (insertError) {
+      if (error) {
         return NextResponse.json({ error: "No se pudo asignar el turno especial" }, { status: 500 });
       }
 
-      return NextResponse.json({ ok: true, turnCode: specialCode });
+      return NextResponse.json(data);
     }
 
     if (action === "call_next") {
-      let query = supabase
-        .from("ticket_turns")
-        .select("id")
-        .eq("turn_date", getBogotaDate())
-        .eq("status", "activo")
-        .order("sequence_number", { ascending: true })
-        .limit(1);
-
-      if (serviceIds.length > 0 && !hasGlobalRole) {
-        query = query.in("service_id", serviceIds);
-      }
-
-      const { data: nextTurns, error: nextError } = await query;
-      if (nextError || !nextTurns?.[0]?.id) {
+      const { data, error } = await supabase.rpc("call_next_lunch_turn");
+      if (error) {
         return NextResponse.json({ error: "No hay turnos activos para llamar" }, { status: 404 });
       }
 
-      const { error: updateError } = await supabase
-        .from("ticket_turns")
-        .update({ status: "en_fila" })
-        .eq("id", nextTurns[0].id);
-
-      if (updateError) {
-        return NextResponse.json({ error: "No se pudo llamar el siguiente turno" }, { status: 500 });
-      }
-
-      return NextResponse.json({ ok: true });
+      return NextResponse.json(data);
     }
 
     if (action === "pause_turn" || action === "resume_turn") {

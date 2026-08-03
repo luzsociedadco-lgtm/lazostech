@@ -163,6 +163,7 @@ export default function TicketsPage() {
   const [monitorQrOpen, setMonitorQrOpen] = useState(false);
   const [studentScanOpen, setStudentScanOpen] = useState(false);
   const [cameraPopupOpen, setCameraPopupOpen] = useState(false);
+  const [turnAssignedOpen, setTurnAssignedOpen] = useState(false);
   const [scanMessage, setScanMessage] = useState("");
   const [scannerActive, setScannerActive] = useState(false);
   const [turnOptionsOpen, setTurnOptionsOpen] = useState(false);
@@ -473,7 +474,7 @@ export default function TicketsPage() {
 
   const isOfficialLunchQr = (qrValue: string) => {
     const normalized = qrValue.trim();
-    return normalized === lunchTurnQrId || normalized.includes(lunchTurnQrId);
+    return normalized === lunchTurnQrId;
   };
 
   const stopQrScanner = useCallback(() => {
@@ -503,12 +504,23 @@ export default function TicketsPage() {
     }
 
     stopQrScanner();
-    await submitTurnAction("request");
-    setScanMessage("Lectura completada.");
+    const assigned = await submitTurnAction("request", "regular", qrValue.trim());
+    if (assigned) {
+      setScanMessage("Turno asignado.");
+      setTurnAssignedOpen(true);
+      return true;
+    }
+
+    setScanMessage("Leimos el QR, pero no se pudo asignar el turno.");
+    return false;
+  }
+
+  const closeTurnAssignedConfirmation = () => {
+    setTurnAssignedOpen(false);
     setCameraPopupOpen(false);
     setStudentScanOpen(false);
-    return true;
-  }
+    setScanMessage("");
+  };
 
   const startBarcodeDetectorScanner = async () => {
     setScanMessage("Abriendo camara...");
@@ -688,7 +700,11 @@ export default function TicketsPage() {
         : "Metodo NEQUI seleccionado. La pasarela se conectara en el siguiente paso.",
     );
   };
-  const submitTurnAction = async (action: "request" | "reactivate", type: "regular" | "special" = "regular") => {
+  const submitTurnAction = async (
+    action: "request" | "reactivate",
+    type: "regular" | "special" = "regular",
+    qrCodeId?: string
+  ): Promise<boolean> => {
     setIsTurnLoading(true);
     setTurnMessage("");
     setTurnError("");
@@ -697,13 +713,17 @@ export default function TicketsPage() {
       const response = await fetch("/api/tickets/turn", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ action, type, qrCodeId: action === "request" ? lunchTurnQrId : undefined }),
+        body: JSON.stringify({
+          action,
+          type,
+          qrCodeId: action === "request" ? qrCodeId : undefined
+        }),
       });
       const json = await response.json().catch(() => ({}));
 
       if (!response.ok) {
         setTurnError(json.error || "No se pudo actualizar tu turno.");
-        return;
+        return false;
       }
 
       setTurn(json.turn ?? null);
@@ -714,6 +734,7 @@ export default function TicketsPage() {
             ? "Tu turno fue reactivado por 10 minutos."
             : "Turno asignado correctamente.",
       );
+      return true;
     } finally {
       setIsTurnLoading(false);
     }
@@ -996,7 +1017,12 @@ export default function TicketsPage() {
             </button>
           </header>
           <div className="tickets-monitor-qr">
-            <img src="/api/tickets/turn/qr" alt="QR oficial para asignar turnos" width={210} height={210} />
+            <img
+              src="/api/tickets/turn/qr"
+              alt="QR oficial para asignar turnos"
+              width={210}
+              height={210}
+            />
             <span>QR oficial de almuerzos</span>
           </div>
         </section>
@@ -1219,6 +1245,19 @@ export default function TicketsPage() {
             playsInline
           />
           {scanMessage ? <p className="tickets-special-message">{scanMessage}</p> : null}
+        </section>
+      ) : null}
+
+      {turnAssignedOpen ? (
+        <section className="tickets-monitor-modal is-compact tickets-turn-assigned-modal" role="dialog" aria-modal="true">
+          <div className="tickets-turn-assigned-icon" aria-hidden="true">
+            <Check size={28} />
+          </div>
+          <h2>Turno asignado</h2>
+          <p>Tu turno fue asignado correctamente.</p>
+          <button type="button" onClick={closeTurnAssignedConfirmation}>
+            OK
+          </button>
         </section>
       ) : null}
 

@@ -1,0 +1,5 @@
+Id_Rol_Monitor,Id_Estudiante,Id_Servicio,Rol,Esta_Activo,Fecha_Creacion
+398e257c-f14f-4192-b94e-1afabc5cbb9a,bfa77e9c-3ca0-4312-ad90-62caba9259a2,5e71c48f-f646-4cb3-854a-f1795256ddcb,monitor_restaurante,True,2026-05-29 01:44:03.813126
+3740d033-2ac1-4807-beee-5386fc421d0e,48b2524e-8cc4-45a6-9e44-36a989307542,5e71c48f-f646-4cb3-854a-f1795256ddcb,monitor_restaurante,True,2026-06-02 16:45:14.933195
+62dc1009-607b-47bc-8610-32dedb7cb18d,27ba3638-1f80-4640-9f91-0765275966fb,5e71c48f-f646-4cb3-854a-f1795256ddcb,monitor_restaurante,True,2026-06-02 16:45:14.933195
+e5e0dd17-b38b-4644-b78b-f3d509c76d10,ea5f9b6a-71f6-4acb-b6b3-b6c83690e696,5e71c48f-f646-4cb3-854a-f1795256ddcb,monitor_restaurante,True,2026-06-02 16:45:14.933195

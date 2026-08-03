@@ -1,0 +1,96 @@
+tabla,campo,orden,tipo_supabase,tipo_access,obligatorio,clave_primaria
+profiles,id,1,uuid,TEXT(36),Si,Si
+profiles,username,2,text,TEXT(255),No,No
+profiles,full_name,3,text,TEXT(255),No,No
+profiles,university,4,text,TEXT(255),No,No
+profiles,wallet_address,5,text,TEXT(255),No,No
+profiles,role,6,text,TEXT(255),No,No
+profiles,created_at,7,timestamp with time zone,DATETIME,Si,No
+recycling_events,id,1,uuid,TEXT(36),Si,Si
+recycling_events,user_id,2,uuid,TEXT(36),Si,No
+recycling_events,material_type,3,text,TEXT(255),Si,No
+recycling_events,quantity,4,numeric,DOUBLE,Si,No
+recycling_events,validated,5,boolean,YESNO,No,No
+recycling_events,created_at,6,timestamp with time zone,DATETIME,Si,No
+ticket_turn_events,id,1,uuid,TEXT(36),Si,Si
+ticket_turn_events,turn_id,2,uuid,TEXT(36),No,No
+ticket_turn_events,service_id,3,uuid,TEXT(36),No,No
+ticket_turn_events,actor_user_id,4,uuid,TEXT(36),No,No
+ticket_turn_events,event_type,5,text,TEXT(255),Si,No
+ticket_turn_events,payload,6,jsonb,LONGTEXT,Si,No
+ticket_turn_events,created_at,7,timestamp with time zone,DATETIME,Si,No
+ticket_turn_monitor_roles,id,1,uuid,TEXT(36),Si,Si
+ticket_turn_monitor_roles,user_id,2,uuid,TEXT(36),Si,No
+ticket_turn_monitor_roles,service_id,3,uuid,TEXT(36),No,No
+ticket_turn_monitor_roles,role,4,text,TEXT(255),Si,No
+ticket_turn_monitor_roles,is_active,5,boolean,YESNO,Si,No
+ticket_turn_monitor_roles,created_at,6,timestamp with time zone,DATETIME,Si,No
+ticket_turn_reactivations,id,1,uuid,TEXT(36),Si,Si
+ticket_turn_reactivations,turn_id,2,uuid,TEXT(36),Si,No
+ticket_turn_reactivations,service_id,3,uuid,TEXT(36),Si,No
+ticket_turn_reactivations,user_id,4,uuid,TEXT(36),Si,No
+ticket_turn_reactivations,reactivated_at,5,timestamp with time zone,DATETIME,Si,No
+ticket_turn_reactivations,expires_at,6,timestamp with time zone,DATETIME,No,No
+ticket_turn_reactivations,created_at,7,timestamp with time zone,DATETIME,Si,No
+ticket_turn_services,id,1,uuid,TEXT(36),Si,Si
+ticket_turn_services,code,2,text,TEXT(255),Si,No
+ticket_turn_services,name,3,text,TEXT(255),Si,No
+ticket_turn_services,qr_code_token,4,text,TEXT(255),Si,No
+ticket_turn_services,operation_start_time,5,time without time zone,DATETIME,Si,No
+ticket_turn_services,monthly_reactivation_limit,6,integer,LONG,Si,No
+ticket_turn_services,is_active,7,boolean,YESNO,Si,No
+ticket_turn_services,created_at,8,timestamp with time zone,DATETIME,Si,No
+ticket_turn_services,updated_at,9,timestamp with time zone,DATETIME,Si,No
+ticket_turn_services,queue_paused,10,boolean,YESNO,Si,No
+ticket_turn_services,queue_paused_at,11,timestamp with time zone,DATETIME,No,No
+ticket_turns,id,1,uuid,TEXT(36),Si,Si
+ticket_turns,service_id,2,uuid,TEXT(36),Si,No
+ticket_turns,user_id,3,uuid,TEXT(36),Si,No
+ticket_turns,student_code,4,text,TEXT(255),Si,No
+ticket_turns,student_email,5,text,TEXT(255),Si,No
+ticket_turns,student_name,6,text,TEXT(255),Si,No
+ticket_turns,turn_date,7,date,DATETIME,Si,No
+ticket_turns,sequence_number,8,integer,LONG,Si,No
+ticket_turns,turn_code,9,text,TEXT(255),Si,No
+ticket_turns,status,10,text,TEXT(255),Si,No
+ticket_turns,assigned_at,11,timestamp with time zone,DATETIME,Si,No
+ticket_turns,expires_at,12,timestamp with time zone,DATETIME,No,No
+ticket_turns,attended_at,13,timestamp with time zone,DATETIME,No,No
+ticket_turns,created_at,14,timestamp with time zone,DATETIME,Si,No
+ticket_turns,updated_at,15,timestamp with time zone,DATETIME,Si,No
+ticket_turns,is_special,16,boolean,YESNO,Si,No
+ticket_turns,is_paused,17,boolean,YESNO,Si,No
+ticket_turns,paused_at,18,timestamp with time zone,DATETIME,No,No
+token_rewards,id,1,uuid,TEXT(36),Si,Si
+token_rewards,user_id,2,uuid,TEXT(36),Si,No
+token_rewards,recycling_event_id,3,uuid,TEXT(36),No,No
+token_rewards,amount,4,numeric,DOUBLE,Si,No
+token_rewards,tx_hash,5,text,TEXT(255),No,No
+token_rewards,created_at,6,timestamp with time zone,DATETIME,Si,No
+user_notifications,id,1,uuid,TEXT(36),Si,Si
+user_notifications,user_id,2,uuid,TEXT(36),Si,No
+user_notifications,type,3,text,TEXT(255),Si,No
+user_notifications,title,4,text,TEXT(255),Si,No
+user_notifications,body,5,text,TEXT(255),Si,No
+user_notifications,href,6,text,TEXT(255),No,No
+user_notifications,is_read,7,boolean,YESNO,Si,No
+user_notifications,created_at,8,timestamp with time zone,DATETIME,Si,No
+user_profiles,user_id,1,uuid,TEXT(36),Si,Si
+user_profiles,email,2,text,TEXT(255),Si,No
+user_profiles,first_name,3,text,TEXT(255),Si,No
+user_profiles,last_name,4,text,TEXT(255),Si,No
+user_profiles,phone,5,text,TEXT(255),Si,No
+user_profiles,national_id,6,text,TEXT(255),Si,No
+user_profiles,student_code,7,text,TEXT(255),Si,No
+user_profiles,university_id,8,integer,LONG,Si,No
+user_profiles,campus_id,9,integer,LONG,Si,No
+user_profiles,program_id,10,integer,LONG,Si,No
+user_profiles,student_type,11,text,TEXT(255),Si,No
+user_profiles,benefit_label,12,text,TEXT(255),Si,No
+user_profiles,university_validated,13,boolean,YESNO,Si,No
+user_profiles,created_at,14,timestamp with time zone,DATETIME,Si,No
+user_profiles,updated_at,15,timestamp with time zone,DATETIME,Si,No
+user_profiles,linked_wallet,16,text,TEXT(255),No,No
+user_profiles,wallet_linked_at,17,timestamp with time zone,DATETIME,No,No
+user_profiles,onchain_profile_registered,18,boolean,YESNO,Si,No
+user_profiles,onchain_affiliation_synced,19,boolean,YESNO,Si,No

@@ -1,4 +1,9 @@
 {
+  "scripts": {
+    "readiness:code": "node tools/check-mainnet-readiness.mjs --tier=code",
+    "readiness:predeploy": "node tools/check-mainnet-readiness.mjs --tier=predeploy",
+    "readiness:mainnet": "node tools/check-mainnet-readiness.mjs --tier=production"
+  },
   "devDependencies": {
     "supabase": "2.109.1"
   },

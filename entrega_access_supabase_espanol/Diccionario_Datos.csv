@@ -1,0 +1,115 @@
+Tabla,Campo,Tipo_Supabase,Tipo_Access,Obligatorio,Clave_Primaria
+Perfiles,Id_Estudiante,uuid,TEXT(36),Si,Si
+Perfiles,Nombre_Usuario,text,TEXT(255),No,No
+Perfiles,Nombre_Completo,text,TEXT(255),No,No
+Perfiles,Universidad,text,TEXT(255),No,No
+Perfiles,Direccion_Billetera,text,TEXT(255),No,No
+Perfiles,Rol,text,TEXT(255),No,No
+Perfiles,Fecha_Creacion,timestamp with time zone,DATETIME,Si,No
+Eventos_Reciclaje,Id_Evento_Reciclaje,uuid,TEXT(36),Si,Si
+Eventos_Reciclaje,Id_Estudiante,uuid,TEXT(36),Si,No
+Eventos_Reciclaje,Tipo_Material,text,TEXT(255),Si,No
+Eventos_Reciclaje,Cantidad,numeric,DOUBLE,Si,No
+Eventos_Reciclaje,Validado,boolean,YESNO,No,No
+Eventos_Reciclaje,Fecha_Creacion,timestamp with time zone,DATETIME,Si,No
+Eventos_Turnos,Id_Evento_Turno,uuid,TEXT(36),Si,Si
+Eventos_Turnos,Id_Turno,uuid,TEXT(36),No,No
+Eventos_Turnos,Id_Servicio,uuid,TEXT(36),No,No
+Eventos_Turnos,Id_Usuario_Actor,uuid,TEXT(36),No,No
+Eventos_Turnos,Tipo_Evento,text,TEXT(255),Si,No
+Eventos_Turnos,Datos_Evento,jsonb,LONGTEXT,Si,No
+Eventos_Turnos,Fecha_Creacion,timestamp with time zone,DATETIME,Si,No
+Roles_Monitores,Id_Rol_Monitor,uuid,TEXT(36),Si,Si
+Roles_Monitores,Id_Estudiante,uuid,TEXT(36),Si,No
+Roles_Monitores,Id_Servicio,uuid,TEXT(36),No,No
+Roles_Monitores,Rol,text,TEXT(255),Si,No
+Roles_Monitores,Esta_Activo,boolean,YESNO,Si,No
+Roles_Monitores,Fecha_Creacion,timestamp with time zone,DATETIME,Si,No
+Reactivaciones_Turnos,Id_Reactivacion,uuid,TEXT(36),Si,Si
+Reactivaciones_Turnos,Id_Turno,uuid,TEXT(36),Si,No
+Reactivaciones_Turnos,Id_Servicio,uuid,TEXT(36),Si,No
+Reactivaciones_Turnos,Id_Estudiante,uuid,TEXT(36),Si,No
+Reactivaciones_Turnos,Fecha_Reactivacion,timestamp with time zone,DATETIME,Si,No
+Reactivaciones_Turnos,Fecha_Expiracion,timestamp with time zone,DATETIME,No,No
+Reactivaciones_Turnos,Fecha_Creacion,timestamp with time zone,DATETIME,Si,No
+Servicios_Turnos,Id_Servicio,uuid,TEXT(36),Si,Si
+Servicios_Turnos,Codigo,text,TEXT(255),Si,No
+Servicios_Turnos,Nombre,text,TEXT(255),Si,No
+Servicios_Turnos,Token_QR,text,TEXT(255),Si,No
+Servicios_Turnos,Hora_Inicio_Operacion,time without time zone,DATETIME,Si,No
+Servicios_Turnos,Limite_Reactivaciones_Mensuales,integer,LONG,Si,No
+Servicios_Turnos,Esta_Activo,boolean,YESNO,Si,No
+Servicios_Turnos,Fecha_Creacion,timestamp with time zone,DATETIME,Si,No
+Servicios_Turnos,Fecha_Actualizacion,timestamp with time zone,DATETIME,Si,No
+Servicios_Turnos,Fila_Pausada,boolean,YESNO,Si,No
+Servicios_Turnos,Fecha_Pausa_Fila,timestamp with time zone,DATETIME,No,No
+Turnos,Id_Turno,uuid,TEXT(36),Si,Si
+Turnos,Id_Servicio,uuid,TEXT(36),Si,No
+Turnos,Id_Estudiante,uuid,TEXT(36),Si,No
+Turnos,Codigo_Estudiante,text,TEXT(255),Si,No
+Turnos,Correo_Electronico,text,TEXT(255),Si,No
+Turnos,Nombre_Estudiante,text,TEXT(255),Si,No
+Turnos,Fecha_Turno,date,DATETIME,Si,No
+Turnos,Numero_Secuencia,integer,LONG,Si,No
+Turnos,Codigo_Turno,text,TEXT(255),Si,No
+Turnos,Estado,text,TEXT(255),Si,No
+Turnos,Fecha_Asignacion,timestamp with time zone,DATETIME,Si,No
+Turnos,Fecha_Expiracion,timestamp with time zone,DATETIME,No,No
+Turnos,Fecha_Atencion,timestamp with time zone,DATETIME,No,No
+Turnos,Fecha_Creacion,timestamp with time zone,DATETIME,Si,No
+Turnos,Fecha_Actualizacion,timestamp with time zone,DATETIME,Si,No
+Turnos,Es_Especial,boolean,YESNO,Si,No
+Turnos,Esta_Pausado,boolean,YESNO,Si,No
+Turnos,Fecha_Pausa,timestamp with time zone,DATETIME,No,No
+Recompensas_Tokens,Id_Recompensa,uuid,TEXT(36),Si,Si
+Recompensas_Tokens,Id_Estudiante,uuid,TEXT(36),Si,No
+Recompensas_Tokens,Id_Evento_Reciclaje,uuid,TEXT(36),No,No
+Recompensas_Tokens,Cantidad_Tokens,numeric,DOUBLE,Si,No
+Recompensas_Tokens,Hash_Transaccion,text,TEXT(255),No,No
+Recompensas_Tokens,Fecha_Creacion,timestamp with time zone,DATETIME,Si,No
+Notificaciones,Id_Notificacion,uuid,TEXT(36),Si,Si
+Notificaciones,Id_Estudiante,uuid,TEXT(36),Si,No
+Notificaciones,Tipo,text,TEXT(255),Si,No
+Notificaciones,Titulo,text,TEXT(255),Si,No
+Notificaciones,Mensaje,text,TEXT(255),Si,No
+Notificaciones,Enlace,text,TEXT(255),No,No
+Notificaciones,Leida,boolean,YESNO,Si,No
+Notificaciones,Fecha_Creacion,timestamp with time zone,DATETIME,Si,No
+Datos_Estudiantiles,Id_Estudiante,uuid,TEXT(36),Si,Si
+Datos_Estudiantiles,Correo_Electronico,text,TEXT(255),Si,No
+Datos_Estudiantiles,Nombres,text,TEXT(255),Si,No
+Datos_Estudiantiles,Apellidos,text,TEXT(255),Si,No
+Datos_Estudiantiles,Telefono,text,TEXT(255),Si,No
+Datos_Estudiantiles,Documento_Identidad,text,TEXT(255),Si,No
+Datos_Estudiantiles,Codigo_Estudiante,text,TEXT(255),Si,No
+Datos_Estudiantiles,Id_Universidad,integer,LONG,Si,No
+Datos_Estudiantiles,Id_Sede,integer,LONG,Si,No
+Datos_Estudiantiles,Id_Programa,integer,LONG,Si,No
+Datos_Estudiantiles,Tipo_Estudiante,text,TEXT(255),Si,No
+Datos_Estudiantiles,Beneficio,text,TEXT(255),Si,No
+Datos_Estudiantiles,Validado_Universidad,boolean,YESNO,Si,No
+Datos_Estudiantiles,Fecha_Creacion,timestamp with time zone,DATETIME,Si,No
+Datos_Estudiantiles,Fecha_Actualizacion,timestamp with time zone,DATETIME,Si,No
+Datos_Estudiantiles,Billetera_Vinculada,text,TEXT(255),No,No
+Datos_Estudiantiles,Fecha_Vinculacion_Billetera,timestamp with time zone,DATETIME,No,No
+Datos_Estudiantiles,Perfil_Registrado_Blockchain,boolean,YESNO,Si,No
+Datos_Estudiantiles,Afiliacion_Sincronizada_Blockchain,boolean,YESNO,Si,No
+Estudiantes_Registrados,Id_Estudiante,uuid,TEXT(36),Si,Si
+Estudiantes_Registrados,Correo_Electronico,text,TEXT(255),No,No
+Estudiantes_Registrados,Nombre_Completo,text,TEXT(255),No,No
+Estudiantes_Registrados,Nombre_Usuario,text,TEXT(255),No,No
+Estudiantes_Registrados,Codigo_Estudiante,text,TEXT(255),No,No
+Estudiantes_Registrados,Documento_Identidad,text,TEXT(255),No,No
+Estudiantes_Registrados,Telefono,text,TEXT(255),No,No
+Estudiantes_Registrados,Universidad,text,TEXT(255),No,No
+Estudiantes_Registrados,Id_Universidad,integer,LONG,No,No
+Estudiantes_Registrados,Id_Sede,integer,LONG,No,No
+Estudiantes_Registrados,Id_Programa,integer,LONG,No,No
+Estudiantes_Registrados,Tipo_Estudiante,text,TEXT(255),No,No
+Estudiantes_Registrados,Beneficio,text,TEXT(255),No,No
+Estudiantes_Registrados,Validado_Universidad,boolean,YESNO,No,No
+Estudiantes_Registrados,Billetera_Vinculada,text,TEXT(255),No,No
+Estudiantes_Registrados,Fecha_Confirmacion_Correo,timestamp with time zone,DATETIME,No,No
+Estudiantes_Registrados,Ultimo_Ingreso,timestamp with time zone,DATETIME,No,No
+Estudiantes_Registrados,Fecha_Registro,timestamp with time zone,DATETIME,No,No
+Estudiantes_Registrados,Fecha_Eliminacion,timestamp with time zone,DATETIME,No,No

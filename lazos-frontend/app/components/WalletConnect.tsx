@@ -3,7 +3,7 @@
 import { LogOut, Wallet, X } from "lucide-react";
 import { useEffect, useRef } from "react";
 import { useAccount, useConnect, useDisconnect, useSwitchChain } from "wagmi";
-import { baseSepolia } from "wagmi/chains";
+import { appChain } from "@/src/config/network";
 
 function compactAddress(address: string) {
   return `${address.slice(0, 6)}...${address.slice(-4)}`;
@@ -21,7 +21,7 @@ export function WalletConnect() {
   }, [isConnected]);
 
   if (isConnected && address) {
-    const wrongChain = chainId !== baseSepolia.id;
+    const wrongChain = chainId !== appChain.id;
 
     return (
       <div className="wallet-connect wallet-connect--connected">
@@ -29,10 +29,10 @@ export function WalletConnect() {
           <button
             className="wallet-connect__button wallet-connect__button--warning"
             disabled={isSwitching}
-            onClick={() => switchChain({ chainId: baseSepolia.id })}
+            onClick={() => switchChain({ chainId: appChain.id })}
             type="button"
           >
-            {isSwitching ? "Cambiando..." : "Cambiar a Base Sepolia"}
+            {isSwitching ? "Cambiando..." : `Cambiar a ${appChain.name}`}
           </button>
         ) : (
           <span className="wallet-connect__account" title={address}>

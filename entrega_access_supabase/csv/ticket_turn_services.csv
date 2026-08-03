@@ -1,0 +1,2 @@
+id,code,name,qr_code_token,operation_start_time,monthly_reactivation_limit,is_active,created_at,updated_at,queue_paused,queue_paused_at
+5e71c48f-f646-4cb3-854a-f1795256ddcb,univalle-lunch-main,Fila de almuerzos Univalle,QR-0861f84f9998a759e040063f,12:00:00,10,True,2026-05-29 01:44:03.813126,2026-06-16 16:35:56.174796,False,

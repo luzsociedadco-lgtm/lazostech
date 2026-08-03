@@ -1,0 +1,3 @@
+user_id,email,first_name,last_name,phone,national_id,student_code,university_id,campus_id,program_id,student_type,benefit_label,university_validated,created_at,updated_at,linked_wallet,wallet_linked_at,onchain_profile_registered,onchain_affiliation_synced
+83b0d947-b200-699f-25bf-598a8d34e2fc,estudiante_83b0d947@ejemplo.edu.co,Nombre,Anonimo 83B0D9,,,,0,1,0,,,False,2026-05-31 20:16:56.058263,2026-06-02 00:45:58.244963,,,False,False
+55409e27-45fc-c35f-e121-5f76c7511d93,estudiante_55409e27@ejemplo.edu.co,Nombre,Anonimo 55409E,3008365360,ID-55409E2745,COD-55409E27,1000,1001,1001107,Pregrado,Almuerzo Regular,True,2026-06-01 20:20:53.867089,2026-06-01 22:47:51.561148,,,False,False

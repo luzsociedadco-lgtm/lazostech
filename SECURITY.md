@@ -37,6 +37,7 @@ The project follows several security practices:
 * role-based access control
 * transparent governance execution
 * upgrade review procedures
+* CI-enforced Solidity deployment, selector, ownership, and upgrade tests
+* Base Mainnet chain guards and multisig ownership requirements
 
-Future development will include external smart contract security audits.
-acknowledged for their contribution to improving the security of the project.
+No independent external smart-contract audit has been completed for the current release candidate. Base Mainnet deployment remains blocked until an audit is approved with no open critical or high findings. See `docs/runbooks/mainnet-cutover.md`.

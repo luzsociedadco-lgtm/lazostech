@@ -1,10 +1,10 @@
-import * as chains from "viem/chains";
+import { appChain, appRpcUrl } from "./src/config/network";
 
 export const DEFAULT_ALCHEMY_API_KEY = process.env.NEXT_PUBLIC_ALCHEMY_API_KEY || "";
 
 const scaffoldConfig = {
   // 👇 Red en la que estás trabajando
-  targetNetworks: [chains.baseSepolia],
+  targetNetworks: [appChain],
 
   // 👇 Intervalo de actualización de datos (en milisegundos)
   pollingInterval: 30000,
@@ -14,7 +14,7 @@ const scaffoldConfig = {
 
   // 👇 Tu RPC personalizado (el que pusiste en .env.local)
   rpcOverrides: {
-    [chains.baseSepolia.id]: process.env.NEXT_PUBLIC_RPC_URL || "",
+    [appChain.id]: appRpcUrl,
   },
 
   // 👇 Si usas WalletConnect

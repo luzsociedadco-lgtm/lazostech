@@ -16,7 +16,7 @@ const MELENDEZ_CAMPUS_ID = 1002;
 
 type EnvShape = {
   RPC_URL: string;
-  PRIVATE_KEY: string;
+  DIAMOND_OPERATOR_PRIVATE_KEY: string;
   DIAMOND: string;
 };
 
@@ -56,10 +56,10 @@ function parseEnv(raw: string) {
 }
 
 async function loadRootEnv() {
-  if (process.env.RPC_URL && process.env.PRIVATE_KEY) {
+  if (process.env.RPC_URL && process.env.DIAMOND_OPERATOR_PRIVATE_KEY) {
     return {
       RPC_URL: process.env.RPC_URL,
-      PRIVATE_KEY: process.env.PRIVATE_KEY,
+      DIAMOND_OPERATOR_PRIVATE_KEY: process.env.DIAMOND_OPERATOR_PRIVATE_KEY,
       DIAMOND: process.env.DIAMOND || NUDOS_DIAMOND_ADDRESS
     } satisfies EnvShape;
   }
@@ -74,7 +74,7 @@ async function loadRootEnv() {
     try {
       const raw = await fs.readFile(candidate, "utf8");
       const parsed = parseEnv(raw);
-      if (parsed.RPC_URL && parsed.PRIVATE_KEY) {
+      if (parsed.RPC_URL && parsed.DIAMOND_OPERATOR_PRIVATE_KEY) {
         return parsed as EnvShape;
       }
     } catch {
@@ -149,7 +149,7 @@ export async function syncWalletToDiamond(user: AppUser): Promise<OnchainSyncRes
 
   const env = await loadRootEnv();
   const provider = new JsonRpcProvider(env.RPC_URL);
-  const operator = new Wallet(env.PRIVATE_KEY, provider);
+  const operator = new Wallet(env.DIAMOND_OPERATOR_PRIVATE_KEY, provider);
   const diamondAddress = (env.DIAMOND || NUDOS_DIAMOND_ADDRESS) as `0x${string}`;
 
   const profileRead = new Contract(diamondAddress, profileFacetAbi, provider);
