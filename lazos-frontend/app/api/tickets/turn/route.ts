@@ -103,9 +103,9 @@ export async function POST(request: Request) {
     const student = getStudentPayload(sessionUser);
     const { data: turn, error } = await supabase.rpc("request_lunch_turn", {
       qr_code_id: qrCodeId,
-      student_code: student.studentCode,
-      student_email: student.studentEmail,
-      student_name: student.studentName
+      _student_code: student.studentCode,
+      _student_email: student.studentEmail,
+      _student_name: student.studentName
     });
     if (error) throw new Error(error.message);
     return NextResponse.json({ turn });
