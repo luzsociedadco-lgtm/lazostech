@@ -23,7 +23,7 @@ The mobile shell is built with Expo/React Native and integrates RevenueCat for
 a verified-seller plan. RevenueCat project ID: proj6882bca0.
 
 Demo: https://www.lazostech.com/unimarket
-Repository: [paste the final public repository URL here]
+Repository: https://github.com/luzsociedadco-lgtm/lazostech/tree/shipaton/unimarket
 
 Built by LazosTech students at Universidad del Valle.
 

@@ -19,6 +19,10 @@ The current public demo is available at:
 
 https://www.lazostech.com/unimarket
 
+Public source branch:
+
+https://github.com/luzsociedadco-lgtm/lazostech/tree/shipaton/unimarket
+
 The demo shows category browsing, featured listings, listing creation, search,
 item details, and preparation of an exchange request.
 
