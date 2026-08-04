@@ -3110,6 +3110,30 @@ a {
   content: none;
 }
 
+.market-community-title {
+  font-size: 1.12rem !important;
+  margin-top: 5px !important;
+}
+
+.market-community-title::before {
+  content: "" !important;
+  width: 10px !important;
+  height: 10px !important;
+  margin-right: 7px !important;
+  background: #2e7d32 !important;
+  border-radius: 50%;
+  transform: none !important;
+  vertical-align: 1px !important;
+}
+
+.market-community-caption {
+  display: block;
+  margin-top: 5px;
+  color: #3f2a05;
+  font-size: 0.61rem;
+  font-weight: 700;
+}
+
 .market-balance-card button {
   border: 0;
   border-radius: 999px;
@@ -3292,6 +3316,11 @@ a {
   color: #df3d91;
 }
 
+.market-category-pill.is-selected span {
+  outline: 3px solid #fff8ef;
+  outline-offset: 2px;
+}
+
 .market-category-pill small {
   font-size: 0.61rem;
   font-weight: 700;
@@ -3341,6 +3370,192 @@ a {
   box-shadow: 0 8px 14px rgba(58, 33, 5, 0.18);
   scroll-snap-align: none;
 }
+
+.market-product-card[role="button"] {
+  cursor: pointer;
+}
+
+.market-product-card[role="button"]:focus-visible {
+  outline: 3px solid #fff8ef;
+  outline-offset: 3px;
+}
+
+.market-empty-state {
+  min-width: 230px;
+  margin: 8px 18px;
+  color: #fff8ef;
+  font-size: 0.72rem;
+}
+
+.market-demo-shell {
+  background: #b87313;
+}
+
+.market-demo-banner {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  align-items: center;
+  padding: 18px 16px;
+  margin: 0 -18px 12px;
+  background: #f0bb00;
+  color: #191207;
+}
+
+.market-demo-banner span,
+.market-demo-banner strong,
+.market-demo-banner p {
+  display: block;
+}
+
+.market-demo-banner span,
+.market-demo-modal-label {
+  font-size: 0.57rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+}
+
+.market-demo-banner strong {
+  margin-top: 4px;
+  font-size: 1.22rem;
+  line-height: 1.05;
+}
+
+.market-demo-banner p {
+  margin: 5px 0 0;
+  max-width: 290px;
+  font-size: 0.68rem;
+  line-height: 1.25;
+}
+
+.market-demo-actions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  margin: 0 0 14px;
+}
+
+.market-demo-verified {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  color: #fff8ef;
+  font-size: 0.67rem;
+  font-weight: 800;
+}
+
+.market-demo-primary {
+  border: 0;
+  border-radius: 999px;
+  padding: 10px 15px;
+  background: #191207;
+  color: #f0bb00;
+  font-size: 0.68rem;
+  font-weight: 800;
+}
+
+
+.market-demo-categories {
+  display: flex;
+  gap: 7px;
+  overflow-x: auto;
+  margin: 0 -18px 16px;
+  padding: 0 18px 2px;
+  scrollbar-width: none;
+}
+
+.market-demo-categories::-webkit-scrollbar { display: none; }
+
+.market-demo-categories button {
+  flex: 0 0 auto;
+  border: 1px solid rgba(25, 18, 7, 0.35);
+  border-radius: 999px;
+  padding: 7px 11px;
+  background: transparent;
+  color: #191207;
+  font-size: 0.64rem;
+  font-weight: 700;
+}
+
+.market-demo-categories button.is-active {
+  background: #191207;
+  color: #f0bb00;
+}
+
+.market-demo-count {
+  color: #fff8ef;
+  font-size: 0.62rem;
+  font-weight: 700;
+}
+
+.market-demo-safety {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 14px;
+  border-radius: 9px;
+  background: #fff8ed;
+  color: #191207;
+}
+
+.market-demo-safety strong { font-size: 0.77rem; }
+.market-demo-safety p { margin: 4px 0 0; font-size: 0.64rem; line-height: 1.3; }
+
+.market-demo-impact {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+}
+
+.market-demo-impact div {
+  padding: 12px 8px;
+  border-radius: 8px;
+  background: #191207;
+  color: #f0bb00;
+  text-align: center;
+}
+
+.market-demo-impact strong,
+.market-demo-impact span { display: block; }
+.market-demo-impact strong { font-size: 1.03rem; }
+.market-demo-impact span { margin-top: 3px; color: #fff8ef; font-size: 0.55rem; line-height: 1.15; }
+
+.market-demo-modal-layer {
+  position: fixed;
+  inset: 0;
+  z-index: 40;
+  display: grid;
+  place-items: center;
+  padding: 20px;
+  background: rgba(0, 0, 0, 0.68);
+}
+
+.market-demo-modal {
+  position: relative;
+  width: min(100%, 380px);
+  padding: 24px 20px 20px;
+  border-radius: 14px;
+  background: #fff8ed;
+  color: #191207;
+  box-shadow: 0 18px 50px rgba(0,0,0,.35);
+}
+
+.market-demo-close {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  border: 0;
+  background: transparent;
+  color: #191207;
+}
+
+.market-demo-modal h2 { margin: 8px 0 5px; font-size: 1.28rem; }
+.market-demo-modal p { margin: 0; font-size: 0.72rem; line-height: 1.4; }
+.market-demo-modal-meta { display: grid; gap: 4px; margin: 16px 0; font-size: 0.68rem; }
+.market-demo-modal-meta strong { font-size: 1.18rem; }
+.market-demo-full { width: 100%; }
+.market-demo-input { width: 100%; margin: 16px 0; padding: 11px 12px; border: 1px solid #d9c9b7; border-radius: 8px; background: #fff; }
 
 .market-product-card__image {
   position: relative;
