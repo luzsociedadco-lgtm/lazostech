@@ -3634,16 +3634,16 @@ a {
   font-weight: 700;
 }
 
-/* Public UniMarket demo: LazosTech black and yellow identity. */
+/* Public UniMarket demo: LazosTech wireframe gold with dark content panels. */
 .market-demo-screen {
-  background: #050505;
-  color: #f4c83f;
+  background: #8a5917;
+  color: #fff4d0;
 }
 
 .market-demo-screen .market-demo-shell {
-  background: #050505;
-  color: #f4c83f;
-  box-shadow: none;
+  background: #8a5917;
+  color: #fff4d0;
+  box-shadow: 0 18px 38px rgba(58, 33, 5, 0.2);
   padding-bottom: 46px;
 }
 
@@ -3654,20 +3654,51 @@ a {
   gap: 14px;
   margin: 0 -18px;
   padding: 14px 18px;
-  background: #050505;
+  background: rgba(30, 29, 28, 0.96);
   border-bottom: 1px solid rgba(244, 200, 63, 0.42);
 }
 
 .market-demo-screen .market-topbar h1 {
+  grid-column: auto;
   margin: 0;
   color: #f4c83f;
   font-size: 1.16rem;
   text-align: left;
   letter-spacing: -0.03em;
+  line-height: 1.02;
 }
 
 .market-demo-screen .market-topbar button {
   color: #f4c83f;
+}
+
+.market-demo-menu {
+  display: grid;
+  gap: 7px;
+  margin: 0 -18px;
+  padding: 10px 18px 12px;
+  border-bottom: 1px solid rgba(244, 200, 63, 0.24);
+  background: rgba(30, 29, 28, 0.96);
+}
+
+.market-demo-menu button {
+  width: 100%;
+  padding: 9px 11px;
+  border: 1px solid rgba(244, 200, 63, 0.24);
+  border-radius: 9px;
+  background: rgba(13, 13, 13, 0.92);
+  color: #f4c83f;
+  font: inherit;
+  font-size: 0.66rem;
+  font-weight: 700;
+  text-align: left;
+  cursor: pointer;
+}
+
+.market-demo-menu button:hover,
+.market-demo-menu button:focus-visible {
+  background: rgba(244, 200, 63, 0.16);
+  outline: none;
 }
 
 .market-brand-lockup {
@@ -3681,17 +3712,15 @@ a {
   gap: 2px;
 }
 
-.market-brand-mark {
-  display: grid;
-  width: 28px;
-  height: 28px;
-  place-items: center;
-  border: 1px solid #f4c83f;
-  border-radius: 8px;
-  color: #f4c83f;
-  font-size: 0.88rem;
-  font-weight: 900;
-  line-height: 1;
+.market-brand-logo {
+  display: block;
+  width: 34px;
+  height: 34px;
+  padding: 4px;
+  object-fit: contain;
+  border-radius: 50%;
+  background: #050505;
+  filter: drop-shadow(0 0 7px rgba(244, 200, 63, 0.24));
 }
 
 .market-brand-name {
@@ -3699,6 +3728,7 @@ a {
   font-size: 0.48rem;
   font-weight: 900;
   letter-spacing: 0.16em;
+  line-height: 1;
 }
 
 .market-demo-screen .market-demo-banner {
@@ -3706,9 +3736,9 @@ a {
   padding: 22px 20px;
   border: 1px solid rgba(244, 200, 63, 0.72);
   border-radius: 16px;
-  background: #0d0d0d;
+  background: #191207;
   color: #f4c83f;
-  box-shadow: 0 16px 34px rgba(0, 0, 0, 0.26);
+  box-shadow: 0 16px 34px rgba(0, 0, 0, 0.36), inset 0 1px 0 rgba(255, 228, 122, 0.08);
 }
 
 .market-demo-screen .market-demo-banner span,
@@ -3732,7 +3762,19 @@ a {
 }
 
 .market-demo-screen .market-demo-verified {
+  gap: 6px;
+  font-size: 0.8rem;
   color: #f4c83f;
+  -webkit-text-stroke: 0.6px #191207;
+  text-shadow: 1px 0 #191207, -1px 0 #191207, 0 1px #191207, 0 -1px #191207;
+}
+
+.market-demo-screen .market-demo-verified svg {
+  width: 18px;
+  height: 18px;
+  fill: #f4c83f;
+  color: #191207;
+  stroke-width: 2.4;
 }
 
 .market-demo-screen .market-demo-primary {
@@ -3780,6 +3822,7 @@ a {
 
 .market-demo-screen .market-demo-categories button {
   border-color: rgba(244, 200, 63, 0.42);
+  background: rgba(30, 29, 28, 0.96);
   color: #f4c83f;
 }
 
@@ -3793,8 +3836,38 @@ a {
   letter-spacing: -0.02em;
 }
 
+.market-demo-screen .market-section {
+  margin-top: 14px;
+  padding: 21px 17px 21px;
+  border: 1px solid rgba(244, 200, 63, 0.2);
+  border-radius: 16px;
+  background: rgba(30, 29, 28, 0.96);
+  box-shadow: 0 12px 24px rgba(0, 0, 0, 0.18);
+}
+
+.market-demo-screen .market-section + .market-section {
+  margin-top: 14px;
+}
+
+.market-demo-screen .market-demo-items {
+  margin-left: -14px;
+  margin-right: -14px;
+  padding-left: 14px;
+}
+
 .market-demo-screen .market-demo-count {
-  color: #c7b978;
+  display: inline-flex;
+  align-items: center;
+  justify-content: flex-end;
+  padding: 5px 8px;
+  border: 1px solid rgba(244, 200, 63, 0.28);
+  border-radius: 999px;
+  background: rgba(30, 29, 28, 0.96);
+  color: #f4c83f;
+  font-size: 0.55rem;
+  line-height: 1.15;
+  white-space: nowrap;
+  text-align: right;
 }
 
 .market-demo-screen .market-product-card {
@@ -3838,9 +3911,10 @@ a {
 }
 
 .market-demo-screen .market-demo-safety {
+  padding: 18px 16px;
   border-radius: 12px;
   border: 1px solid rgba(244, 200, 63, 0.26);
-  background: #111111;
+  background: rgba(30, 29, 28, 0.96);
   color: #f4c83f;
 }
 
@@ -3848,10 +3922,15 @@ a {
   color: #eee4bd;
 }
 
+.market-demo-screen .market-demo-impact {
+  gap: 10px;
+}
+
 .market-demo-screen .market-demo-impact div {
+  padding: 15px 10px;
   border-radius: 12px;
   border: 1px solid rgba(244, 200, 63, 0.32);
-  background: #111111;
+  background: rgba(30, 29, 28, 0.96);
   color: #f4c83f;
 }
 
@@ -3861,7 +3940,7 @@ a {
 
 .market-demo-screen .market-demo-modal {
   border: 1px solid rgba(244, 200, 63, 0.72);
-  background: #0d0d0d;
+  background: rgba(30, 29, 28, 0.96);
   color: #f4c83f;
 }
 
@@ -3915,6 +3994,52 @@ a {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 10px;
+}
+
+.market-demo-upload {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 58px;
+  padding: 10px 12px;
+  border: 1px solid rgba(244, 200, 63, 0.48);
+  border-radius: 10px;
+  background: rgba(30, 29, 28, 0.96);
+  color: #f4c83f;
+  cursor: pointer;
+}
+
+.market-demo-upload > svg {
+  flex: 0 0 auto;
+}
+
+.market-demo-upload span {
+  display: grid;
+  gap: 3px;
+}
+
+.market-demo-upload strong {
+  font-size: 0.7rem;
+}
+
+.market-demo-upload small {
+  color: #e2d39a;
+  font-size: 0.58rem;
+}
+
+.market-demo-upload input {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  opacity: 0;
+  cursor: pointer;
+}
+
+.market-demo-upload:focus-within {
+  outline: 2px solid #f4c83f;
+  outline-offset: 2px;
 }
 
 @media (min-width: 720px) {
