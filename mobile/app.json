@@ -1,0 +1,20 @@
+{
+  "expo": {
+    "name": "UniMarket by LazosTech",
+    "slug": "lazostech-unimarket",
+    "version": "0.1.0",
+    "orientation": "portrait",
+    "scheme": "unimarket",
+    "userInterfaceStyle": "dark",
+    "plugins": ["expo-dev-client"],
+    "ios": {
+      "bundleIdentifier": "com.lazostech.unimarket"
+    },
+    "android": {
+      "package": "com.lazostech.unimarket"
+    },
+    "extra": {
+      "publicDemoUrl": "https://www.lazostech.com/unimarket"
+    }
+  }
+}
