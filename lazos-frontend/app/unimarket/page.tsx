@@ -4,12 +4,12 @@ import Image from "next/image";
 import { CheckCircle2, Menu, Search, ShieldCheck, X } from "lucide-react";
 import { useMemo, useState } from "react";
 
-const categories = ["Todos", "Libros", "Tecnologia", "Trueque", "Ropa", "Emprendimientos"];
+const categories = ["Todos", "Libros", "Tecnología", "Trueque", "Ropa", "Emprendimientos"];
 
 const items = [
   { title: "Calculadoras y libros", description: "Kit de estudio, excelente estado", category: "Libros", price: "350", mode: "Trueque", seller: "Valentina · Univalle", location: "Biblioteca Central", image: "/images/slide-1.jpg" },
-  { title: "Laptop para clases", description: "8GB RAM, poco uso", category: "Tecnologia", price: "1.800", mode: "Oferta", seller: "Carlos · Univalle", location: "Cafeteria Melendez", image: "/images/slide-1.jpg" },
-  { title: "Brownies de la casa", description: "Entrega en campus esta tarde", category: "Emprendimientos", price: "8", mode: "Comprar", seller: "Laura · Univalle", location: "Plazoleta Ingenierias", image: "/images/slide-1.jpg" },
+  { title: "Laptop para clases", description: "8GB RAM, poco uso", category: "Tecnología", price: "1.800", mode: "Oferta", seller: "Carlos · Univalle", location: "Cafetería Meléndez", image: "/images/slide-1.jpg" },
+  { title: "Brownies de la casa", description: "Entrega en campus esta tarde", category: "Emprendimientos", price: "8", mode: "Comprar", seller: "Laura · Univalle", location: "Plazoleta Ingenierías", image: "/images/slide-1.jpg" },
 ];
 
 export default function UniMarketPage() {
@@ -25,11 +25,14 @@ export default function UniMarketPage() {
   }), [category, query]);
 
   return (
-    <main className="market-screen">
+    <main className="market-screen market-demo-screen">
       <section className="market-shell market-demo-shell">
         <header className="market-topbar">
-          <h1>UniMarket</h1>
-          <button type="button" aria-label="Menú del demo"><Menu size={18} /></button>
+          <div className="market-brand-lockup">
+            <span className="market-brand-mark" aria-hidden="true">L</span>
+            <div><span className="market-brand-name">LAZOSTECH</span><h1>UniMarket</h1></div>
+          </div>
+          <button type="button" aria-label="Menú del demo"><Menu size={19} /></button>
         </header>
 
         <section className="market-demo-banner">
@@ -38,12 +41,12 @@ export default function UniMarketPage() {
             <strong>Intercambio circular universitario</strong>
             <p>Compra, vende o intercambia dentro de tu comunidad universitaria.</p>
           </div>
-          <ShieldCheck size={32} aria-hidden="true" />
+          <ShieldCheck size={34} aria-hidden="true" />
         </section>
 
         <div className="market-demo-actions">
           <span className="market-demo-verified"><CheckCircle2 size={15} /> Comunidad verificada</span>
-          <button type="button" className="market-demo-primary" onClick={() => setPublished(true)}>Publicar item</button>
+          <button type="button" className="market-demo-primary" onClick={() => setPublished(true)}>Publicar ítem</button>
         </div>
 
         <label className="market-searchbar">
@@ -51,7 +54,7 @@ export default function UniMarketPage() {
           <input value={query} onChange={event => setQuery(event.target.value)} placeholder="Buscar en mi campus..." />
         </label>
 
-        <div className="market-demo-categories" aria-label="Filtrar por categoria">
+        <div className="market-demo-categories" aria-label="Filtrar por categoría">
           {categories.map(option => <button key={option} type="button" className={category === option ? "is-active" : ""} onClick={() => setCategory(option)}>{option}</button>)}
         </div>
 
@@ -75,7 +78,7 @@ export default function UniMarketPage() {
 
         <section className="market-section">
           <div className="market-section__header"><h2>Impacto de la comunidad</h2><span className="market-demo-count">Piloto Univalle</span></div>
-          <div className="market-demo-impact"><div><strong>35</strong><span>estudiantes validando</span></div><div><strong>68</strong><span>items en circulación</span></div><div><strong>100%</strong><span>entrega local</span></div></div>
+          <div className="market-demo-impact"><div><strong>35</strong><span>estudiantes validando</span></div><div><strong>68</strong><span>ítems en circulación</span></div><div><strong>100%</strong><span>entrega local</span></div></div>
         </section>
       </section>
 

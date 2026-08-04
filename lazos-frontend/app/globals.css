@@ -3634,6 +3634,255 @@ a {
   font-weight: 700;
 }
 
+/* Public UniMarket demo: LazosTech black and yellow identity. */
+.market-demo-screen {
+  background: #050505;
+  color: #f4c83f;
+}
+
+.market-demo-screen .market-demo-shell {
+  background: #050505;
+  color: #f4c83f;
+  box-shadow: none;
+}
+
+.market-demo-screen .market-topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  margin: 0 -18px;
+  padding: 14px 18px;
+  background: #050505;
+  border-bottom: 1px solid rgba(244, 200, 63, 0.42);
+}
+
+.market-demo-screen .market-topbar h1 {
+  margin: 0;
+  color: #f4c83f;
+  font-size: 1.16rem;
+  text-align: left;
+  letter-spacing: -0.03em;
+}
+
+.market-demo-screen .market-topbar button {
+  color: #f4c83f;
+}
+
+.market-brand-lockup {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+}
+
+.market-brand-lockup > div {
+  display: grid;
+  gap: 2px;
+}
+
+.market-brand-mark {
+  display: grid;
+  width: 28px;
+  height: 28px;
+  place-items: center;
+  border: 1px solid #f4c83f;
+  border-radius: 8px;
+  color: #f4c83f;
+  font-size: 0.88rem;
+  font-weight: 900;
+  line-height: 1;
+}
+
+.market-brand-name {
+  color: #f4c83f;
+  font-size: 0.48rem;
+  font-weight: 900;
+  letter-spacing: 0.16em;
+}
+
+.market-demo-screen .market-demo-banner {
+  margin: 18px 0 16px;
+  padding: 20px;
+  border: 1px solid rgba(244, 200, 63, 0.72);
+  border-radius: 16px;
+  background: #0d0d0d;
+  color: #f4c83f;
+}
+
+.market-demo-screen .market-demo-banner span,
+.market-demo-screen .market-demo-modal-label {
+  color: #f4c83f;
+}
+
+.market-demo-screen .market-demo-banner strong {
+  color: #ffe47a;
+  font-size: 1.3rem;
+}
+
+.market-demo-screen .market-demo-banner p {
+  color: #f5edcc;
+}
+
+.market-demo-screen .market-demo-banner > svg {
+  flex: 0 0 auto;
+  color: #f4c83f;
+}
+
+.market-demo-screen .market-demo-verified {
+  color: #f4c83f;
+}
+
+.market-demo-screen .market-demo-primary {
+  border: 1px solid #f4c83f;
+  background: #f4c83f;
+  color: #080808;
+  transition: background 160ms ease, color 160ms ease, transform 160ms ease;
+}
+
+.market-demo-screen .market-demo-primary:hover {
+  background: #ffe47a;
+  transform: translateY(-1px);
+}
+
+.market-demo-screen .market-searchbar {
+  margin-top: 18px;
+  border: 1px solid rgba(244, 200, 63, 0.55);
+  background: #0d0d0d;
+  color: #f4c83f;
+}
+
+.market-demo-screen .market-searchbar input {
+  color: #fff3b0;
+}
+
+.market-demo-screen .market-searchbar input::placeholder {
+  color: #bba967;
+}
+
+.market-demo-screen .market-demo-categories button {
+  border-color: rgba(244, 200, 63, 0.42);
+  color: #f4c83f;
+}
+
+.market-demo-screen .market-demo-categories button.is-active {
+  background: #f4c83f;
+  color: #080808;
+}
+
+.market-demo-screen .market-section__header h2 {
+  color: #f4c83f;
+}
+
+.market-demo-screen .market-demo-count {
+  color: #c7b978;
+}
+
+.market-demo-screen .market-product-card {
+  border: 1px solid rgba(244, 200, 63, 0.26);
+  background: #111111;
+  box-shadow: 0 10px 22px rgba(0, 0, 0, 0.34);
+}
+
+.market-demo-screen .market-product-card__image {
+  background: #171717;
+}
+
+.market-demo-screen .market-product-card__image img {
+  filter: brightness(0.72) saturate(0.72);
+}
+
+.market-demo-screen .market-product-card__body h3,
+.market-demo-screen .market-product-card__footer strong {
+  color: #f4c83f;
+}
+
+.market-demo-screen .market-product-card__body p {
+  color: #eee4bd;
+}
+
+.market-demo-screen .market-product-card__body small {
+  color: #aaa06f;
+}
+
+.market-demo-screen .market-product-card__footer strong::before {
+  background: #f4c83f;
+}
+
+.market-demo-screen .market-product-card__footer span {
+  background: #28220c;
+  color: #f4c83f;
+  border: 1px solid rgba(244, 200, 63, 0.4);
+}
+
+.market-demo-screen .market-demo-safety {
+  border: 1px solid rgba(244, 200, 63, 0.26);
+  background: #111111;
+  color: #f4c83f;
+}
+
+.market-demo-screen .market-demo-safety p {
+  color: #eee4bd;
+}
+
+.market-demo-screen .market-demo-impact div {
+  border: 1px solid rgba(244, 200, 63, 0.32);
+  background: #111111;
+  color: #f4c83f;
+}
+
+.market-demo-screen .market-demo-impact span {
+  color: #c7b978;
+}
+
+.market-demo-screen .market-demo-modal {
+  border: 1px solid rgba(244, 200, 63, 0.72);
+  background: #0d0d0d;
+  color: #f4c83f;
+}
+
+.market-demo-screen .market-demo-modal h2 {
+  color: #ffe47a;
+}
+
+.market-demo-screen .market-demo-modal p,
+.market-demo-screen .market-demo-modal-meta span {
+  color: #eee4bd;
+}
+
+.market-demo-screen .market-demo-close {
+  color: #f4c83f;
+}
+
+.market-demo-screen .market-demo-input {
+  border-color: rgba(244, 200, 63, 0.48);
+  background: #050505;
+  color: #fff3b0;
+}
+
+@media (min-width: 720px) {
+  .market-demo-screen .market-demo-shell {
+    max-width: 880px;
+    margin: 0 auto;
+    padding-left: 28px;
+    padding-right: 28px;
+  }
+
+  .market-demo-screen .market-topbar {
+    margin-left: -28px;
+    margin-right: -28px;
+    padding-left: 28px;
+    padding-right: 28px;
+  }
+
+  .market-demo-screen .market-demo-banner {
+    padding: 26px 28px;
+  }
+
+  .market-demo-screen .market-demo-banner strong {
+    font-size: 1.7rem;
+  }
+}
+
 .market-tour-card {
   position: relative;
   min-height: 168px;
