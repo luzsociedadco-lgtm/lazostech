@@ -14,7 +14,7 @@ const navItems = [
 export default function FooterNav() {
   const pathname = usePathname();
 
-  if (pathname === "/" || pathname === "/we" || pathname === "/luzsociedad") {
+  if (pathname === "/" || pathname === "/we" || pathname === "/luzsociedad" || pathname === "/unimarket") {
     return null;
   }
 

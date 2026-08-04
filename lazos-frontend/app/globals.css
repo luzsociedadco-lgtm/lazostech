@@ -3644,6 +3644,7 @@ a {
   background: #050505;
   color: #f4c83f;
   box-shadow: none;
+  padding-bottom: 46px;
 }
 
 .market-demo-screen .market-topbar {
@@ -3702,11 +3703,12 @@ a {
 
 .market-demo-screen .market-demo-banner {
   margin: 18px 0 16px;
-  padding: 20px;
+  padding: 22px 20px;
   border: 1px solid rgba(244, 200, 63, 0.72);
   border-radius: 16px;
   background: #0d0d0d;
   color: #f4c83f;
+  box-shadow: 0 16px 34px rgba(0, 0, 0, 0.26);
 }
 
 .market-demo-screen .market-demo-banner span,
@@ -3716,7 +3718,8 @@ a {
 
 .market-demo-screen .market-demo-banner strong {
   color: #ffe47a;
-  font-size: 1.3rem;
+  font-size: 1.34rem;
+  letter-spacing: -0.02em;
 }
 
 .market-demo-screen .market-demo-banner p {
@@ -3739,16 +3742,22 @@ a {
   transition: background 160ms ease, color 160ms ease, transform 160ms ease;
 }
 
+.market-demo-screen .market-demo-actions {
+  margin-bottom: 18px;
+}
+
 .market-demo-screen .market-demo-primary:hover {
   background: #ffe47a;
   transform: translateY(-1px);
 }
 
 .market-demo-screen .market-searchbar {
-  margin-top: 18px;
+  margin-top: 20px;
+  min-height: 44px;
   border: 1px solid rgba(244, 200, 63, 0.55);
   background: #0d0d0d;
   color: #f4c83f;
+  box-shadow: inset 0 0 0 1px rgba(244, 200, 63, 0.04);
 }
 
 .market-demo-screen .market-searchbar input {
@@ -3771,6 +3780,7 @@ a {
 
 .market-demo-screen .market-section__header h2 {
   color: #f4c83f;
+  letter-spacing: -0.02em;
 }
 
 .market-demo-screen .market-demo-count {
@@ -3778,6 +3788,9 @@ a {
 }
 
 .market-demo-screen .market-product-card {
+  min-width: 146px;
+  max-width: 146px;
+  border-radius: 12px;
   border: 1px solid rgba(244, 200, 63, 0.26);
   background: #111111;
   box-shadow: 0 10px 22px rgba(0, 0, 0, 0.34);
@@ -3815,6 +3828,7 @@ a {
 }
 
 .market-demo-screen .market-demo-safety {
+  border-radius: 12px;
   border: 1px solid rgba(244, 200, 63, 0.26);
   background: #111111;
   color: #f4c83f;
@@ -3825,6 +3839,7 @@ a {
 }
 
 .market-demo-screen .market-demo-impact div {
+  border-radius: 12px;
   border: 1px solid rgba(244, 200, 63, 0.32);
   background: #111111;
   color: #f4c83f;
