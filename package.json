@@ -5,7 +5,7 @@
     "readiness:mainnet": "node tools/check-mainnet-readiness.mjs --tier=production"
   },
   "devDependencies": {
-    "supabase": "2.109.1"
+    "supabase": "2.111.0"
   },
   "engines": {
     "node": "20.x"
