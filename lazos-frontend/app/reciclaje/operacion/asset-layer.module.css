@@ -1,0 +1,30 @@
+.page { min-height: 100vh; background: #f2f0e8; color: #10231a; padding: 44px clamp(18px, 4vw, 70px) 100px; }
+.header { display: flex; justify-content: space-between; gap: 32px; align-items: end; max-width: 1280px; margin: 0 auto 26px; }
+.header span, .card > span { color: #26724a; font-size: 12px; font-weight: 800; letter-spacing: .12em; text-transform: uppercase; }
+.header h1 { max-width: 760px; font-size: clamp(42px, 6vw, 82px); line-height: .94; letter-spacing: -.055em; margin: 14px 0; }
+.header p { font-size: 18px; color: #486054; }
+.rootCard { min-width: 290px; background: #10231a; color: white; padding: 22px; border-radius: 22px; display: grid; gap: 8px; }
+.rootCard code { color: #91d8a9; font-size: 11px; overflow-wrap: anywhere; }
+.message, .error { max-width: 1280px; margin: 0 auto 18px; padding: 14px 18px; border-radius: 14px; background: #dcebdc; }
+.error { background: #ffd8d1; color: #8e2418; }
+.relayBar { max-width: 1280px; margin: 0 auto 18px; display: flex; justify-content: space-between; align-items: center; gap: 18px; border: 1px solid #cbd2ca; border-radius: 16px; background: white; padding: 13px 16px; }
+.relayBar span { color: #526259; font-size: 13px; }.relayBar button { border: 0; border-radius: 11px; background: #10231a; color: white; font-weight: 800; padding: 10px 14px; cursor: pointer; }.relayBar button:disabled { opacity: .5; cursor: wait; }
+.metrics { max-width: 1280px; margin: 0 auto 22px; display: grid; grid-template-columns: repeat(6, 1fr); gap: 10px; }
+.metrics article { background: white; border: 1px solid #d7d8cf; border-radius: 18px; padding: 18px; display: grid; gap: 4px; }
+.metrics strong { font-size: 25px; }.metrics span { color: #637168; font-size: 12px; }
+.grid { max-width: 1280px; margin: 0 auto 22px; display: grid; grid-template-columns: minmax(280px, .72fr) minmax(0, 1.55fr); gap: 18px; }
+.card { background: white; border: 1px solid #d7d8cf; border-radius: 24px; padding: 24px; box-shadow: 0 18px 50px rgba(16,35,26,.06); }
+.card h2 { font-size: 28px; margin: 8px 0 20px; }.card label { display: grid; gap: 6px; margin: 12px 0; color: #46564d; font-size: 13px; }
+.card input, .card select { width: 100%; border: 1px solid #c8cec8; border-radius: 12px; background: #fafaf7; padding: 12px 13px; color: #10231a; }
+.card button { border: 0; border-radius: 12px; background: #e7e938; color: #10231a; font-weight: 850; padding: 12px 16px; cursor: pointer; }
+.card button:disabled { opacity: .5; cursor: wait; }.card > button { width: 100%; margin-top: 8px; }
+.cardTitle { display: flex; justify-content: space-between; gap: 16px; align-items: start; }.cardTitle b { background: #edf1eb; padding: 8px 12px; border-radius: 999px; }
+.assetList { display: grid; gap: 10px; max-height: 560px; overflow: auto; }.assetRow { display: flex; justify-content: space-between; gap: 16px; border: 1px solid #e0e3dc; border-radius: 16px; padding: 15px; }
+.assetRow > div { display: grid; gap: 5px; }.assetRow > div:last-child { justify-items: end; }.assetRow a { color: #10231a; font-weight: 850; }.assetRow span, .assetRow small { color: #637168; font-size: 12px; }
+.assetRow b { width: max-content; border-radius: 999px; background: #e3eee5; color: #1c6a3f; padding: 5px 9px; font-size: 11px; text-transform: uppercase; }.assetRow b[data-status="redeemed"], .assetRow b[data-status="transformed"] { background: #e5e5e1; color: #555; }
+.assetRow button { padding: 8px 10px; font-size: 11px; }.audit { max-width: 1280px; margin: 0 auto; }.audit > div { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px 24px; }
+.evidenceButton { position: relative; overflow: hidden; border: 1px solid #cbd2ca; border-radius: 10px; padding: 7px 9px; color: #526259; font-size: 11px; font-weight: 750; cursor: pointer; }.evidenceButton input { position: absolute; width: 1px; height: 1px; opacity: 0; }
+.audit p { display: flex; justify-content: space-between; gap: 18px; border-bottom: 1px solid #e7e7e1; padding: 10px 0; margin: 0; font-size: 13px; }.audit time { color: #748078; }
+.denied { max-width: 720px; margin: 12vh auto; padding: 42px; border-radius: 28px; background: #10231a; color: white; }.denied span { color: #91d8a9; text-transform: uppercase; letter-spacing: .1em; font-size: 12px; }.denied h1 { font-size: 48px; line-height: 1; }.denied button { display: block; border: 0; border-radius: 12px; background: #e7e938; color: #10231a; font-weight: 850; padding: 12px 16px; cursor: pointer; }.denied a { display: inline-block; margin-top: 15px; color: #e7e938; font-weight: 800; }
+@media (max-width: 900px) { .header { display: grid; }.rootCard { min-width: 0; }.metrics { grid-template-columns: repeat(2, 1fr); }.grid { grid-template-columns: 1fr; }.audit > div { grid-template-columns: 1fr; } }
+@media (max-width: 540px) { .page { padding-inline: 12px; }.header h1 { font-size: 44px; }.metrics { grid-template-columns: 1fr 1fr; }.assetRow { display: grid; }.assetRow > div:last-child { justify-items: start; }.relayBar { align-items: stretch; flex-direction: column; }.denied { margin: 30px 12px; padding: 26px; }.denied h1 { font-size: 38px; } }

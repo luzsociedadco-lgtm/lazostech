@@ -6,6 +6,7 @@ import {IDiamondLoupe} from "src/interfaces/diamond/IDiamondLoupe.sol";
 import {OwnershipFacet} from "src/facets/core/OwnershipFacet.sol";
 import {RewardFacet} from "src/facets/economy/RewardFacet.sol";
 import {TicketsFacet} from "src/facets/economy/TicketsFacet.sol";
+import {NudosToken} from "src/token/NudosToken.sol";
 
 /// @notice Read-only post-deployment assertions for the production Diamond.
 contract ValidateMainnetDeployment is Script {
@@ -25,6 +26,13 @@ contract ValidateMainnetDeployment is Script {
         require(OwnershipFacet(diamond).owner() == expectedOwner, "Validate: wrong Diamond owner");
         require(RewardFacet(diamond).getRewardToken() == token, "Validate: reward token not configured");
         require(TicketsFacet(diamond).quoteTicketRedemption(1) > 0, "Validate: ticket quote not initialized");
+
+        NudosToken nudosToken = NudosToken(token);
+        require(nudosToken.totalSupply() == 1_000_000 ether, "Validate: wrong NUDOS supply");
+        require(nudosToken.balanceOf(expectedOwner) == 900_000 ether, "Validate: wrong Safe allocation");
+        require(nudosToken.balanceOf(diamond) == 100_000 ether, "Validate: wrong Diamond allocation");
+        require(nudosToken.TREASURY_SAFE() == expectedOwner, "Validate: wrong token Safe");
+        require(nudosToken.REWARD_DIAMOND() == diamond, "Validate: wrong token Diamond");
 
         IDiamondLoupe loupe = IDiamondLoupe(diamond);
         address[] memory facets = loupe.facetAddresses();

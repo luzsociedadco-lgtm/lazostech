@@ -7,7 +7,8 @@
     "e2e:contracts": "node scripts/frontend-backend-e2e.mjs",
     "build": "next build",
     "start": "next start",
-    "check-types": "tsc --noEmit"
+    "check-types": "tsc --noEmit",
+    "test:ops-monitor": "node --experimental-strip-types ../tools/test-chain-health-monitor.mjs"
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4.3.2",
@@ -15,7 +16,7 @@
     "@types/react": "^19.2.17",
     "@types/react-dom": "^19",
     "autoprefixer": "^10.5.2",
-    "postcss": "8.5.19",
+    "postcss": "8.5.26",
     "tailwindcss": "^4.1.16",
     "typescript": "5.9.3"
   },
@@ -24,7 +25,6 @@
     "node": "22.x"
   },
   "dependencies": {
-    "@react-native-async-storage/async-storage": "^2.2.0",
     "@supabase/ssr": "0.12.1",
     "@supabase/supabase-js": "2.110.3",
     "@tanstack/react-query": "^5.101.2",
@@ -43,7 +43,7 @@
   },
   "overrides": {
     "axios": "1.18.1",
-    "postcss": "8.5.19",
+    "postcss": "8.5.26",
     "sharp": "0.35.0"
   },
   "optionalDependencies": {
@@ -53,4 +53,3 @@
     "lightningcss-linux-x64-musl": "^1.30.2"
   }
 }
-

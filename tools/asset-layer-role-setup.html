@@ -1,0 +1,158 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Roles Asset Layer | LazosTech</title>
+  <style>
+    :root { color-scheme: light; font-family: Inter, system-ui, sans-serif; background: #f2f0e8; color: #10231a; }
+    body { margin: 0; padding: 48px 20px; }
+    main { max-width: 920px; margin: auto; }
+    h1 { font-size: clamp(40px, 7vw, 72px); line-height: .94; letter-spacing: -.05em; margin: 12px 0 18px; }
+    .eyebrow { color: #26724a; font-size: 12px; font-weight: 800; letter-spacing: .12em; text-transform: uppercase; }
+    .notice { padding: 16px 18px; border-radius: 16px; background: #10231a; color: white; overflow-wrap: anywhere; }
+    .grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 18px; margin-top: 22px; }
+    article { background: white; border: 1px solid #d7d8cf; border-radius: 22px; padding: 24px; box-shadow: 0 18px 50px rgba(16,35,26,.06); }
+    code { display: block; margin: 12px 0; font-size: 12px; overflow-wrap: anywhere; }
+    button { width: 100%; border: 0; border-radius: 12px; background: #e7e938; color: #10231a; font-weight: 850; padding: 13px 16px; cursor: pointer; }
+    button:disabled { cursor: not-allowed; opacity: .5; }
+    .status { color: #26724a; font-weight: 800; }
+    a { color: #26724a; }
+    @media (max-width: 700px) { .grid { grid-template-columns: 1fr; } }
+  </style>
+</head>
+<body>
+  <main>
+    <span class="eyebrow">LazosTech · Base Sepolia</span>
+    <h1>Asignación segura de roles</h1>
+    <p>Esta herramienta solo puede enviar dos llamadas predeterminadas al root de LazosTech. No solicita claves privadas.</p>
+    <p class="notice" id="notice">Conecta la wallet administradora 0xCa9c...3a4B.</p>
+    <button id="connect" type="button">Conectar wallet de Chrome</button>
+    <section class="grid">
+      <article>
+        <span class="eyebrow">Operador</span>
+        <h2 id="operator-title">Comprobando…</h2>
+        <code>0xB4BFd705bd44E5b6e154b55f6198c2b1F5a457eC</code>
+        <button data-role="operator" disabled type="button">Asignar operador</button>
+        <p id="operator-result"></p>
+      </article>
+      <article>
+        <span class="eyebrow">Auditor</span>
+        <h2 id="auditor-title">Comprobando…</h2>
+        <code>0x0e34aA3dFd097Ac3a318B4832B2F094caB28220c</code>
+        <button data-role="auditor" disabled type="button">Asignar auditor</button>
+        <p id="auditor-result"></p>
+      </article>
+    </section>
+  </main>
+  <script>
+    const chainId = "0x14a34";
+    const root = "0x6DbfbbE9d2719C10aA1BD2Cda227d2453E1F16F7";
+    const expectedAdmin = "0xca9cdd6714033a4d08e4be479c1077e5b35f3a4b";
+    const roles = {
+      operator: {
+        check: "0x148fb125000000000000000000000000000000000000000000000000000000000000000162c396e909cb3a33ff933605f9a069dae6c5528d447227ab9091bc0c1244a941000000000000000000000000b4bfd705bd44e5b6e154b55f6198c2b1f5a457ec",
+        grant: "0x6348bdeb000000000000000000000000000000000000000000000000000000000000000162c396e909cb3a33ff933605f9a069dae6c5528d447227ab9091bc0c1244a941000000000000000000000000b4bfd705bd44e5b6e154b55f6198c2b1f5a457ec"
+      },
+      auditor: {
+        check: "0x148fb1250000000000000000000000000000000000000000000000000000000000000001438169c14634f87e2308c3344f7ca2d6dbc85f722194ebf0c8cfe2aaf2d9dea90000000000000000000000000e34aa3dfd097ac3a318b4832b2f094cab28220c",
+        grant: "0x6348bdeb0000000000000000000000000000000000000000000000000000000000000001438169c14634f87e2308c3344f7ca2d6dbc85f722194ebf0c8cfe2aaf2d9dea90000000000000000000000000e34aa3dfd097ac3a318b4832b2f094cab28220c"
+      }
+    };
+
+    const notice = document.querySelector("#notice");
+    const connectButton = document.querySelector("#connect");
+    let account = null;
+
+    function provider() {
+      if (!window.ethereum) throw new Error("No se encontró una wallet Ethereum en Chrome.");
+      return window.ethereum;
+    }
+
+    async function ensureNetwork() {
+      try {
+        await provider().request({ method: "wallet_switchEthereumChain", params: [{ chainId }] });
+      } catch (error) {
+        if (error.code !== 4902) throw error;
+        await provider().request({
+          method: "wallet_addEthereumChain",
+          params: [{
+            chainId,
+            chainName: "Base Sepolia",
+            nativeCurrency: { name: "ETH", symbol: "ETH", decimals: 18 },
+            rpcUrls: ["https://sepolia.base.org"],
+            blockExplorerUrls: ["https://sepolia.basescan.org"]
+          }]
+        });
+      }
+    }
+
+    async function roleAssigned(roleKey) {
+      const result = await provider().request({
+        method: "eth_call",
+        params: [{ to: root, data: roles[roleKey].check }, "latest"]
+      });
+      return BigInt(result) === 1n;
+    }
+
+    async function refresh() {
+      for (const roleKey of Object.keys(roles)) {
+        const active = await roleAssigned(roleKey);
+        document.querySelector(`#${roleKey}-title`).textContent = active ? "Rol activo" : "Pendiente";
+        const button = document.querySelector(`[data-role="${roleKey}"]`);
+        button.disabled = !account || account !== expectedAdmin || active;
+        if (active) button.textContent = "Asignado";
+      }
+    }
+
+    async function connect() {
+      try {
+        await ensureNetwork();
+        const accounts = await provider().request({ method: "eth_requestAccounts" });
+        account = accounts[0]?.toLowerCase() || null;
+        if (account !== expectedAdmin) {
+          notice.textContent = `Wallet incorrecta: ${account || "ninguna"}. Usa 0xCa9c...3a4B.`;
+          return;
+        }
+        notice.textContent = `Administradora conectada: ${accounts[0]}.`;
+        connectButton.textContent = "Wallet correcta conectada";
+        await refresh();
+      } catch (error) {
+        notice.textContent = error.message || "No se pudo conectar la wallet.";
+      }
+    }
+
+    async function grant(roleKey) {
+      const button = document.querySelector(`[data-role="${roleKey}"]`);
+      const result = document.querySelector(`#${roleKey}-result`);
+      try {
+        button.disabled = true;
+        result.textContent = "Esperando firma…";
+        const hash = await provider().request({
+          method: "eth_sendTransaction",
+          params: [{ from: account, to: root, data: roles[roleKey].grant, value: "0x0" }]
+        });
+        result.innerHTML = `<a href="https://sepolia.basescan.org/tx/${hash}" target="_blank" rel="noreferrer">Ver transacción</a>`;
+        for (let attempt = 0; attempt < 30; attempt += 1) {
+          await new Promise(resolve => setTimeout(resolve, 2000));
+          const receipt = await provider().request({ method: "eth_getTransactionReceipt", params: [hash] });
+          if (receipt) {
+            if (receipt.status !== "0x1") throw new Error("La transacción fue revertida.");
+            await refresh();
+            return;
+          }
+        }
+        result.textContent = "La transacción sigue pendiente; revísala en BaseScan.";
+      } catch (error) {
+        result.textContent = error.message || "No se pudo asignar el rol.";
+        await refresh();
+      }
+    }
+
+    connectButton.addEventListener("click", connect);
+    document.querySelectorAll("[data-role]").forEach(button => {
+      button.addEventListener("click", () => grant(button.dataset.role));
+    });
+  </script>
+</body>
+</html>
