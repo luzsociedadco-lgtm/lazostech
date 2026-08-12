@@ -20,9 +20,7 @@ abstract contract NudosDeploymentBase is Script {
         DiamondCutFacet cutFacet = new DiamondCutFacet();
         diamond = new Diamond(deploymentOwner, address(cutFacet));
         DiamondInit init = new DiamondInit();
-        NudosFacetCutFactory factory = new NudosFacetCutFactory();
-
-        IDiamondCut.FacetCut[] memory cut = factory.deployFacets();
+        IDiamondCut.FacetCut[] memory cut = NudosFacetCutFactory.deployFacets();
         IDiamondCut(address(diamond)).diamondCut(cut, address(init), abi.encodeCall(DiamondInit.init, ()));
 
         if (finalOwner != deploymentOwner) {

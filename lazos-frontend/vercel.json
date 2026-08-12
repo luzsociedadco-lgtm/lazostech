@@ -2,5 +2,15 @@
   "$schema": "https://openapi.vercel.sh/vercel.json",
   "framework": "nextjs",
   "installCommand": "npm ci --workspaces=false --legacy-peer-deps",
-  "buildCommand": "next build"
+  "buildCommand": "next build",
+  "crons": [
+    {
+      "path": "/api/asset-layer/relay",
+      "schedule": "0 12 * * *"
+    },
+    {
+      "path": "/api/ops/chain-health",
+      "schedule": "10 12 * * *"
+    }
+  ]
 }

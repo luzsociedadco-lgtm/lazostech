@@ -48,7 +48,9 @@ The 2026-07-22 baseline, measured with `forge coverage --ir-minimum --report sum
 
 ## 2. Decide and implement the NUDOS token policy
 
-The active source tree does not currently contain the canonical ERC20 implementation. Before writing or activating it, approve:
+The canonical implementation is `src/token/NudosToken.sol`. It has no owner,
+mint, upgrade, or pause authority and allocates the complete supply in its
+constructor. Before deployment, approve and archive:
 
 1. maximum or fixed supply;
 2. whether minting remains possible after launch;
@@ -58,7 +60,28 @@ The active source tree does not currently contain the canonical ERC20 implementa
 6. burn and upgrade policy;
 7. how the reward treasury is funded and replenished.
 
-Record the approved policy in `TOKENOMICS.md`, implement the token, add unit/fuzz/invariant tests, include it in the external audit, and then update the `token` section of `config/mainnet-readiness.json`.
+Record the approved policy in `TOKENOMICS.md`, keep the unit/fuzz/invariant
+tests green, include the token in the external audit, and then update the
+`token` section of `config/mainnet-readiness.json` only after on-chain evidence
+exists.
+
+Deploy the Diamond first, then deploy the fixed-supply token with:
+
+```powershell
+$env:DIAMOND_OWNER="0xSAFE_ADDRESS"
+$env:DIAMOND_ADDRESS="0xDIAMOND_ADDRESS"
+forge script script/DeployNudosToken.s.sol:DeployNudosToken `
+  --rpc-url $env:BASE_MAINNET_RPC_URL `
+  --account nudos-deployer `
+  --sender $env:DEPLOYER_ADDRESS `
+  --broadcast `
+  --verify `
+  -vvv
+```
+
+The final Safe owner must then execute `setRewardToken(tokenAddress)` on the
+Diamond. This is a Safe transaction and must be proposed, reviewed, signed by
+two owners, and verified before the reward flows are enabled.
 
 ## 3. Create the production Safe
 

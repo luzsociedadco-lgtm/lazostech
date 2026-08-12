@@ -39,8 +39,10 @@ function isAddress(value) {
 }
 
 function git(args) {
-  const windowsGit = "C:\\Program Files\\Git\\cmd\\git.exe";
-  const command = process.platform === "win32" && existsSync(windowsGit) ? windowsGit : "git";
+  // Resolve Git from PATH so the checker works in managed Windows runtimes,
+  // portable installations, CI, and developer machines alike. An explicit
+  // binary can still be supplied when an operator needs one.
+  const command = process.env.GIT_BINARY || "git";
   return execFileSync(command, args, { cwd: root, encoding: "utf8" }).trim();
 }
 
@@ -72,8 +74,13 @@ add(
 add(
   "mainnet-safe-owner",
   "code",
-  mainnetDeploy.includes("DIAMOND_OWNER") && mainnetDeploy.includes("owner must be a Safe/multisig"),
-  "mainnet owner cannot remain the deployer EOA",
+  mainnetDeploy.includes("DIAMOND_OWNER") &&
+    mainnetDeploy.includes("owner must be a Safe/multisig") &&
+    mainnetDeploy.includes("getOwners()") &&
+    mainnetDeploy.includes("getThreshold()") &&
+    mainnetDeploy.includes("owners.length >= 3") &&
+    mainnetDeploy.includes("threshold >= 2"),
+  "mainnet owner must be a deployed Safe with at least 3 owners and threshold 2",
 );
 add(
   "mainnet-keystore-policy",

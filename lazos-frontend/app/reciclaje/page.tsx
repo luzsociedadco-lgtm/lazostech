@@ -1,14 +1,15 @@
 "use client";
 
 import Image from "next/image";
+import Link from "next/link";
 import {
   MapPin,
   QrCode,
   ScrollText,
 } from "lucide-react";
-import { useState } from "react";
-import { FeatureGate } from "@/app/components/FeatureGate";
+import { useEffect, useState } from "react";
 import ComingSoonCover from "@/app/components/ComingSoonCover";
+import { FeatureGate } from "@/app/components/FeatureGate";
 import { useNudosErc20Balance } from "@/app/hooks/useNudosErc20Balance";
 import { useAuth } from "@/app/providers/AuthProvider";
 
@@ -35,11 +36,35 @@ export default function ReciclajePage() {
   const { balance, isConnected, isLoading, symbol } = useNudosErc20Balance();
   const [certificateOpen, setCertificateOpen] = useState(false);
   const [walletQrOpen, setWalletQrOpen] = useState(false);
+  const [enterpriseAdmin, setEnterpriseAdmin] = useState(false);
   const balanceDisplay = isConnected ? (isLoading ? "..." : balance ?? "0") : "Conecta tu wallet";
   const walletAddress = user?.linkedWallet?.address || "";
   const walletQrUrl = walletAddress
     ? `https://api.qrserver.com/v1/create-qr-code/?size=220x220&data=${encodeURIComponent(walletAddress)}`
     : "";
+
+  useEffect(() => {
+    let active = true;
+    if (!user) {
+      setEnterpriseAdmin(false);
+      return () => {
+        active = false;
+      };
+    }
+
+    void fetch("/api/asset-layer/access", { cache: "no-store" })
+      .then(response => response.json())
+      .then((payload: { enterpriseAdmin?: boolean }) => {
+        if (active) setEnterpriseAdmin(payload.enterpriseAdmin === true);
+      })
+      .catch(() => {
+        if (active) setEnterpriseAdmin(false);
+      });
+
+    return () => {
+      active = false;
+    };
+  }, [user?.id]);
 
   return (
     <main className="recycle-screen">
@@ -47,6 +72,11 @@ export default function ReciclajePage() {
         <FeatureGate module="reciclaje">
         <header className="recycle-header">
           <h1>Recicla-Ahorro</h1>
+          {enterpriseAdmin ? (
+            <Link href="/reciclaje/operacion" className="recycle-outline-button">
+              Operación empresarial
+            </Link>
+          ) : null}
         </header>
 
         <button type="button" className="recycle-balance-card" onClick={() => setCertificateOpen(true)}>

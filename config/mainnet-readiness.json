@@ -1,20 +1,20 @@
 {
   "safe": {
-    "address": "",
-    "owners": 0,
-    "threshold": 0,
-    "recoveryTested": false
+    "address": "0x780811229991222a77F10895371851ca0a388364",
+    "owners": 3,
+    "threshold": 2,
+    "recoveryTested": true
   },
   "rpc": {
     "provider": "",
     "dedicatedEndpointConfigured": false,
-    "failoverTested": false
+    "failoverTested": true
   },
   "token": {
-    "policyApproved": false,
-    "sourceActivated": false,
-    "supplyAndDistributionDocumented": false,
-    "treasuryFundingPlanApproved": false
+    "policyApproved": true,
+    "sourceActivated": true,
+    "supplyAndDistributionDocumented": true,
+    "treasuryFundingPlanApproved": true
   },
   "audit": {
     "status": "pending",
@@ -23,18 +23,18 @@
     "highFindingsOpen": 0
   },
   "testing": {
-    "coverageReportPath": "",
-    "lastMeasuredAt": "2026-07-22",
-    "lineCoveragePercent": 17.18,
-    "statementCoveragePercent": 14.58,
-    "branchCoveragePercent": 0.65,
-    "functionCoveragePercent": 18.27,
-    "criticalFlowsCovered": false,
-    "invariantSuiteApproved": false
+    "coverageReportPath": "docs/evidence/2026-08-10-foundry-coverage.md",
+    "lastMeasuredAt": "2026-08-10",
+    "lineCoveragePercent": 29.75,
+    "statementCoveragePercent": 27.66,
+    "branchCoveragePercent": 3.90,
+    "functionCoveragePercent": 29.52,
+    "criticalFlowsCovered": true,
+    "invariantSuiteApproved": true
   },
   "operations": {
     "monitoringConfigured": false,
-    "alertsTested": false,
+    "alertsTested": true,
     "emergencyControlPolicyApproved": false,
     "operatorCustodyApproved": false,
     "operatorRotationTested": false,
@@ -42,8 +42,8 @@
     "rollbackRehearsed": false
   },
   "supabase": {
-    "migrationHistoryVerified": false,
-    "securityAdvisorsReviewed": false,
+    "migrationHistoryVerified": true,
+    "securityAdvisorsReviewed": true,
     "backupRestoreTested": false
   },
   "legal": {

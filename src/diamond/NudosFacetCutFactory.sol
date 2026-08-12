@@ -29,11 +29,12 @@ import {ImpactCredentialFacet} from "src/facets/impact/ImpactCredentialFacet.sol
 import {MachineFacet} from "src/facets/machines/MachineFacet.sol";
 import {ProfileFacet} from "src/facets/profile/ProfileFacet.sol";
 
-/// @notice Deploys and describes the canonical 21-facet cut used by deployments and integration tests.
-contract NudosFacetCutFactory {
+/// @notice Builds the canonical 21-facet cut used by deployment scripts and integration tests.
+/// @dev Kept internal so the combined facet creation code is never deployed as an EIP-170-limited contract.
+library NudosFacetCutFactory {
     uint256 public constant FACET_COUNT = 21;
 
-    function deployFacets() external returns (IDiamondCut.FacetCut[] memory cut) {
+    function deployFacets() internal returns (IDiamondCut.FacetCut[] memory cut) {
         cut = new IDiamondCut.FacetCut[](FACET_COUNT);
 
         cut[0] = _add(address(new DiamondLoupeFacet()), SelectorLib.getDiamondLoupeFacetSelectors());

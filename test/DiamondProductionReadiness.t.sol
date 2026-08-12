@@ -24,6 +24,12 @@ contract SecondDummyUpgradeFacet {
     }
 }
 
+contract ReplacementUpgradeFacet {
+    function ping() external pure returns (uint256) {
+        return 2;
+    }
+}
+
 contract DiamondProductionReadinessTest is Test {
     address internal protocolOwner;
     address internal attacker;
@@ -36,8 +42,7 @@ contract DiamondProductionReadinessTest is Test {
         DiamondCutFacet cutFacet = new DiamondCutFacet();
         diamond = new Diamond(protocolOwner, address(cutFacet));
         DiamondInit init = new DiamondInit();
-        NudosFacetCutFactory factory = new NudosFacetCutFactory();
-        IDiamondCut.FacetCut[] memory cut = factory.deployFacets();
+        IDiamondCut.FacetCut[] memory cut = NudosFacetCutFactory.deployFacets();
 
         vm.prank(protocolOwner);
         IDiamondCut(address(diamond)).diamondCut(cut, address(init), abi.encodeCall(DiamondInit.init, ()));
@@ -122,6 +127,30 @@ contract DiamondProductionReadinessTest is Test {
         OwnershipFacet(address(diamond)).transferOwnership(address(0));
     }
 
+    function testOwnerCanReplaceAndRollBackSelector() public {
+        DummyUpgradeFacet originalFacet = new DummyUpgradeFacet();
+        ReplacementUpgradeFacet replacementFacet = new ReplacementUpgradeFacet();
+
+        vm.prank(protocolOwner);
+        IDiamondCut(address(diamond))
+            .diamondCut(_singleAdd(address(originalFacet), DummyUpgradeFacet.ping.selector), address(0), "");
+        assertEq(DummyUpgradeFacet(address(diamond)).ping(), 1);
+
+        vm.prank(protocolOwner);
+        IDiamondCut(address(diamond))
+            .diamondCut(
+                _singleReplace(address(replacementFacet), ReplacementUpgradeFacet.ping.selector), address(0), ""
+            );
+        assertEq(ReplacementUpgradeFacet(address(diamond)).ping(), 2);
+
+        vm.prank(protocolOwner);
+        IDiamondCut(address(diamond))
+            .diamondCut(_singleReplace(address(originalFacet), DummyUpgradeFacet.ping.selector), address(0), "");
+
+        assertEq(DummyUpgradeFacet(address(diamond)).ping(), 1);
+        assertEq(IDiamondLoupe(address(diamond)).facetAddress(DummyUpgradeFacet.ping.selector), address(originalFacet));
+    }
+
     function _singleAdd(address facet, bytes4 selector) internal pure returns (IDiamondCut.FacetCut[] memory cut) {
         bytes4[] memory selectors = new bytes4[](1);
         selectors[0] = selector;
@@ -129,6 +158,16 @@ contract DiamondProductionReadinessTest is Test {
         cut = new IDiamondCut.FacetCut[](1);
         cut[0] = IDiamondCut.FacetCut({
             facetAddress: facet, action: IDiamondCut.FacetCutAction.Add, functionSelectors: selectors
+        });
+    }
+
+    function _singleReplace(address facet, bytes4 selector) internal pure returns (IDiamondCut.FacetCut[] memory cut) {
+        bytes4[] memory selectors = new bytes4[](1);
+        selectors[0] = selector;
+
+        cut = new IDiamondCut.FacetCut[](1);
+        cut[0] = IDiamondCut.FacetCut({
+            facetAddress: facet, action: IDiamondCut.FacetCutAction.Replace, functionSelectors: selectors
         });
     }
 }
