@@ -40,16 +40,21 @@ its reference below.
 
 | Scenario | Date | Lead | Target time | Actual time | Result | Evidence reference |
 | --- | --- | --- | --- | --- | --- | --- |
-| Lost Safe signer | PENDING | PENDING | 30 min | PENDING | PENDING | Mainnet rehearsal available |
-| Compromised relayer operator | PENDING | PENDING | 15 min | PENDING | PENDING | PENDING |
-| Primary RPC outage/failover | PENDING | PENDING | 5 min | PENDING | PENDING | Local rules tested; delivery pending |
-| Defective Diamond cut/rollback | PENDING | PENDING | 30 min | PENDING | PENDING | Local rollback only |
-| Reward or treasury anomaly | PENDING | PENDING | 15 min | PENDING | PENDING | PENDING |
-| Supabase isolated restore | PENDING | PENDING | Defined before drill | PENDING | PENDING | PENDING |
+| Lost Safe signer | 2026-08-12 | PENDING | 30 min | PENDING | TECHNICAL PASS; acceptance pending | Base Mainnet Safe recovery rehearsal |
+| Compromised relayer operator | 2026-08-13 | PENDING | 15 min | PENDING | TECHNICAL PASS; acceptance pending | Base Sepolia Safe operations rehearsal |
+| Primary RPC outage/failover | 2026-08-12 | PENDING | 5 min | PENDING | TECHNICAL PASS; acceptance pending | Production RPC and monitoring evidence |
+| Defective Diamond cut/rollback | 2026-08-13 | PENDING | 30 min | PENDING | TECHNICAL PASS; acceptance pending | Base Sepolia Safe operations rehearsal |
+| Reward or treasury anomaly | 2026-08-13 | PENDING | 15 min | PENDING | TECHNICAL PASS; acceptance pending | Technical tabletop consolidation and Foundry suites |
+| Supabase isolated restore | 2026-08-13 | PENDING | PENDING | PENDING | TECHNICAL PASS; acceptance pending | Supabase restore drill evidence |
 
 For each exercise record the declaration time, who made each decision, Safe or
 public transaction hashes where applicable, sanitized logs, failed steps,
 recovery point, and follow-up owners/dates.
+
+The technical mapping and reward/treasury decision tree are consolidated in
+`docs/evidence/2026-08-13-operations-tabletop-technical.md`. Rows remain
+organizationally pending until the named lead records actual exercise timing
+and accepts each procedure.
 
 ## Approval outcome
 

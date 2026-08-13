@@ -73,13 +73,16 @@ client-visible or committed.
 ## Evidence available to the auditor
 
 - Base Mainnet 2-of-3 Safe creation and recovery rehearsal evidence.
+- Base Sepolia 2-of-3 Safe operator rotation and atomic Diamond
+  add/replace/rollback/removal evidence.
 - 27 passing Foundry tests across 5 suites on 2026-08-12.
 - Stateful invariant and critical-flow coverage, with the limitations recorded
   in `docs/evidence/2026-08-10-foundry-coverage.md`.
 - Post-fix EIP-170 size report with all deployable contracts under the runtime
   limit; the previously oversized facet factory is now an internal library.
-- Local Diamond rollback rehearsal.
-- RPC failover and alert-rule self-tests.
+- Production RPC failover, authenticated monitoring and observed alert
+  delivery.
+- Isolated Supabase roles, schema, data and migration-history restore drill.
 - TypeScript verification and dependency audit results recorded in
   `docs/evidence/2026-08-12-local-predeploy-verification.md`.
 - Token policy and approved economic schedule documentation.
@@ -88,11 +91,8 @@ client-visible or committed.
 
 - Overall coverage remains low: 29.75% lines, 27.66% statements, 3.90%
   branches, and 29.52% functions in the last measured report.
-- The current Base Sepolia Diamond owner is an EOA, so the pilot does not prove
-  Safe-governed operator rotation or Safe-governed rollback.
-- Production RPCs, alert delivery, Supabase restore, operations approvals,
-  legal review, Mainnet deployment, explorer verification, and Mainnet E2E are
-  incomplete.
+- Organizational operations approvals, named roles, legal review, Mainnet
+  deployment, explorer verification, and Mainnet E2E are incomplete.
 - The current worktree is not a clean, frozen release.
 - The latest production build attempt timed out locally and is inconclusive;
   the last recorded successful build predates the new monitoring route.

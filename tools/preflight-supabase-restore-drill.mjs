@@ -7,8 +7,22 @@ import { fileURLToPath } from "node:url";
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 
 function commandAvailable(command) {
-  const locator = process.platform === "win32" ? "where.exe" : "which";
-  return spawnSync(locator, [command], { encoding: "utf8", windowsHide: true }).status === 0;
+  const extensions = process.platform === "win32" && !path.extname(command)
+    ? ["", ".exe", ".cmd", ".bat"]
+    : [""];
+  return (process.env.PATH ?? "")
+    .split(path.delimiter)
+    .filter(Boolean)
+    .some(directory => extensions.some(extension => existsSync(path.join(directory, `${command}${extension}`))));
+}
+
+function commandWorks(command, args) {
+  const result = spawnSync(command, args, {
+    encoding: "utf8",
+    timeout: 8_000,
+    windowsHide: true,
+  });
+  return result.status === 0;
 }
 
 function linkedProjectRef() {
@@ -44,6 +58,10 @@ function targetIsIsolated(sourceRef) {
 }
 
 const sourceRef = linkedProjectRef();
+const dockerClientAvailable = commandAvailable("docker");
+const dockerEngineAvailable =
+  dockerClientAvailable && commandWorks("docker", ["version", "--format", "{{.Server.Version}}"]);
+const hostPsqlAvailable = commandAvailable("psql");
 const checks = [
   {
     id: "linked-project",
@@ -56,14 +74,21 @@ const checks = [
     detail: "project-pinned Supabase CLI",
   },
   {
-    id: "docker",
-    passed: commandAvailable("docker"),
-    detail: "required by Supabase CLI db dump",
+    id: "docker-client",
+    passed: dockerClientAvailable,
+    detail: "required by Supabase CLI db dump and the local target",
+  },
+  {
+    id: "docker-engine",
+    passed: dockerEngineAvailable,
+    detail: "Docker engine must be reachable by the current user",
   },
   {
     id: "psql",
-    passed: commandAvailable("psql"),
-    detail: "required for transactional restore and validation",
+    passed: hostPsqlAvailable || dockerEngineAvailable,
+    detail: hostPsqlAvailable
+      ? "host psql available"
+      : "use psql inside the disposable Supabase database container",
   },
   {
     id: "isolated-target",

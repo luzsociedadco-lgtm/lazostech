@@ -13,7 +13,8 @@ only database modified by restore and validation.
 ## Prerequisites
 
 1. Docker Desktop available to Supabase CLI.
-2. PostgreSQL `psql` client available.
+2. PostgreSQL `psql` available either on the host or inside the disposable
+   Supabase database container.
 3. Project-pinned Supabase CLI (`2.109.1` in this repository).
 4. A fresh target with a project reference different from the linked source.
 5. The source and target passwords supplied only through the interactive shell
@@ -52,8 +53,27 @@ test them separately if the application depends on Storage.
 
 ## Restore
 
-Restore into the disposable target in one transaction and stop on the first
-error:
+When `psql` is not installed on Windows, use the client inside the disposable
+Supabase database container. Copy the dump files only into that target
+container, then pass their container paths to `psql`. Confirm the exact target
+container ID first; never select a container by an ambiguous partial match.
+
+Before loading data, initialize the disposable target with the Supabase Auth
+and Storage services so their managed schema migrations match the dump. A bare
+`supabase/postgres` container is not sufficient for current Auth and Storage
+tables. If the combined startup is unhealthy, initialize and verify DB + Auth,
+preserve the database volume, then initialize and verify DB + Storage.
+
+On Windows, do not rely on piping an interactive password into
+`supabase db dump`: the CLI may detach the PostgreSQL container from stdin.
+Prompt in Git Bash, export the value only as temporary `PGPASSWORD`, and pass
+the environment variable by name to the official PostgreSQL container. Unset
+it on every exit path. Never embed the password in the connection URL or
+command arguments.
+
+Restore roles, application schema, and data in one transaction. Restore the
+project migration history in a second transaction, matching Supabase's current
+procedure. Stop on the first error:
 
 ```powershell
 psql --single-transaction --variable ON_ERROR_STOP=1 `
@@ -61,16 +81,24 @@ psql --single-transaction --variable ON_ERROR_STOP=1 `
   --file tmp/supabase-restore-drill/schema.sql `
   --command 'SET session_replication_role = replica' `
   --file tmp/supabase-restore-drill/data.sql `
+  --dbname $env:SUPABASE_RESTORE_TARGET_DB_URL
+
+psql --single-transaction --variable ON_ERROR_STOP=1 `
   --file tmp/supabase-restore-drill/history_schema.sql `
   --file tmp/supabase-restore-drill/history_data.sql `
   --dbname $env:SUPABASE_RESTORE_TARGET_DB_URL
 ```
 
+If the roles phase reports that `supabase_admin` is reserved, preserve the
+original dump and create a restore-only copy that comments only the prohibited
+`ALTER ROLE "supabase_admin" ...` statement, following Supabase's documented
+troubleshooting. Record both hashes and never weaken another role or grant.
+
 ## Validation
 
 The drill passes only when all checks succeed:
 
-- all 15 source migration versions exist on the target;
+- all 16 source migration versions exist on the target;
 - required schemas, tables, functions, triggers, RLS policies, and grants exist;
 - row counts for application tables match the source snapshot;
 - a target-only authenticated test user can execute the permitted lunch-turn

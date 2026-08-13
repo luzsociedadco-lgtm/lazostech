@@ -12,6 +12,7 @@ function isPublicPath(pathname: string) {
     pathname === "/we" ||
     pathname === "/luzsociedad" ||
     pathname === "/unimarket" ||
+    pathname.startsWith("/legal") ||
     pathname.startsWith("/reciclaje/lotes/") ||
     pathname.startsWith("/auth/callback")
   );

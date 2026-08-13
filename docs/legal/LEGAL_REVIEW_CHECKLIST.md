@@ -45,6 +45,21 @@ entity, contracts, jurisdictions, and data flows before public mainnet launch.
 - Complaint, privacy-request, and security-report channels tested.
 - Versioned acceptance records retained with document version and timestamp.
 
+## Implemented review surfaces
+
+The release includes public, no-index draft routes at:
+
+- `/legal`;
+- `/legal/terminos`;
+- `/legal/privacidad`;
+- `/legal/riesgos-token`.
+
+Every route is prominently marked **Borrador - No vigente** and must not be
+used to collect acceptance. Before activation, counsel and the operating entity
+must replace all pending controller/entity details, approve the actual product
+and data flows, set a version/effective date, remove the draft/no-index status,
+publish the approved texts, and implement versioned acceptance where required.
+
 ## Sources for counsel to confirm
 
 - Colombian personal-data framework: Ley 1581 de 2012 and Decreto 1074 de
@@ -52,8 +67,8 @@ entity, contracts, jurisdictions, and data flows before public mainnet launch.
   <https://sedeelectronica.sic.gov.co/politica-de-tratamiento-de-datos-personales>.
 - Consumer protection: Ley 1480 de 2011 at
   <https://www.funcionpublica.gov.co/eva/gestornormativo/norma.php?i=44306>.
-- Current SFC position on virtual assets:
-  <https://www.superfinanciera.gov.co/publicaciones/10103299/innovasfcelhub-10103299/>.
+- Current SFC consumer information on virtual assets:
+  <https://www.superfinanciera.gov.co/publicaciones/10115324/que-son-los-activos-digitales-o-criptoactivos/>.
 - UIAF virtual-asset information and reporting materials:
   <https://uiaf.gov.co/sector/activos-virtuales>.
 
