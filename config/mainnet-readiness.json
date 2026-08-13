@@ -6,8 +6,8 @@
     "recoveryTested": true
   },
   "rpc": {
-    "provider": "",
-    "dedicatedEndpointConfigured": false,
+    "provider": "Alchemy primary and Chainstack failover",
+    "dedicatedEndpointConfigured": true,
     "failoverTested": true
   },
   "token": {
@@ -33,7 +33,7 @@
     "invariantSuiteApproved": true
   },
   "operations": {
-    "monitoringConfigured": false,
+    "monitoringConfigured": true,
     "alertsTested": true,
     "emergencyControlPolicyApproved": false,
     "operatorCustodyApproved": false,
