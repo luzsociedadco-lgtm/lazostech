@@ -3,6 +3,11 @@
 Status: prepared for isolated alternate-index staging; not a Mainnet deployment
 authorization.
 
+Frozen code/review commit:
+`9bfd866d1947acd6f8147ce3d886353bc7dc9eee` on
+`agent/nudos-pre-mainnet-gates`. Clean verification is recorded in
+`docs/evidence/2026-08-13-clean-pre-mainnet-release.md`.
+
 This manifest isolates the NUDOS Mainnet-predeploy and LazosTech Asset Layer
 work from unrelated changes currently present in the mixed worktree. It is the
 authoritative staging scope once GitHub authentication is restored.

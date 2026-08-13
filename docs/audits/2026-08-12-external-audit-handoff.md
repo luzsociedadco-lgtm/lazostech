@@ -8,15 +8,18 @@ report.
 
 ## Candidate release
 
-- Repository worktree: `C:\Users\INICIO\lazos-dapp\NUDOS`
-- Current branch: `shipaton/unimarket`
-- Observed HEAD: `3c94e14aab2483d24f3be2094dcc84ee94f7f3f7`
-- Frozen audit commit: **PENDING**
-- Worktree state at preparation: **DIRTY (64 porcelain entries)**
+- Repository: `luzsociedadco-lgtm/lazostech`
+- Release branch: `agent/nudos-pre-mainnet-gates`
+- Frozen audit code/review commit:
+  `9bfd866d1947acd6f8147ce3d886353bc7dc9eee`
+- Parent `origin/main`:
+  `bcceb496b38dbd0ffad1264cb7fd2a08c5e1d653`
+- Frozen validation worktree: **CLEAN**
 
-The observed HEAD is not declared to be the audit commit. Freeze only the
-intended Mainnet sources, deployment inputs, tests, and documentation after
-unrelated worktree changes are separated.
+The audit scope is the frozen commit above. Later documentation-only commits
+may link this identifier but do not change the audited code tree. Any source,
+configuration or deployment-script change requires a new frozen commit and an
+auditor-approved delta/retest.
 
 ## Required smart-contract scope
 
@@ -93,7 +96,6 @@ client-visible or committed.
   branches, and 29.52% functions in the last measured report.
 - Organizational operations approvals, named roles, legal review, Mainnet
   deployment, explorer verification, and Mainnet E2E are incomplete.
-- The current worktree is not a clean, frozen release.
 - The latest production build attempt timed out locally and is inconclusive;
   the last recorded successful build predates the new monitoring route.
 - Foundry emits existing lint/compiler warnings for unused return names,
