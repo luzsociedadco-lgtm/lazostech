@@ -31,11 +31,15 @@ proposed or signed as part of this verification.
 | Operations monitor self-test | PASS, failover/stale-block/missing-code cases |
 | Dependency audit | PASS, 0 vulnerabilities at moderate threshold |
 | Next.js production build | INCONCLUSIVE on this Windows runner: no error output before a 304-second timeout |
+| Local HTTP/visual verification | INCONCLUSIVE: the in-app browser connection failed before opening a tab and route requests timed out during Next compilation |
 
 The dependency folder used for frontend checks was an ignored local junction to
 the already installed dependency tree; it was not added to Git. The Next.js
 build must be repeated by GitHub/Vercel from the pushed commit and must not be
 reported as passing until that independent build completes.
+
+The temporary local server was stopped after the route requests timed out. No
+visual PASS is claimed.
 
 ## Remaining predeploy gates
 
