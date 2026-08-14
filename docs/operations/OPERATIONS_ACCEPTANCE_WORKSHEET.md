@@ -47,12 +47,12 @@ its reference below.
 
 | Scenario | Date | Lead | Target time | Actual time | Result | Evidence reference |
 | --- | --- | --- | --- | --- | --- | --- |
-| Lost Safe signer | 2026-08-12 | Incident lead 604D (assigned; signature pending) | 30 min | PENDING | TECHNICAL PASS; acceptance pending | Base Mainnet Safe recovery rehearsal |
-| Compromised relayer operator | 2026-08-13 | Incident lead 604D (assigned; signature pending) | 15 min | PENDING | TECHNICAL PASS; acceptance pending | Base Sepolia Safe operations rehearsal |
-| Primary RPC outage/failover | 2026-08-12 | Incident lead 604D (assigned; signature pending) | 5 min | PENDING | TECHNICAL PASS; acceptance pending | Production RPC and monitoring evidence |
-| Defective Diamond cut/rollback | 2026-08-13 | Incident lead 604D with backup 54D6 (signatures pending) | 30 min | PENDING | TECHNICAL PASS; acceptance pending | Base Sepolia Safe operations rehearsal |
-| Reward or treasury anomaly | 2026-08-13 | Incident lead 604D with Safe quorum (signatures pending) | 15 min | PENDING | TECHNICAL PASS; acceptance pending | Technical tabletop consolidation and Foundry suites |
-| Supabase isolated restore | 2026-08-13 | Application operator FBE9 (full address/signature pending) | PENDING | PENDING | TECHNICAL PASS; acceptance pending | Supabase restore drill evidence |
+| Lost Safe signer | 2026-08-12 | Incident lead 604D (accepted 2026-08-14 UTC) | 30 min | 41 min 22 sec | PROCEDURE PASS; TARGET MISSED; RETEST REQUIRED | Base Mainnet Safe recovery rehearsal; timestamps `06:57:47Z` to `07:39:09Z` |
+| Compromised relayer operator | 2026-08-13 | Incident lead 604D (accepted 2026-08-14 UTC) | 15 min | PENDING | TECHNICAL PASS; TIMING RETEST REQUIRED | Base Sepolia Safe operations rehearsal |
+| Primary RPC outage/failover | 2026-08-12 | Incident lead 604D (accepted 2026-08-14 UTC) | 5 min | PENDING | TECHNICAL PASS; TIMING RETEST REQUIRED | Production RPC and monitoring evidence |
+| Defective Diamond cut/rollback | 2026-08-13 | Incident lead 604D with backup 54D6 (accepted 2026-08-14 UTC) | 30 min | PENDING | TECHNICAL PASS; TIMING RETEST REQUIRED | Base Sepolia Safe operations rehearsal |
+| Reward or treasury anomaly | 2026-08-13 | Incident lead 604D with Safe quorum (roles accepted 2026-08-14 UTC) | 15 min | PENDING | TECHNICAL PASS; TIMING RETEST REQUIRED | Technical tabletop consolidation and Foundry suites |
+| Supabase isolated restore | 2026-08-13 | Application operator FBE9 (accepted 2026-08-14 UTC) | PENDING | PENDING | TECHNICAL PASS; RPO/RTO DECISION AND TIMING RETEST REQUIRED | Supabase restore drill evidence |
 
 For each exercise record the declaration time, who made each decision, Safe or
 public transaction hashes where applicable, sanitized logs, failed steps,
