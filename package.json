@@ -5,6 +5,7 @@
     "ops:rpc:check": "node tools/check-rpc-operations.mjs",
     "ops:rpc:self-test": "node tools/check-rpc-operations.mjs --self-test --json",
     "ops:supabase:restore-preflight": "node tools/preflight-supabase-restore-drill.mjs",
+    "ops:acceptance:verify": "node lazos-frontend/scripts/verify-operations-acceptance.mjs",
     "readiness:code": "node tools/check-mainnet-readiness.mjs --tier=code",
     "readiness:predeploy": "node tools/check-mainnet-readiness.mjs --tier=predeploy",
     "readiness:mainnet": "node tools/check-mainnet-readiness.mjs --tier=production"

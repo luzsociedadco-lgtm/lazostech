@@ -1,0 +1,10 @@
+{
+  "version": 1,
+  "roster": "NUDOS-OPS-2026-08-13",
+  "account": "0xF8Cd6CA7E4ad04c5BF1b0F1E59AaB5fD0537604D",
+  "role": "incident-lead-safe-owner-604D",
+  "message": "NUDOS OPERATIONS ACCEPTANCE v1\nRoster: NUDOS-OPS-2026-08-13\nAccepted at UTC: 2026-08-14T00:37:28.508Z\nAccount: 0xF8Cd6CA7E4ad04c5BF1b0F1E59AaB5fD0537604D\nRole: incident-lead-safe-owner-604D\nProduction Safe: 0x780811229991222a77F10895371851ca0a388364\nSafe threshold: 2 of 3\nEmergency policy SHA-256: 1a13baa22781dd38d8ed2cbdf35e438ecc50f3de6b6de9095d445cfde543bb29\nIncident runbook SHA-256: 02cbadd68c3847a15ea9eb104ae9d4f0e4491b34b7596c8fb4d7bc0ad8952177\nI accept the assigned role, the two-person Safe control model, the separate minimally funded operator model, the tested alert/escalation process, and the incident duties in the referenced documents.\nI understand that the fixed-supply NUDOS token has no pause, mint, seizure, owner, or upgrade control and that stopping the frontend cannot stop direct token transfers.\nNo private key, seed, password, provider credential, personal contact channel, or personal database row is included in this acceptance.",
+  "signature": "0x3c13e82f9c287fef079eb57f9fa6ce90d9614086ca16153d073c60949e10a86667dfb4def4e58e2cfdd25455dd78920c1f379718e2188d03b67b94078364d3c51c",
+  "recovered": "0xF8Cd6CA7E4ad04c5BF1b0F1E59AaB5fD0537604D",
+  "verified": true
+}

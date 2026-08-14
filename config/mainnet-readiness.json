@@ -35,8 +35,8 @@
   "operations": {
     "monitoringConfigured": true,
     "alertsTested": true,
-    "emergencyControlPolicyApproved": false,
-    "operatorCustodyApproved": false,
+    "emergencyControlPolicyApproved": true,
+    "operatorCustodyApproved": true,
     "operatorRotationTested": true,
     "incidentRunbookApproved": false,
     "rollbackRehearsed": true
