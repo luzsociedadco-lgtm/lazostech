@@ -65,6 +65,12 @@ a {
   padding: 0;
 }
 
+.app-frame:has(.legal-site) {
+  width: 100%;
+  max-width: none;
+  padding: 0;
+}
+
 .screen-shell {
   animation: rise-in 320ms ease-out;
 }

@@ -6,8 +6,8 @@
     "recoveryTested": true
   },
   "rpc": {
-    "provider": "",
-    "dedicatedEndpointConfigured": false,
+    "provider": "Alchemy primary and Chainstack failover",
+    "dedicatedEndpointConfigured": true,
     "failoverTested": true
   },
   "token": {
@@ -33,18 +33,18 @@
     "invariantSuiteApproved": true
   },
   "operations": {
-    "monitoringConfigured": false,
+    "monitoringConfigured": true,
     "alertsTested": true,
-    "emergencyControlPolicyApproved": false,
-    "operatorCustodyApproved": false,
-    "operatorRotationTested": false,
+    "emergencyControlPolicyApproved": true,
+    "operatorCustodyApproved": true,
+    "operatorRotationTested": true,
     "incidentRunbookApproved": false,
-    "rollbackRehearsed": false
+    "rollbackRehearsed": true
   },
   "supabase": {
     "migrationHistoryVerified": true,
     "securityAdvisorsReviewed": true,
-    "backupRestoreTested": false
+    "backupRestoreTested": true
   },
   "legal": {
     "tokenAndPrivacyReviewApproved": false,

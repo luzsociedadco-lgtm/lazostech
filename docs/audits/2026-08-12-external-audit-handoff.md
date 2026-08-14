@@ -8,15 +8,21 @@ report.
 
 ## Candidate release
 
-- Repository worktree: `C:\Users\INICIO\lazos-dapp\NUDOS`
-- Current branch: `shipaton/unimarket`
-- Observed HEAD: `3c94e14aab2483d24f3be2094dcc84ee94f7f3f7`
-- Frozen audit commit: **PENDING**
-- Worktree state at preparation: **DIRTY (64 porcelain entries)**
+- Repository: `luzsociedadco-lgtm/lazostech`
+- Release branch: `agent/nudos-pre-mainnet-gates`
+- Frozen audit code/review commit:
+  `9bfd866d1947acd6f8147ce3d886353bc7dc9eee`
+- Local release-evidence head verified on 2026-08-14 UTC:
+  `eb97d1802` (documentation/configuration/evidence only after the frozen code
+  commit; publication to the remote branch remains pending explicit approval).
+- Parent `origin/main`:
+  `bcceb496b38dbd0ffad1264cb7fd2a08c5e1d653`
+- Frozen validation worktree: **CLEAN**
 
-The observed HEAD is not declared to be the audit commit. Freeze only the
-intended Mainnet sources, deployment inputs, tests, and documentation after
-unrelated worktree changes are separated.
+The audit scope is the frozen commit above. Later documentation-only commits
+may link this identifier but do not change the audited code tree. Any source,
+configuration or deployment-script change requires a new frozen commit and an
+auditor-approved delta/retest.
 
 ## Required smart-contract scope
 
@@ -73,27 +79,30 @@ client-visible or committed.
 ## Evidence available to the auditor
 
 - Base Mainnet 2-of-3 Safe creation and recovery rehearsal evidence.
+- Base Sepolia 2-of-3 Safe operator rotation and atomic Diamond
+  add/replace/rollback/removal evidence.
 - 27 passing Foundry tests across 5 suites on 2026-08-12.
 - Stateful invariant and critical-flow coverage, with the limitations recorded
   in `docs/evidence/2026-08-10-foundry-coverage.md`.
 - Post-fix EIP-170 size report with all deployable contracts under the runtime
   limit; the previously oversized facet factory is now an internal library.
-- Local Diamond rollback rehearsal.
-- RPC failover and alert-rule self-tests.
+- Production RPC failover, authenticated monitoring and observed alert
+  delivery.
+- Isolated Supabase roles, schema, data and migration-history restore drill.
 - TypeScript verification and dependency audit results recorded in
   `docs/evidence/2026-08-12-local-predeploy-verification.md`.
 - Token policy and approved economic schedule documentation.
+- Four cryptographically verified operations-role acceptances and the recorded
+  41-minute-22-second Safe recovery timing gap.
+- Base Mainnet block `49942092` non-broadcast deployment dry-run for the
+  canonical Diamond and fixed-supply token scripts.
 
 ## Known limitations to report, not suppress
 
 - Overall coverage remains low: 29.75% lines, 27.66% statements, 3.90%
   branches, and 29.52% functions in the last measured report.
-- The current Base Sepolia Diamond owner is an EOA, so the pilot does not prove
-  Safe-governed operator rotation or Safe-governed rollback.
-- Production RPCs, alert delivery, Supabase restore, operations approvals,
-  legal review, Mainnet deployment, explorer verification, and Mainnet E2E are
-  incomplete.
-- The current worktree is not a clean, frozen release.
+- Operations roles are accepted, but the timed incident retest, legal review,
+  Mainnet deployment, explorer verification, and Mainnet E2E are incomplete.
 - The latest production build attempt timed out locally and is inconclusive;
   the last recorded successful build predates the new monitoring route.
 - Foundry emits existing lint/compiler warnings for unused return names,

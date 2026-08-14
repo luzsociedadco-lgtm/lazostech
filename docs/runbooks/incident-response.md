@@ -1,8 +1,9 @@
 # NUDOS incident-response runbook - draft for approval
 
-Status: operational draft. It is not approved until the named incident lead,
-Safe owners, application operator, privacy contact, and communications owner
-accept their roles and complete a tabletop exercise.
+Status: technically rehearsed operational draft. The six required scenarios
+have technical evidence, but this runbook is not approved until the named
+incident lead, Safe owners, application operator, privacy contact, and
+communications owner accept their roles, targets and decision duties.
 
 ## Severity
 

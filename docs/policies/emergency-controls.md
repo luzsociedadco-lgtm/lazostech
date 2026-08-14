@@ -1,4 +1,8 @@
-# NUDOS emergency-controls policy - draft for approval
+# NUDOS emergency-controls policy - technically rehearsed, pending approval
+
+Technical status: the Safe recovery, operator revocation, Diamond rollback,
+RPC failover, alert delivery and isolated database restore paths have been
+rehearsed. This status does not approve the policy or assign human roles.
 
 ## Current control model
 

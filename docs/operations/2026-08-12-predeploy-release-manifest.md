@@ -1,6 +1,12 @@
 # NUDOS predeploy release manifest - 2026-08-12
 
-Status: prepared, not staged, committed, pushed, or deployed.
+Status: prepared for isolated alternate-index staging; not a Mainnet deployment
+authorization.
+
+Frozen code/review commit:
+`9bfd866d1947acd6f8147ce3d886353bc7dc9eee` on
+`agent/nudos-pre-mainnet-gates`. Clean verification is recorded in
+`docs/evidence/2026-08-13-clean-pre-mainnet-release.md`.
 
 This manifest isolates the NUDOS Mainnet-predeploy and LazosTech Asset Layer
 work from unrelated changes currently present in the mixed worktree. It is the
@@ -13,7 +19,8 @@ authoritative staging scope once GitHub authentication is restored.
 - Diamond deployment-size remediation and production-readiness tests;
 - Base Mainnet Safe and recovery evidence;
 - RPC failover checks, chain-health monitor, cron, and operational runbooks;
-- audit handoff, legal checklist, emergency policy, and acceptance worksheet;
+- audit handoff/outreach, legal checklist and draft public review pages,
+  emergency policy, technical tabletop and acceptance worksheet;
 - Asset Layer migration, API, operator UI, public passport, relayer, role
   bootstrap, remote verifier, and readiness checker;
 - Supabase advisor remediation and the matching remote migration;
@@ -43,6 +50,9 @@ lazos-frontend/.env.example
 lazos-frontend/app/api/asset-layer/
 lazos-frontend/app/api/ops/
 lazos-frontend/app/components/AppAuthGate.tsx
+lazos-frontend/app/components/FooterNav.tsx
+lazos-frontend/app/globals.css
+lazos-frontend/app/legal/
 lazos-frontend/app/lib/asset-layer/
 lazos-frontend/app/lib/ops/
 lazos-frontend/app/reciclaje/lotes/
