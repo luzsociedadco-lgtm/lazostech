@@ -1,6 +1,7 @@
 # NUDOS independent security audit outreach - draft
 
-Status: **READY TO SEND AFTER THE RELEASE COMMIT IS FROZEN**.
+Status: **READY FOR FINAL RECIPIENT/BUDGET APPROVAL; REMOTE BRANCH PUSH
+PENDING**.
 
 This file prepares an audit request. It does not select a vendor, accept a
 quote, spend funds, submit a form, or represent that an audit has started.
@@ -16,7 +17,7 @@ documented Solidity/EVM and upgradeable Diamond experience:
    <https://www.trailofbits.com/services/software-assurance>
 3. Cyfrin Blockchain Audits:
    <https://www.cyfrin.io/blockchain-audits>
-4. Spearbit:
+4. Spearbit / Cantina (the official Spearbit site now redirects to Cantina):
    <https://spearbit.com/>
 
 The list is not an endorsement. Compare the named reviewers, independence,
@@ -51,7 +52,9 @@ Subject: NUDOS EIP-2535 / fixed-supply token independent audit request
 
 ## Material to attach
 
-- frozen release commit and repository/PR link;
+- frozen code commit
+  `9bfd866d1947acd6f8147ce3d886353bc7dc9eee`, release-evidence branch head,
+  and repository/PR link after the branch push is approved;
 - `docs/audits/2026-08-12-external-audit-handoff.md`;
 - architecture, tokenomics, deployment and operations documents in the frozen
   release;
